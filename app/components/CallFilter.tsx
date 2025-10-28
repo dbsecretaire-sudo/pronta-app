@@ -1,3 +1,5 @@
+import React, { useState } from 'react';
+
 export default function CallFilter({ onFilterChange }: { onFilterChange: (filter: { byName: string; byPhone: string }) => void }) {
   const [byName, setByName] = useState("");
   const [byPhone, setByPhone] = useState("");
