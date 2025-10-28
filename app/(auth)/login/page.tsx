@@ -4,26 +4,22 @@ import { useRouter } from "next/navigation";
 import { login } from "@/app/lib/auth";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null); // Ajout d'un état pour gérer les erreurs
+  const [email, setEmail] = useState("dbsecretaire@gmail.com");
+  const [password, setPassword] = useState("pronta1992");
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Tentative de connexion avec l'email :", email);
 
     try {
       const success = await login(email, password);
       if (success) {
-        console.log("Authentification réussie ! Redirection vers /dashboard...");
         router.push("/dashboard");
       } else {
-        console.log("Échec de l'authentification : identifiants incorrects.");
         setError("Identifiants incorrects");
       }
     } catch (err) {
-      console.error("Erreur lors de la connexion :", err);
       setError("Erreur lors de la connexion");
     }
   };
