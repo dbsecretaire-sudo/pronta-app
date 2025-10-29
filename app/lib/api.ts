@@ -1,3 +1,5 @@
+import { CalendarEvent } from "./types";
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL; // Remplacez par l’URL de votre backend
 
 export async function fetchCalls(filter: { byName: string; byPhone: string }) {
@@ -5,7 +7,13 @@ export async function fetchCalls(filter: { byName: string; byPhone: string }) {
   return res.json();
 }
 
-export async function fetchCalendar() {
-  const res = await fetch(`${API_URL}/api/calendar`);
+console.log("URL de l'API :", API_URL); // Ajoutez ce log pour déboguer
+
+export async function fetchCalendar(): Promise<CalendarEvent[]> {
+  const res = await fetch(`${API_URL}/calendar`);
+  if (!res.ok) {
+    console.error("Réponse de l'API :", await res.text()); // Loguez la réponse pour déboguer
+    return [];
+  }
   return res.json();
 }
