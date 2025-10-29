@@ -1,4 +1,4 @@
-const API_URL = 'https://api.pronta.corsica';
+const API_URL = process.env.API_URL;
 
 
 import Cookies from 'js-cookie';
