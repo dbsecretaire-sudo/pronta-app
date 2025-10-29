@@ -13,5 +13,3 @@ export async function fetchCalendar(): Promise<CalendarEvent[]> {
   const res = await fetch(`${API_URL}/api/calendar`);
   return res.json();
 }
-
-}
