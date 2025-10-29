@@ -12,19 +12,14 @@ export async function POST(request: Request) {
     const { rows } = await pool.query(query, [email]);
 
     if (rows.length === 0) {
-      console.log("Utilisateur non trouvé");
       return NextResponse.json({ error: 'Identifiants invalides' }, { status: 401 });
     }
 
     const user = rows[0];
-    console.log("Mot de passe hashé en base :", user.password_hash); // Log du hash en base
-    console.log("Mot de passe saisi :", password); // Log du mot de passe saisi
 
     const passwordMatch = await bcrypt.compare(password, user.password_hash);
-    console.log("Le mot de passe correspond ?", passwordMatch); // Log du résultat de la comparaison
 
     if (!passwordMatch) {
-      console.log("Mot de passe incorrect");
       return NextResponse.json({ error: 'Identifiants invalides' }, { status: 401 });
     }
 
