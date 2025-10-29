@@ -6,6 +6,6 @@ export async function fetchCalls(filter: { byName: string; byPhone: string }) {
 }
 
 export async function fetchCalendar() {
-  const res = await fetch(`${API_URL}/calendar`);
+  const res = await fetch(`${API_URL}/api/calendar`);
   return res.json();
 }
