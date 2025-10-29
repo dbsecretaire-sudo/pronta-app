@@ -9,8 +9,6 @@ export default function Login() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  console.log(process.env.NEXT_PUBLIC_API_URL);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
