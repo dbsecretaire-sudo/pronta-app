@@ -10,10 +10,8 @@ export async function fetchCalls(filter: { byName: string; byPhone: string }) {
 console.log("URL de l'API :", API_URL); // Ajoutez ce log pour déboguer
 
 export async function fetchCalendar(): Promise<CalendarEvent[]> {
-  const res = await fetch(`${API_URL}/calendar`);
-  if (!res.ok) {
-    console.error("Réponse de l'API :", await res.text()); // Loguez la réponse pour déboguer
-    return [];
-  }
+  const res = await fetch(`${API_URL}/api/calendar`);
   return res.json();
+}
+
 }
