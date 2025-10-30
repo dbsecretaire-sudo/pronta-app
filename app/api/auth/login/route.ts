@@ -8,7 +8,7 @@ export async function POST(request: Request) {
   const { email, password } = await request.json();
 
   try {
-    const query = 'SELECT * FROM users WHERE email = $1';
+    const query = 'SELECT id, email, password_hash FROM users WHERE email = $1';
     const { rows } = await pool.query(query, [email]);
 
     if (rows.length === 0) {
