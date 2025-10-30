@@ -115,7 +115,7 @@ export default function Navbar({ children }: { children: React.ReactNode }) {
           </div>
           <div className="p-4 border-t border-gray-200">
             <button
-              onClick={handleLogout}
+              onClick={logout}
               className="w-full text-left py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded px-2"
             >
               Déconnexion
