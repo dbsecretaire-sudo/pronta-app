@@ -45,7 +45,7 @@ export default function DashboardHome() {
 
         const subscribedServices = await subscribedRes.json();
         const allServices = await allServicesRes.json();
-console.log(subscribedRes, "- services : ", allServices);
+
         // Marquer les services déjà souscrits
         const servicesWithStatus = allServices.map((service: AvailableService) => ({
           ...service,
