@@ -1,8 +1,18 @@
 "use client";
-import { useRedirectIfLoggedIn } from "@/app/hook/useAuth";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { checkAuth } from "@/app/lib/auth";
 
 export default function Home() {
-  useRedirectIfLoggedIn();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (checkAuth()) {
+      router.push("/dashboard");
+    } else {
+      router.push("/login");
+    }
+  }, []);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
