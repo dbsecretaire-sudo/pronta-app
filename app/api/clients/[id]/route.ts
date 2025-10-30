@@ -47,7 +47,6 @@ export async function PUT(
   try {
     const { name, email, phone, address, company } = await request.json();
 
-    // Validation basique
     if (!name || !email) {
       return NextResponse.json(
         { error: "Le nom et l'email sont obligatoires" },
