@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { logout } from "@/app/lib/auth";
 
 export default function Navbar({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,11 +13,6 @@ export default function Navbar({ children }: { children: React.ReactNode }) {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    window.location.href = "/login";
-  };
 
   return (
     <div>
@@ -80,7 +76,7 @@ export default function Navbar({ children }: { children: React.ReactNode }) {
               Agenda
             </Link>
             <button
-              onClick={handleLogout}
+              onClick={logout}
               className="mt-auto block py-2 text-gray-600 hover:text-gray-900 text-left"
             >
               Déconnexion
