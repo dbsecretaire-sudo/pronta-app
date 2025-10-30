@@ -1,14 +1,14 @@
-// middleware.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
-  // Ignorer les fichiers statiques et les assets publics
+  // Ignorer les fichiers statiques, les assets publics et les routes API
   if (
     request.nextUrl.pathname.startsWith("/_next/static/") ||
     request.nextUrl.pathname.startsWith("/_next/image") ||
     request.nextUrl.pathname.startsWith("/favicon.ico") ||
-    request.nextUrl.pathname.startsWith("/static/")
+    request.nextUrl.pathname.startsWith("/static/") ||
+    request.nextUrl.pathname.startsWith("/api/")
   ) {
     return NextResponse.next();
   }
