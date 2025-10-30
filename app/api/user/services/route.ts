@@ -66,14 +66,14 @@ export async function POST(request: Request) {
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions); // <-- Utilise getServerSession pour la cohérence
+    const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "Non autorisé" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
+
     const userId = session.user.id;
+    console.log("User ID:", userId); // <-- Ajoute ce log
+
     const query = `
       SELECT s.id, s.name, s.description, s.route, s.icon
       FROM user_services us
@@ -81,10 +81,13 @@ export async function GET() {
       WHERE us.user_id = $1
       ORDER BY s.name
     `;
+    console.log("Requête SQL:", query); // <-- Ajoute ce log
     const { rows } = await pool.query(query, [userId]);
+    console.log("Résultat de la requête:", rows); // <-- Ajoute ce log
+
     return NextResponse.json(rows);
   } catch (error) {
-    console.error("Erreur lors de la récupération des services :", error);
+    console.error("Erreur détaillée :", error); // <-- Log complet de l'erreur
     return NextResponse.json(
       { error: "Erreur lors de la récupération des services" },
       { status: 500 }
