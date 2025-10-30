@@ -91,7 +91,8 @@ export const authOptions: import("next-auth").NextAuthOptions = {
         httpOnly: true,
         sameSite: "lax",
         path: "/",
-        secure: false,
+        secure: process.env.NODE_ENV === "production", // ✅ Doit être true en production
+        domain: process.env.NODE_ENV === "production" ? ".pronta.corsica" : undefined,
       },
     },
   },

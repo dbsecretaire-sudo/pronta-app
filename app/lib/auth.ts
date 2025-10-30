@@ -1,5 +1,3 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
 import { signIn } from "next-auth/react";
 import Cookies from 'js-cookie';
 
