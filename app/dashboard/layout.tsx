@@ -35,11 +35,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <Navbar
-      navItems={allNavItems}
-      showServicesSection={!isInService}
-      isInService={isInService}
+    navItems={allNavItems}
+    showServicesSection={!isInService}
+    isInService={isInService}
     >
-      {children}
+        {children}
     </Navbar>
   );
 }

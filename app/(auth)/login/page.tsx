@@ -5,7 +5,7 @@ import { login } from "@/app/lib/auth";
 
 export default function Login() {
   const [email, setEmail] = useState("");     // Champ vide par défaut
-const [password, setPassword] = useState(""); // Champ vide par défaut
+  const [password, setPassword] = useState(""); // Champ vide par défaut
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
@@ -33,6 +33,7 @@ const [password, setPassword] = useState(""); // Champ vide par défaut
           <label className="block text-gray-700">Email</label>
           <input
             type="email"
+            name="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="w-full p-2 border rounded"
@@ -43,6 +44,7 @@ const [password, setPassword] = useState(""); // Champ vide par défaut
           <label className="block text-gray-700">Mot de passe</label>
           <input
             type="password"
+            name="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full p-2 border rounded"

@@ -1,19 +1,11 @@
 "use client";
 import { useRouter, usePathname } from "next/navigation";
-import { checkAuth } from "@/app/lib/auth";
 import Navbar from "@/app/components/Navbar";
 import { useEffect } from "react";
 
 export default function ProntaCallsLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-
-  // Vérification d'authentification au chargement
-  useEffect(() => {
-    if (!checkAuth()) {
-      router.push("/login");
-    }
-  }, [router]);
 
   // Navigation spécifique à ProntaCalls
   const navItems = [

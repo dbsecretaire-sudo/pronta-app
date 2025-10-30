@@ -64,35 +64,32 @@ export async function POST(request: Request) {
   }
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    console.log("Session en cours");
     const session = await getServerSession(authOptions);
-    console.log("Session complète :", session); // <-- Log complet de la session
+
+    console.log("Session dans /api/user/services :", session); // ✅ Log pour le debug
 
     if (!session?.user?.id) {
+      console.log("Session non autorisée :", session); // ✅ Log pour le debug
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
     const userId = session.user.id;
-    console.log("User ID depuis la session :", userId); // <-- Vérifie que c'est bien "1"
-
     const query = `
       SELECT s.id, s.name, s.description, s.route, s.icon
       FROM user_services us
       JOIN services s ON us.service_id = s.id
-      WHERE us.user_id = $1 AND us.is_active = true
+      WHERE us.user_id = $1
       ORDER BY s.name
     `;
 
     const { rows } = await pool.query(query, [userId]);
-    console.log("Services récupérés :", rows); // <-- Log des résultats
-
     return NextResponse.json(rows);
   } catch (error) {
-    console.error("Erreur détaillée :", error); // <-- Log complet de l'erreur
+    console.error("Erreur :", error);
     return NextResponse.json(
-      { error: `Erreur lors de la récupération des services from app/api/user/services/route.ts, ${error}` },
+      { error: "Erreur lors de la récupération des services" },
       { status: 500 }
     );
   }

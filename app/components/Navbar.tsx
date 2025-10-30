@@ -1,27 +1,17 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import Cookies from 'js-cookie';
+import { useSession, signOut } from "next-auth/react"; // ✅ Importe signOut
 import { usePathname } from "next/navigation";
-
-interface NavItem {
-  name: string;
-  path: string;
-  icon?: string | React.ReactNode;
-}
 
 interface NavbarProps {
   children: React.ReactNode;
-  navItems: NavItem[];
+  navItems: Array<{ name: string; path: string; icon?: string | React.ReactNode }>;
   showLogo?: boolean;
   logoText?: string;
-  onLogout?: () => void;
   isInService?: boolean;
-  services?: Array<{
-    name: string;
-    path: string;
-    icon: string | React.ReactNode;
-  }>;
+  services?: Array<{ name: string; path: string; icon: string | React.ReactNode }>;
   showServicesSection?: boolean;
 }
 
@@ -30,29 +20,30 @@ export default function Navbar({
   navItems,
   showLogo = true,
   logoText = "Pronta",
-  showServicesSection = true,
-  onLogout = () => {
-    Cookies.remove('token');
-    window.location.href = "/login";
-  },
   isInService = false,
-  services = []
+  services = [],
+  showServicesSection = true,
 }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { data: session, status } = useSession(); // ✅ Utilise useSession
   const pathname = usePathname();
 
   useEffect(() => {
-    const token = Cookies.get('token');
-    setIsAuthenticated(!!token);
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  if (!isAuthenticated) return null;
+  // ✅ Utilise `status` pour vérifier l'authentification
+  if (status === "unauthenticated") return null;
+  if (status === "loading") return null; // Optionnel : affiche un loader
+
+  // ✅ Fonction de déconnexion avec NextAuth
+  const handleLogout = () => {
+    signOut({ callbackUrl: "/login" }); // ✅ Utilise signOut de NextAuth
+  };
 
   return (
     <div className="flex flex-col h-screen bg-gray-50">
@@ -129,7 +120,7 @@ export default function Navbar({
             )}
 
             <button
-              onClick={onLogout}
+              onClick={handleLogout}
               className="mt-auto block py-2 text-gray-600 hover:text-gray-900 text-left"
             >
               Déconnexion
@@ -190,7 +181,7 @@ export default function Navbar({
 
           <div className="p-4 border-t border-gray-200">
             <button
-              onClick={onLogout}
+              onClick={handleLogout}
               className="w-full text-left py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded px-2"
             >
               Déconnexion

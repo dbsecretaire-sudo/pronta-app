@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react"; // ✅ Ajoute useSession
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -29,40 +30,75 @@ interface AvailableService {
 }
 
 export default function DashboardHome() {
+  const { data: session, status } = useSession(); // ✅ Récupère la session
   const [services, setServices] = useState<Service[]>([]);
-    const [availableServices, setAvailableServices] = useState<AvailableService[]>([]);
+  const [availableServices, setAvailableServices] = useState<AvailableService[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
- useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [subscribedRes, allServicesRes] = await Promise.all([
-          fetch('/api/user/services'),
-          fetch('/api/services')
-        ]);
+  useEffect(() => {
+    console.log("Statut de la session :", status);
+    // Si la session est en cours de chargement, ne fais rien
+    if (status === "loading") {
+        return;
+    }
+    // Si l'utilisateur n'est pas authentifié, redirige ou affiche un message
+    if (status === "unauthenticated") {
+      setLoading(false);
+      return;
+    }
 
-        const subscribedServices = await subscribedRes.json();
-        const allServices = await allServicesRes.json();
+    // Si l'utilisateur est authentifié, récupère les données
+    if (status === "authenticated") {
+      console.log("Session valide :", session); // ✅ Log pour le debug
+      const fetchData = async () => {
+        try {
+          const [subscribedRes, allServicesRes] = await Promise.all([
+            fetch('/api/user/services', {credentials: 'include'}),
+            fetch('/api/services', {credentials: 'include'})
+          ]);
 
-        // Marquer les services déjà souscrits
-        const servicesWithStatus = allServices.map((service: AvailableService) => ({
-          ...service,
-          isSubscribed: subscribedServices.some((s: Service) => s.id === service.id)
-        }));
+          if (!subscribedRes.ok) {
+            throw new Error(`Erreur HTTP: ${subscribedRes.status}`);
+          }
 
-        setServices(subscribedServices);
-        setAvailableServices(servicesWithStatus);
-      } catch (error) {
-        console.error("Erreur:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+          if (!allServicesRes.ok) {
+            throw new Error(`Erreur HTTP: ${allServicesRes.status}`);
+          }
 
-    fetchData();
-  }, []);
+          const subscribedServices = await subscribedRes.json();
+          const allServices = await allServicesRes.json();
+
+          if (!Array.isArray(subscribedServices)) {
+            console.error("subscribedServices n'est pas un tableau :", subscribedServices);
+            setServices([]);
+            setAvailableServices(
+              allServices.map((service: AvailableService) => ({
+                ...service,
+                isSubscribed: false
+              }))
+            );
+            return;
+          }
+
+          const servicesWithStatus = allServices.map((service: AvailableService) => ({
+            ...service,
+            isSubscribed: subscribedServices.some((s: Service) => s.id === service.id)
+          }));
+
+          setServices(subscribedServices);
+          setAvailableServices(servicesWithStatus);
+        } catch (error) {
+          console.error("Erreur lors de la récupération des données:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchData();
+    }
+  }, [status]);
 
   const handleSubscribe = async (serviceId: string) => {
     try {
@@ -71,14 +107,15 @@ export default function DashboardHome() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userId: 1, serviceId }), // À remplacer par l'ID utilisateur réel
+        credentials: 'include',
+        body: JSON.stringify({ serviceId }), // À remplacer par l'ID utilisateur réel
       });
 
       if (response.ok) {
         // Rafraîchir les données
         const [subscribedRes, allServicesRes] = await Promise.all([
-          fetch('/api/user/services'),
-          fetch('/api/services')
+          fetch('/api/user/services', {credentials: 'include'}),
+          fetch('/api/services', {credentials: 'include'})
         ]);
 
         const subscribedServices = await subscribedRes.json();

@@ -2,18 +2,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import pool from '@/app/lib/db';
 
+// Typage des paramètres de la route
+interface Params {
+  id: string;
+}
+
+// DELETE /api/clients/[id]
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Params } // ✅ Typage explicite pour Next.js 16
 ) {
   try {
-    const { id } = await params;
+    const { id } = params; // ✅ Pas besoin d'attendre, params est déjà un objet
 
-    // Vérifier si le client existe et est lié à des factures
-    const checkQuery = `
-      SELECT 1 FROM invoices WHERE client_id = $1 LIMIT 1
-    `;
+    // Vérifie si le client est lié à des factures
+    const checkQuery = 'SELECT 1 FROM invoices WHERE client_id = $1 LIMIT 1';
     const checkRes = await pool.query(checkQuery, [id]);
+
     if (checkRes.rows.length > 0) {
       return NextResponse.json(
         { error: "Ce client est lié à des factures et ne peut pas être supprimé" },
@@ -21,7 +26,7 @@ export async function DELETE(
       );
     }
 
-    // Supprimer le client
+    // Supprime le client
     const deleteQuery = 'DELETE FROM clients WHERE id = $1 RETURNING *';
     const { rows } = await pool.query(deleteQuery, [id]);
 
@@ -34,6 +39,7 @@ export async function DELETE(
 
     return NextResponse.json(rows[0]);
   } catch (error) {
+    console.error("Erreur DELETE :", error);
     return NextResponse.json(
       { error: "Erreur lors de la suppression du client" },
       { status: 500 }
@@ -41,13 +47,13 @@ export async function DELETE(
   }
 }
 
-
+// PUT /api/clients/[id]
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Params } // ✅ Même typage
 ) {
   try {
-    const { id } = await params;
+    const { id } = params;
     const { name, email, phone, address, company } = await request.json();
 
     if (!name || !email) {
@@ -63,6 +69,7 @@ export async function PUT(
       WHERE id = $6
       RETURNING *
     `;
+
     const { rows } = await pool.query(query, [name, email, phone, address, company, id]);
 
     if (rows.length === 0) {
@@ -80,6 +87,8 @@ export async function PUT(
         { status: 409 }
       );
     }
+
+    console.error("Erreur PUT :", error);
     return NextResponse.json(
       { error: "Erreur lors de la mise à jour du client" },
       { status: 500 }

@@ -1,33 +1,30 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-
+import { signIn } from "next-auth/react";
 import Cookies from 'js-cookie';
 
 export async function login(email: string, password: string): Promise<boolean> {
   try {
-    const res = await fetch(`${API_URL}/api/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+    const result = await signIn("credentials", {
+      email,
+      password,
+      redirect: false,
     });
 
-    if (res.ok) {
-      const { token } = await res.json();
-      Cookies.set("token", token, { expires: 1 }); // Stocke le token dans un cookie
-      return true;
+    if (result?.error) {
+      console.error("Erreur lors de la connexion avec NextAuth:", result.error);
+      return false;
     }
-    return false;
+
+    return true;
   } catch (error) {
     console.error("Erreur lors de la connexion:", error);
     return false;
   }
 }
 
-export function checkAuth(): boolean {
-  return !!Cookies.get("token");
-}
 
 export function logout() {
-  Cookies.remove("token");
+  Cookies.remove("next-auth.session-token");
   window.location.href = "/login";
 }

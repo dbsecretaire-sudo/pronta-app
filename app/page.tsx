@@ -1,18 +1,17 @@
 "use client";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { checkAuth } from "@/app/lib/auth";
+import { useSession } from "next-auth/react";
 
 export default function Home() {
+  const { data: session, status } = useSession();
   const router = useRouter();
 
-  useEffect(() => {
-    if (checkAuth()) {
-      router.push("/dashboard");
-    } else {
+   useEffect(() => {
+    if (status === "unauthenticated") {
       router.push("/login");
     }
-  }, []);
+  }, [status]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
