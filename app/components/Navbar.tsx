@@ -4,16 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react"; // ✅ Importe signOut
 import { usePathname } from "next/navigation";
-
-interface NavbarProps {
-  children: React.ReactNode;
-  navItems: Array<{ name: string; path: string; icon?: string | React.ReactNode }>;
-  showLogo?: boolean;
-  logoText?: string;
-  isInService?: boolean;
-  services?: Array<{ name: string; path: string; icon: string | React.ReactNode }>;
-  showServicesSection?: boolean;
-}
+import { NavbarProps } from "@/app/models/NavBarProps";
 
 export default function Navbar({
   children,

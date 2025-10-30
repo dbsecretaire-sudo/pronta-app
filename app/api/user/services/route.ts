@@ -4,10 +4,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import pool from '@/app/lib/db';
 import { Session } from 'next-auth';
-
-interface SubscriptionRequest {
-  serviceId: string; // Typage du corps de la requête
-}
+import { SubscriptionRequest } from '@/app/models/SubscriptionRequest';
 
 export async function POST(request: Request) {
   try {

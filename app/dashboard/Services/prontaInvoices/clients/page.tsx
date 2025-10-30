@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import ClientList from "@/app/components/clients/ClientList";
-import { Client } from "@/app/components/models/client";
+import { Client } from "@/app/models/Client";
 
 export default function ClientsPage() {
   const [clients, setClients] = useState<Client[]>([]);

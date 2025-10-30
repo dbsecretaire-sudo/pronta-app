@@ -1,16 +1,7 @@
 // components/clients/ClientCard.tsx
 import React from "react";
 import { PencilIcon, TrashIcon, EnvelopeIcon, PhoneIcon, BuildingOfficeIcon, MapPinIcon } from "@heroicons/react/24/outline";
-import { Client } from "../models/client";
-
-interface ClientCardProps {
-  client: Client;
-  onEdit?: () => void;
-  onDelete?: () => void;
-  showActions?: boolean;
-  compact?: boolean;
-  className?: string;
-}
+import { ClientCardProps } from "@/app/models/ClientCardsProps";
 
 const ClientCard: React.FC<ClientCardProps> = ({
   client,

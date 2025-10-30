@@ -1,23 +1,13 @@
 // auth/[...nextauth]/route.ts
-import NextAuth, { User } from "next-auth";
+import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import pool from "@/app/lib/db";
 import { compare } from "bcryptjs";
-
-interface CustomUser extends User {
-  id: string;
-  email: string;
-  name: string;
-}
+import { CustomUser } from "@/app/models/CustomUser";
+import { Session as CustomSession } from "@/app/models/Session";
 
 declare module "next-auth" {
-  interface Session {
-    user: {
-      id: string;
-      email: string;
-      name: string;
-    };
-  }
+  interface Session extends CustomSession {}
 }
 
 export const authOptions: import("next-auth").NextAuthOptions = {

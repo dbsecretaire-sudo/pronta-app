@@ -1,16 +1,7 @@
 // app/api/calls/route.ts
 import { NextResponse } from 'next/server';
 import pool from '@/app/lib/db';
-
-// Définissez le type pour un appel
-interface Call {
-  id: number;
-  phone: string;
-  name: string;
-  date: Date;
-  duration: number;
-  status: string;
-}
+import { Call } from '@/app/models/Call';
 
 // Endpoint GET : Récupérer les appels (avec filtrage par nom/téléphone)
 export async function GET(request: Request) {

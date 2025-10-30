@@ -3,19 +3,9 @@ import { PencilIcon, TrashIcon, PlusIcon, MagnifyingGlassIcon } from "@heroicons
 import Table from "@/app/components/ui/Table";
 import Pagination from "@/app/components/ui/Pagination";
 import Modal from "@/app/components/ui/Modal";
-import { Client } from "@/app/components/models/client";
+import { Client } from "@/app/models/Client";
 import Link from "next/link";
-
-interface ClientListProps {
-  clients: Client[];
-  totalClients: number;
-  currentPage: number;
-  itemsPerPage: number;
-  onPageChange: (page: number) => void;
-  onSearch: (term: string) => void;
-  onDelete: (clientId: string) => void;
-  loading: boolean;
-}
+import { ClientListProps } from "@/app/models/ClientListProps";
 
 export default function ClientList({
   clients,

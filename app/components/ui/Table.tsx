@@ -1,15 +1,4 @@
-import { ReactNode } from "react";
-
-interface TableProps<T> {
-  data: T[];
-  columns: {
-    header: string;
-    accessor: keyof T;
-    render?: (value: any, row: T) => ReactNode;
-  }[];
-  actions?: (item: T) => ReactNode;
-  emptyMessage?: string;
-}
+import { TableProps } from "@/app/models/TableProps";
 
 export default function Table<T>({ data, columns, actions, emptyMessage = "Aucune donnée disponible" }: TableProps<T>) {
   return (

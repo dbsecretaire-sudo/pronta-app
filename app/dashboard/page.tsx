@@ -3,31 +3,9 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react"; // ✅ Ajoute useSession
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-
-interface Service {
-  id: string;
-  name: string;
-  description: string;
-  route: string;
-  icon: string;
-}
-
-interface Message {
-  id: number;
-  title: string;
-  content: string;
-  date: string;
-  isRead: boolean;
-}
-
-interface AvailableService {
-  id: string;
-  name: string;
-  description: string;
-  route: string;
-  icon: string;
-  isSubscribed: boolean;
-}
+import { Service } from "@/app/models/Service";
+import { AvailableService } from "@/app/models/AvailableService";
+import { Message } from "@/app/models/Message";
 
 export default function DashboardHome() {
   const { data: session, status } = useSession(); // ✅ Récupère la session

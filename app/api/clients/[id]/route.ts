@@ -1,11 +1,7 @@
 // app/api/clients/[id]/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import pool from '@/app/lib/db';
-
-// Typage des paramètres de la route
-interface Params {
-  id: string;
-}
+import { Params } from '@/app/models/Id';
 
 // DELETE /api/clients/[id]
 export async function DELETE(
