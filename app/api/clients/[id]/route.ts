@@ -42,9 +42,10 @@ export async function DELETE(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { name, email, phone, address, company } = await request.json();
 
     if (!name || !email) {
@@ -60,7 +61,7 @@ export async function PUT(
       WHERE id = $6
       RETURNING *
     `;
-    const { rows } = await pool.query(query, [name, email, phone, address, company, params.id]);
+    const { rows } = await pool.query(query, [name, email, phone, address, company, id]);
 
     if (rows.length === 0) {
       return NextResponse.json(
