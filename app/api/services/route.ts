@@ -9,7 +9,7 @@ export async function GET() {
     return NextResponse.json(rows);
   } catch (error) {
     return NextResponse.json(
-      { error: "Erreur lors de la récupération des services" },
+      { error: "Erreur lors de la récupération des services from app/api/services/route.ts" },
       { status: 500 }
     );
   }

@@ -92,7 +92,7 @@ export async function GET() {
   } catch (error) {
     console.error("Erreur détaillée :", error); // <-- Log complet de l'erreur
     return NextResponse.json(
-      { error: "Erreur lors de la récupération des services" },
+      { error: `Erreur lors de la récupération des services from app/api/user/services/route.ts, ${error}` },
       { status: 500 }
     );
   }
