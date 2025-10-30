@@ -4,6 +4,7 @@ import { signIn } from "next-auth/react";
 import Cookies from 'js-cookie';
 
 export async function login(email: string, password: string): Promise<boolean> {
+  console.log(email, password);
   try {
     const result = await signIn("credentials", {
       email,
