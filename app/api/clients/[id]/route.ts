@@ -10,10 +10,10 @@ interface Params {
 // DELETE /api/clients/[id]
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Params } // ✅ Typage explicite pour Next.js 16
+  { params }: { params: Promise<{ id:string }> } // ✅ Typage explicite pour Next.js 16
 ) {
   try {
-    const { id } = params; // ✅ Pas besoin d'attendre, params est déjà un objet
+    const { id } = await params; // ✅ Pas besoin d'attendre, params est déjà un objet
 
     // Vérifie si le client est lié à des factures
     const checkQuery = 'SELECT 1 FROM invoices WHERE client_id = $1 LIMIT 1';
