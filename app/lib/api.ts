@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { CalendarEvent } from "./types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL; // Remplacez par l’URL de votre backend
