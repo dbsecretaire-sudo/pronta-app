@@ -50,10 +50,10 @@ export async function DELETE(
 // PUT /api/clients/[id]
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Params } // ✅ Même typage
+  { params }: { params: Promise<{ id: string }> } // ✅ Utilise `Promise<{ id: string }>`
 ) {
   try {
-    const { id } = params;
+    const { id } = await params; // ✅ Utilise `await` pour obtenir la valeur de `params`
     const { name, email, phone, address, company } = await request.json();
 
     if (!name || !email) {
