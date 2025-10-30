@@ -3,13 +3,10 @@ import { useState, useEffect } from "react";
 import CallList from "@/app/components/CallList";
 import CallFilter from "@/app/components/CallFilter";
 import { fetchCalls } from "@/app/lib/api";
-import { useAuth } from '@/app/hook/useAuth';
 
 export default function Calls() {
   const [calls, setCalls] = useState([]);
   const [filter, setFilter] = useState({ byName: "", byPhone: "" });
-
-  useAuth();
 
   useEffect(() => {
     const loadCalls = async () => {

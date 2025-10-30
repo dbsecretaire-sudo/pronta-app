@@ -5,7 +5,7 @@ import { login } from "@/app/lib/auth";
 
 export default function Login() {
   const [email, setEmail] = useState("");     // Champ vide par défaut
-  const [password, setPassword] = useState(""); // Champ vide par défaut
+const [password, setPassword] = useState(""); // Champ vide par défaut
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
