@@ -98,6 +98,7 @@ export default function DashboardHome() {
   };
 
   if (loading) return <div className="p-8">Chargement...</div>;
+console.log("Services disponibles :", availableServices);
 
   return (
     <div className="p-8 max-w-7xl mx-auto">
@@ -138,7 +139,7 @@ export default function DashboardHome() {
           <h2 className="text-xl font-semibold mb-4">Services disponibles</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {availableServices
-              // .filter(s => !s.isSubscribed)
+              .filter(s => !s.isSubscribed)
               .map((service) => (
                 <div
                   key={service.id}
