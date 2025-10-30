@@ -1,5 +1,5 @@
 // app/api/clients/[id]/route.ts
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import pool from '@/app/lib/db';
 
 export async function DELETE(
@@ -41,7 +41,7 @@ export async function DELETE(
 }
 
 export async function PUT(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
