@@ -67,23 +67,25 @@ export async function POST(request: Request) {
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
+    console.log("Session complète :", session); // <-- Log complet de la session
+
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
     const userId = session.user.id;
-    console.log("User ID:", userId); // <-- Ajoute ce log
+    console.log("User ID depuis la session :", userId); // <-- Vérifie que c'est bien "1"
 
     const query = `
       SELECT s.id, s.name, s.description, s.route, s.icon
       FROM user_services us
       JOIN services s ON us.service_id = s.id
-      WHERE us.user_id = $1
+      WHERE us.user_id = $1 AND us.is_active = true
       ORDER BY s.name
     `;
-    console.log("Requête SQL:", query); // <-- Ajoute ce log
+
     const { rows } = await pool.query(query, [userId]);
-    console.log("Résultat de la requête:", rows); // <-- Ajoute ce log
+    console.log("Services récupérés :", rows); // <-- Log des résultats
 
     return NextResponse.json(rows);
   } catch (error) {
