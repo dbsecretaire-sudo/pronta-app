@@ -3,16 +3,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import pool from '@/app/lib/db';
 
 export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
+
     // Vérifier si le client existe et est lié à des factures
     const checkQuery = `
       SELECT 1 FROM invoices WHERE client_id = $1 LIMIT 1
     `;
-    const checkRes = await pool.query(checkQuery, [params.id]);
-
+    const checkRes = await pool.query(checkQuery, [id]);
     if (checkRes.rows.length > 0) {
       return NextResponse.json(
         { error: "Ce client est lié à des factures et ne peut pas être supprimé" },
@@ -22,7 +23,7 @@ export async function DELETE(
 
     // Supprimer le client
     const deleteQuery = 'DELETE FROM clients WHERE id = $1 RETURNING *';
-    const { rows } = await pool.query(deleteQuery, [params.id]);
+    const { rows } = await pool.query(deleteQuery, [id]);
 
     if (rows.length === 0) {
       return NextResponse.json(
@@ -39,6 +40,7 @@ export async function DELETE(
     );
   }
 }
+
 
 export async function PUT(
   request: NextRequest,
