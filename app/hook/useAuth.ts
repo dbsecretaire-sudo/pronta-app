@@ -24,3 +24,16 @@ export function useRedirectIfLoggedIn() {
     }
   }, []);
 }
+
+export function useRedirectBasedOnAuth() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = Cookies.get('token');
+    if (token) {
+      router.push('/dashboard');
+    } else {
+      router.push('/login');
+    }
+  }, [router]);
+}
