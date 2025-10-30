@@ -45,7 +45,7 @@ export default function DashboardHome() {
 
         const subscribedServices = await subscribedRes.json();
         const allServices = await allServicesRes.json();
-
+console.log(subscribedRes, "- services : ", allServices);
         // Marquer les services déjà souscrits
         const servicesWithStatus = allServices.map((service: AvailableService) => ({
           ...service,
@@ -98,7 +98,6 @@ export default function DashboardHome() {
   };
 
   if (loading) return <div className="p-8">Chargement...</div>;
-console.log("Services disponibles :", availableServices);
 
   return (
     <div className="p-8 max-w-7xl mx-auto">
