@@ -5,6 +5,7 @@ export type Call = {
   type: "incoming" | "outgoing";
   date: string;
   summary: string;
+  duration: number;
 };
 
 export type CalendarEvent = {

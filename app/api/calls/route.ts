@@ -6,15 +6,23 @@ import { Call } from '@/app/models/Call';
 // Endpoint GET : Récupérer les appels (avec filtrage par nom/téléphone)
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
+  const userId = searchParams.get('userId');
   const byName = searchParams.get('byName') || '';
   const byPhone = searchParams.get('byPhone') || '';
 
+  if (!userId) {
+    return NextResponse.json(
+      { error: "userId est requis" },
+      { status: 400 }
+    );
+  }
+
   try {
-    let query = 'SELECT * FROM calls WHERE 1=1';
-    const params: any[] = [];
+    let query = 'SELECT * FROM calls WHERE user_id = $1';
+    const params: any[] = [userId];
 
     if (byName) {
-      query += ' AND name ILIKE $1';
+      query += ` AND name ILIKE $${params.length + 1}`;
       params.push(`%${byName}%`);
     }
 
@@ -22,6 +30,8 @@ export async function GET(request: Request) {
       query += ` AND phone ILIKE $${params.length + 1}`;
       params.push(`%${byPhone}%`);
     }
+
+    query += ' ORDER BY date DESC LIMIT 50';
 
     const { rows } = await pool.query(query, params);
     return NextResponse.json(rows);
@@ -37,15 +47,21 @@ export async function GET(request: Request) {
 // Endpoint POST : Créer un nouvel appel
 export async function POST(request: Request) {
   try {
-    const { phone, name, duration, status } = await request.json();
+    const { userId, phone, name, type, summary, duration } = await request.json();
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: "userId est requis" },
+        { status: 400 }
+      );
+    }
 
     const query = `
-      INSERT INTO calls (phone, name, date, duration, status)
-      VALUES ($1, $2, NOW(), $3, $4)
+      INSERT INTO calls (user_id, name, phone, date, type, summary, duration)
+      VALUES ($1, $2, $3, NOW(), $4, $5, $6)
       RETURNING *
     `;
-    const values = [phone, name, duration, status];
-
+    const values = [userId, name, phone, type, summary, duration];
     const { rows } = await pool.query(query, values);
     return NextResponse.json(rows[0], { status: 201 });
   } catch (error) {
