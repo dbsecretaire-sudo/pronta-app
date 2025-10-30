@@ -29,4 +29,5 @@ export function checkAuth(): boolean {
 
 export function logout() {
   Cookies.remove("token");
+  window.location.href = "/login";
 }
