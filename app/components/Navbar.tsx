@@ -1,13 +1,13 @@
-// app/components/Navbar.tsx
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Cookies from 'js-cookie';
+import { usePathname } from "next/navigation";
 
 interface NavItem {
   name: string;
   path: string;
-  icon?: string;
+  icon?: string | React.ReactNode;
 }
 
 interface NavbarProps {
@@ -15,9 +15,14 @@ interface NavbarProps {
   navItems: NavItem[];
   showLogo?: boolean;
   logoText?: string;
-  showServicesSection?: boolean;
   onLogout?: () => void;
   isInService?: boolean;
+  services?: Array<{
+    name: string;
+    path: string;
+    icon: string | React.ReactNode;
+  }>;
+  showServicesSection?: boolean;
 }
 
 export default function Navbar({
@@ -30,11 +35,13 @@ export default function Navbar({
     Cookies.remove('token');
     window.location.href = "/login";
   },
-  isInService = false
+  isInService = false,
+  services = []
 }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     const token = Cookies.get('token');
@@ -98,12 +105,26 @@ export default function Navbar({
               </Link>
             ))}
 
-            {showServicesSection && (
+            {showServicesSection && services.length > 0 && (
               <>
                 <div className="mb-2 mt-4">
                   <h3 className="text-sm font-semibold text-gray-500 mb-2">Mes services</h3>
-                  {/* Les services seraient passés en props si nécessaires */}
                 </div>
+                {services.map((service) => (
+                  <Link
+                    key={service.path}
+                    href={service.path}
+                    className="block py-2 text-gray-600 hover:text-gray-900 border-b border-gray-200"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {typeof service.icon === 'string' ? (
+                      <span className="mr-2">{service.icon}</span>
+                    ) : (
+                      <span className="mr-2">{service.icon}</span>
+                    )}
+                    {service.name}
+                  </Link>
+                ))}
               </>
             )}
 
@@ -133,20 +154,37 @@ export default function Navbar({
               <Link
                 key={item.path}
                 href={item.path}
-                className="block py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded px-2 mb-1"
+                className={`block py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded px-2 mb-1 ${
+                  pathname === item.path ? 'bg-gray-100' : ''
+                }`}
               >
                 {item.icon && <span className="mr-2">{item.icon}</span>}
                 {item.name}
               </Link>
             ))}
 
-            {showServicesSection && (
-              <>
-                <div className="mb-4 mt-6">
-                  <h3 className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">Services</h3>
-                  {/* Les services seraient passés en props si nécessaires */}
-                </div>
-              </>
+            {showServicesSection && services.length > 0 && (
+              <div className="mb-4 mt-6">
+                <h3 className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">
+                  Mes services
+                </h3>
+                {services.map((service) => (
+                  <Link
+                    key={service.path}
+                    href={service.path}
+                    className={`block py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded px-2 mb-1 ${
+                      pathname.startsWith(service.path) ? 'bg-gray-100' : ''
+                    }`}
+                  >
+                    {typeof service.icon === 'string' ? (
+                      <span className="mr-2">{service.icon}</span>
+                    ) : (
+                      <span className="mr-2">{service.icon}</span>
+                    )}
+                    {service.name}
+                  </Link>
+                ))}
+              </div>
             )}
           </div>
 

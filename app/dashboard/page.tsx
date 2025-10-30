@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 interface Service {
-  id: number;
+  id: string;
   name: string;
   description: string;
   route: string;
@@ -19,26 +19,83 @@ interface Message {
   isRead: boolean;
 }
 
+interface AvailableService {
+  id: string;
+  name: string;
+  description: string;
+  route: string;
+  icon: string;
+  isSubscribed: boolean;
+}
+
 export default function DashboardHome() {
   const [services, setServices] = useState<Service[]>([]);
+    const [availableServices, setAvailableServices] = useState<AvailableService[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  useEffect(() => {
-    // Récupérer les services et messages en parallèle
-    Promise.all([
-      fetch('/api/user/services').then(res => res.json()),
-      fetch('/api/user/messages').then(res => res.json())
-    ]).then(([servicesData, messagesData]) => {
-      setServices(servicesData);
-      setMessages(messagesData);
-      setLoading(false);
-    }).catch(error => {
-      console.error("Erreur:", error);
-      setLoading(false);
-    });
+ useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [subscribedRes, allServicesRes] = await Promise.all([
+          fetch('/api/user/services'),
+          fetch('/api/services')
+        ]);
+
+        const subscribedServices = await subscribedRes.json();
+        const allServices = await allServicesRes.json();
+
+        // Marquer les services déjà souscrits
+        const servicesWithStatus = allServices.map((service: AvailableService) => ({
+          ...service,
+          isSubscribed: subscribedServices.some((s: Service) => s.id === service.id)
+        }));
+
+        setServices(subscribedServices);
+        setAvailableServices(servicesWithStatus);
+      } catch (error) {
+        console.error("Erreur:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
+
+  const handleSubscribe = async (serviceId: string) => {
+    try {
+      const response = await fetch('/api/user/services', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId: 1, serviceId }), // À remplacer par l'ID utilisateur réel
+      });
+
+      if (response.ok) {
+        // Rafraîchir les données
+        const [subscribedRes, allServicesRes] = await Promise.all([
+          fetch('/api/user/services'),
+          fetch('/api/services')
+        ]);
+
+        const subscribedServices = await subscribedRes.json();
+        const allServices = await allServicesRes.json();
+
+        const servicesWithStatus = allServices.map((service: AvailableService) => ({
+          ...service,
+          isSubscribed: subscribedServices.some((s: Service) => s.id === service.id)
+        }));
+
+        setServices(subscribedServices);
+        setAvailableServices(servicesWithStatus);
+      }
+    } catch (error) {
+      console.error("Erreur lors de l'abonnement:", error);
+    }
+  };
 
   if (loading) return <div className="p-8">Chargement...</div>;
 
@@ -46,37 +103,63 @@ export default function DashboardHome() {
     <div className="p-8 max-w-7xl mx-auto">
       <h1 className="text-2xl font-bold mb-8">Tableau de bord</h1>
 
-      {/* Section Services souscrits */}
+      {/* Services souscrits */}
       <section className="mb-10">
         <h2 className="text-xl font-semibold mb-4">Mes services</h2>
         {services.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {services.map((service) => (
-              <div
+              <Link
                 key={service.id}
-                className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-all cursor-pointer border border-gray-100"
-                onClick={() => router.push(service.route)}
+                href={service.route}
+                className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-all border border-gray-100"
               >
                 <div className="flex items-center mb-3">
-                  <span className="material-icons text-blue-600 mr-3">{service.icon}</span>
+                  <span className="text-2xl mr-3">{service.icon}</span>
                   <h3 className="text-lg font-medium">{service.name}</h3>
                 </div>
-                <p className="text-gray-600">{service.description}</p>
-                <div className="mt-4 text-sm text-blue-600 font-medium">
+                <p className="text-gray-600 mb-4">{service.description}</p>
+                <div className="text-sm text-blue-600 font-medium">
                   Accéder →
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         ) : (
-          <div className="bg-blue-50 p-6 rounded-lg">
-            <p className="text-gray-700">Vous n'avez souscrit à aucun service pour le moment.</p>
-            <Link href="/pricing" className="text-blue-600 hover:underline mt-2 inline-block">
-              Découvrir nos offres →
-            </Link>
+          <div className="bg-blue-50 p-6 rounded-lg mb-6">
+            <p className="text-gray-700 mb-4">Vous n'avez souscrit à aucun service pour le moment.</p>
           </div>
         )}
       </section>
+
+      {/* Services disponibles */}
+      {availableServices.some(s => !s.isSubscribed) && (
+        <section className="mb-10">
+          <h2 className="text-xl font-semibold mb-4">Services disponibles</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {availableServices
+              .filter(s => !s.isSubscribed)
+              .map((service) => (
+                <div
+                  key={service.id}
+                  className="bg-white p-6 rounded-lg shadow-md border border-gray-100"
+                >
+                  <div className="flex items-center mb-3">
+                    <span className="text-2xl mr-3">{service.icon}</span>
+                    <h3 className="text-lg font-medium">{service.name}</h3>
+                  </div>
+                  <p className="text-gray-600 mb-4">{service.description}</p>
+                  <button
+                    onClick={() => handleSubscribe(service.id)}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                  >
+                    Souscrire
+                  </button>
+                </div>
+              ))}
+          </div>
+        </section>
+      )}
 
       {/* Section Messagerie intégrée */}
       <section className="mb-10 bg-white rounded-lg shadow-md p-6">
