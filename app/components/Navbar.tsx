@@ -2,12 +2,17 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { logout } from "@/app/lib/auth";
+import Cookies from 'js-cookie';
 
 export default function Navbar({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
+    const token = Cookies.get('token');
+    setIsAuthenticated(!!token);
+
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     handleResize();
     window.addEventListener("resize", handleResize);
@@ -17,7 +22,7 @@ export default function Navbar({ children }: { children: React.ReactNode }) {
   return (
     <div>
       {/* Menu mobile (burger) */}
-      {isMobile && (
+      {isAuthenticated && isMobile && (
         <nav className="bg-white shadow-sm w-full z-30">
           <div className="w-full px-4"> {/* Remplace max-w-7xl mx-auto par w-full */}
             <div className="flex justify-between h-16 items-center">
@@ -45,7 +50,7 @@ export default function Navbar({ children }: { children: React.ReactNode }) {
       )}
 
       {/* Menu mobile déroulant + overlay semi-transparent */}
-      {isMobile && isOpen && (
+      {isAuthenticated && isMobile && isOpen && (
         <>
           <div
             className="fixed inset-0"
@@ -86,7 +91,7 @@ export default function Navbar({ children }: { children: React.ReactNode }) {
       )}
 
       {/* Menu latéral desktop */}
-      {!isMobile && (
+      {isAuthenticated && !isMobile && (
         <div className="w-64 bg-white shadow-md flex flex-col h-screen fixed left-0 top-0 z-20">
           <div className="p-4 border-b border-gray-200">
             <Link href="/dashboard" className="text-xl font-bold text-gray-900">
