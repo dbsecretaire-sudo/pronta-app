@@ -91,7 +91,7 @@ export const authOptions: import("next-auth").NextAuthOptions = {
         httpOnly: true,
         sameSite: "lax",
         path: "/",
-        secure: true,
+        secure: false,
       },
     },
   },
