@@ -89,7 +89,7 @@ export default function Navbar({
       {isMobile && isOpen && !isInService && (
         <>
           <div
-            className="fixed inset-0 bg-black bg-opacity-30 z-30"
+            className="fixed inset-0"
             onClick={() => setIsOpen(false)}
           />
           <div className="fixed inset-y-0 left-0 z-40 w-64 bg-white shadow-lg p-4">
