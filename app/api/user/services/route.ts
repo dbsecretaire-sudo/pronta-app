@@ -66,6 +66,7 @@ export async function POST(request: Request) {
 
 export async function GET() {
   try {
+    console.log("Session en cours");
     const session = await getServerSession(authOptions);
     console.log("Session complète :", session); // <-- Log complet de la session
 
