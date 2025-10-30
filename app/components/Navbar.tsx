@@ -23,15 +23,12 @@ export default function Navbar({ children }: { children: React.ReactNode }) {
       {/* Menu mobile (burger) */}
       {isMobile && (
         <nav className="bg-white shadow-sm w-full z-30">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="w-full px-4"> {/* Remplace max-w-7xl mx-auto par w-full */}
             <div className="flex justify-between h-16 items-center">
               <Link href="/dashboard" className="flex-shrink-0 flex items-center">
                 <span className="text-xl font-bold text-gray-900">Pronta Calls</span>
               </Link>
-              <button
-                onClick={() => setIsOpen(!isOpen)}
-                className="text-gray-600 hover:text-gray-900 focus:outline-none"
-              >
+              <button onClick={() => setIsOpen(!isOpen)} className="text-gray-600 hover:text-gray-900 focus:outline-none">
                 <svg
                   className="w-6 h-6"
                   fill="none"
@@ -54,9 +51,8 @@ export default function Navbar({ children }: { children: React.ReactNode }) {
       {/* Menu mobile déroulant + overlay semi-transparent */}
       {isMobile && isOpen && (
         <>
-          {/* Overlay semi-transparent (noir à 30% d'opacité) */}
           <div
-            className="fixed inset-0 bg-black bg-opacity-30 z-30"
+            className="fixed inset-0"
             onClick={() => setIsOpen(false)}
           />
 
