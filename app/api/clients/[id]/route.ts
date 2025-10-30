@@ -61,7 +61,6 @@ export async function PUT(
       WHERE id = $6
       RETURNING *
     `;
-
     const { rows } = await pool.query(query, [name, email, phone, address, company, params.id]);
 
     if (rows.length === 0) {
