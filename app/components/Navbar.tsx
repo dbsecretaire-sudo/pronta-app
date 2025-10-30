@@ -19,7 +19,7 @@ export default function Navbar({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="flex h-screen">
+    <div>
       {/* Menu mobile (burger) */}
       {isMobile && (
         <nav className="bg-white shadow-sm w-full z-30">

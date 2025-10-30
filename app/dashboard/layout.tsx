@@ -13,8 +13,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <Navbar children={undefined} />
-      <main className="p-6">{children}</main>
+      <div className="flex h-screen">
+        <Navbar children={undefined} />
+        <main className="p-6">{children}</main>
+      </div>
     </div>
   );
 }
