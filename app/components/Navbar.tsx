@@ -55,7 +55,7 @@ export default function Navbar({
   if (!isAuthenticated) return null;
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex flex-col h-screen bg-gray-50">
       {/* Menu mobile */}
       {isMobile && (
         <nav className="bg-white shadow-sm w-full z-30">
