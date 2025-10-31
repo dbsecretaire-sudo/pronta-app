@@ -1,5 +1,5 @@
 import { forwardRef } from "react";
-import { FormInputProps } from "@/app/models/Props";
+import { FormInputProps } from "@/models/Props";
 
 const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
   ({ label, error, helperText, className, ...props }, ref) => {
