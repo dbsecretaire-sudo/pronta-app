@@ -1,4 +1,4 @@
-import { TableProps } from "@/app/models/Props";
+import { TableProps } from "@/models/Props";
 
 export default function Table<T>({ data, columns, actions, emptyMessage = "Aucune donnée disponible" }: TableProps<T>) {
   return (
