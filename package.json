@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "node server/api-server.ts",
+    "dev": "next dev & node api-server.ts",
     "build": "next build",
-    "start": "NODE_ENV=production node server/api-server.ts",
+    "start": "next start & node api-server.ts",
     "lint": "eslint"
   },
   "dependencies": {
