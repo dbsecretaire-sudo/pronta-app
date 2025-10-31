@@ -1,5 +1,7 @@
 export type { 
     Service,
-    CreateService
+    CreateService,
+    AvailableService,
+    SubscriptionRequest
 } from "./type";
 export { ServiceModel } from "./model";

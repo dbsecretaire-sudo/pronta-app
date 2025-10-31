@@ -4,21 +4,21 @@ import next from 'next';
 import cors from 'cors'; // Exemple de middleware
 
 // Import des routeurs
-import authRouter from "@/app/api/auth/route";
-import calendarRouter from "@/app/api/calendar/route";
-import calendarIdRouter from "@/app/api/calendar/route";
-import callsRouter from "@/app/api/calls/route";
-import callsIdRouter from "@/app/api/calls/route";
-import clientsRouter from "@/app/api/clients/route";
-import clientsIdRouter from "@/app/api/clients/route";
-import invoicesRouter from "@/app/api/invoices/route";
-import invoicesIdRouter from "@/app/api/invoices/route";
-import serviceRouter from '@/app/api/services/route';
-import serviceIdRouter from '@/app/api/services/[id]/route';
-import userRouter from '@/app/api/user/route';
-import userIdRouter from '@/app/api/user/[id]/route';
-import userServiceRouter from '@/app/api/UserServices/route';
-import userServiceIdRouter from '@/app/api/UserServices/[userId]/route';
+import authRouter from "./app/api/auth/route";
+import calendarRouter from "./app/api/calendar/route";
+import calendarIdRouter from "./app/api/calendar/route";
+import callsRouter from "./app/api/calls/route";
+import callsIdRouter from "./app/api/calls/route";
+import clientsRouter from "./app/api/clients/route";
+import clientsIdRouter from "./app/api/clients/route";
+import invoicesRouter from "./app/api/invoices/route";
+import invoicesIdRouter from "./app/api/invoices/route";
+import serviceRouter from './app/api/services/route';
+import serviceIdRouter from './app/api/services/[id]/route';
+import userRouter from './app/api/user/route';
+import userIdRouter from './app/api/user/[id]/route';
+import userServiceRouter from './app/api/UserServices/route';
+import userServiceIdRouter from './app/api/UserServices/[userId]/route';
 
 const dev = process.env.NODE_ENV !== 'production';
 const nextApp = next({ dev });

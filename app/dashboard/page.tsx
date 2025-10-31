@@ -3,7 +3,8 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react"; // ✅ Ajoute useSession
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Service, AvailableService } from "@/app/types/Service";
+import { Service, AvailableService } from "@/Types/Services/index";
+import { UserService } from "@/Types/UserServices/index";
 import { Message } from "@/Types/Components/Message/Message";
 
 export default function DashboardHome() {
@@ -77,7 +78,7 @@ export default function DashboardHome() {
     }
   }, [status]);
 
-  const handleSubscribe = async (serviceId: string) => {
+  const handleSubscribe = async (serviceId: number) => {
     try {
       const response = await fetch('/api/user/services', {
         method: 'POST',
