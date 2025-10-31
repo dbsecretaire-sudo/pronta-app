@@ -1,4 +1,4 @@
-import { PaginationProps } from "@/app/models/Props";
+import { PaginationProps } from "@/models/Props";
 
 export default function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) {
   return (
