@@ -1,32 +1,11 @@
-// app/api/auth/login/route.ts
-import { NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import pool from '@/app/lib/db';
+import { Request, Response } from "express";
+import { loginController } from './controller';
 
-export async function POST(request: Request) {
-  const { email, password } = await request.json();
-
+export const login = async (req: Request, res: Response) => {
   try {
-    const query = 'SELECT id, email, password_hash FROM users WHERE email = $1';
-    const { rows } = await pool.query(query, [email]);
-
-    if (rows.length === 0) {
-      return NextResponse.json({ error: 'Identifiants invalides' }, { status: 401 });
-    }
-
-    const user = rows[0];
-
-    const passwordMatch = await bcrypt.compare(password, user.password_hash);
-
-    if (!passwordMatch) {
-      return NextResponse.json({ error: 'Identifiants invalides' }, { status: 401 });
-    }
-
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET || 'votre_cle_secrete', { expiresIn: '1h' });
-    return NextResponse.json({ token });
-  } catch (err) {
-    console.error("Erreur serveur :", err);
-    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
+    const result = await loginController(req.body); // Passe req.body au lieu de req
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(401).json({ error: error instanceof Error ? error.message : "Login failed" });
   }
-}
+};

@@ -1,0 +1,1 @@
+export type { Client, CreateClient, ClientFilter } from "@/Types/Clients/index";

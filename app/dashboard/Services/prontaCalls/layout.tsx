@@ -1,6 +1,6 @@
 "use client";
 import { useRouter, usePathname } from "next/navigation";
-import Navbar from "@/components/Navbar";
+import Navbar from "@/Types/Components/NavBar/index";
 import { useEffect } from "react";
 
 export default function ProntaCallsLayout({ children }: { children: React.ReactNode }) {
@@ -44,7 +44,6 @@ export default function ProntaCallsLayout({ children }: { children: React.ReactN
         </div>
       </nav>
 
-      {/* Utilisation du Navbar partagé avec configuration spécifique */}
       <Navbar
         navItems={navItems}
         showLogo={false}  // On masque le logo car on a déjà la barre de retour

@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Invoice } from "@/models/Invoice";
+import { Invoice } from "@/Types/Invoices/index";
 
 export default function ProntaInvoicesDashboard() {
   const [stats, setStats] = useState({
@@ -82,7 +82,7 @@ export default function ProntaInvoicesDashboard() {
             <tbody className="bg-white divide-y divide-gray-200">
               {recentInvoices.map((invoice) => (
                 <tr key={invoice.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">{invoice.clientName}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{invoice.client_name}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{invoice.amount}€</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
@@ -96,7 +96,7 @@ export default function ProntaInvoicesDashboard() {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {new Date(invoice.dueDate).toLocaleDateString()}
+                    {new Date(invoice.due_date).toLocaleDateString()}
                   </td>
                 </tr>
               ))}

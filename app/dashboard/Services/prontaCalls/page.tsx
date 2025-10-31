@@ -3,11 +3,10 @@
 
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import CallStats from "@/components/CallStats";
-import CallFilter from "@/components/CallFilter";
-import CallList from "@/components/CallList";
-import { Call } from "@/models/Call";
-import { CallFilter as CallFilterInterface } from "@/models/Call";
+import CallStats from "@/Types/Components/Calls/CallStats";
+import CallList from "@/Types/Components/Calls/CallList";
+import CallFilter from '@/Types/Components/Calls/CallFilter';
+import { Call, CallFilter as CallFilterType } from "@/Types/Calls/index";
 
 export default function ProntaCallsDashboard() {
   const { data: session } = useSession();
@@ -17,7 +16,11 @@ export default function ProntaCallsDashboard() {
     missedToday: 0,
     answerRate: 0,
   });
-  const [filter, setFilter] = useState<CallFilterInterface>({ byName: "", byPhone: "" });
+  const [filter, setFilter] = useState<CallFilterType>({
+    userId: 0,          // Valeur initiale (sera mise à jour plus tard)
+    byName: "",
+    byPhone: "",
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -37,7 +40,9 @@ export default function ProntaCallsDashboard() {
 
         // Calcul des statistiques
         const today = new Date().toISOString().split('T')[0];
-        const todayCalls = data.filter((call: Call) => call.date.startsWith(today));
+        const todayCalls = data.filter((call: Call) =>
+          call.date.toISOString().startsWith(today)
+        );
         const missedToday = todayCalls.filter((call: Call) => call.type === 'missed').length;
 
         setStats({
@@ -53,10 +58,14 @@ export default function ProntaCallsDashboard() {
         setLoading(false);
       }
     };
-
+    
     loadCalls();
   }, [session, filter]);
-
+  
+  const handleFilterChange = (newFilters: CallFilterType) => {
+    setFilter(newFilters);
+  };
+  
   if (loading) {
     return (
       <div className="p-8 max-w-7xl mx-auto">
@@ -71,7 +80,10 @@ export default function ProntaCallsDashboard() {
       <CallStats {...stats} />
       <div className="mt-8 bg-white p-6 rounded-lg shadow">
         <h2 className="text-xl font-semibold mb-4">Appels récents</h2>
-        <CallFilter onFilterChange={setFilter} />
+        <CallFilter
+          userId={filter.userId}
+          onFilterChange={handleFilterChange}
+        />
         <CallList calls={calls} />
       </div>
     </div>

@@ -1,24 +1,34 @@
-// app/api/invoices/route.ts
-import { NextResponse } from 'next/server';
-import pool from '@/app/lib/db';
+import { Router } from "express";
+import {
+  getInvoicesByUserId,
+  getInvoiceById,
+  getInvoicesByClient,
+  filterInvoices,
+  createInvoice,
+  addInvoiceItem,
+  updateInvoice,
+  updateInvoiceStatus,
+  deleteInvoice,
+  deleteInvoiceItem,
+} from "./controller";
+import itemRouter from "./[id]/items/route";
 
-export async function GET() {
-  try {
-    const userId = 1; // À remplacer par l'ID de l'utilisateur connecté
+const router = Router();
 
-    const query = `
-      SELECT i.id, i.client_name as "clientName", i.amount, i.status, i.due_date as "dueDate"
-      FROM invoices i
-      WHERE i.user_id = $1
-      ORDER BY i.due_date DESC
-    `;
+// Routes pour /api/invoices
+router.get("/", getInvoicesByUserId);
+router.get("/client", getInvoicesByClient);
+router.get("/filter", filterInvoices);
+router.post("/", createInvoice);
+router.post("/:invoiceId/items", addInvoiceItem);
 
-    const { rows } = await pool.query(query, [userId]);
-    return NextResponse.json(rows);
-  } catch (error) {
-    return NextResponse.json(
-      { error: "Erreur lors de la récupération des factures" },
-      { status: 500 }
-    );
-  }
-}
+// Routes dynamiques
+router.get("/:id", getInvoiceById);
+router.put("/:id", updateInvoice);
+router.patch("/:id/status", updateInvoiceStatus);
+router.delete("/:id", deleteInvoice);
+
+// Routes pour les items de facture
+router.use("/:invoiceId/items", itemRouter);
+
+export default router;

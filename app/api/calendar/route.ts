@@ -1,10 +1,21 @@
-import { NextResponse } from 'next/server';
+import { Router } from "express";
+import {
+  getEventsByUserId,
+  getEventById,
+  getEventsInRange,
+  createEvent,
+  updateEvent,
+  deleteEvent,
+} from "./controller";
 
-export async function GET() {
-  // Exemple : Retournez des données statiques pour le build
-  const events = [
-    { title: "Rendez-vous 1", start: new Date(2025, 9, 29, 10, 0), end: new Date(2025, 9, 29, 11, 0) },
-    { title: "Réunion", start: new Date(2025, 9, 30, 14, 0), end: new Date(2025, 9, 30, 15, 30) },
-  ];
-  return NextResponse.json(events);
-}
+const router = Router();
+
+// Routes pour /api/calendar
+router.get("/", getEventsByUserId);
+router.get("/range", getEventsInRange);
+router.get("/:id", getEventById);
+router.post("/", createEvent);
+router.put("/:id", updateEvent);
+router.delete("/:id", deleteEvent);
+
+export default router;

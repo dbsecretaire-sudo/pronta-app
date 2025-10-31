@@ -1,6 +1,6 @@
 "use client";
 import { usePathname } from "next/navigation";
-import Navbar from "@/components/Navbar";
+import Navbar from "@/Types/Components/NavBar/index";
 
 export default function ProntaInvoicesLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();

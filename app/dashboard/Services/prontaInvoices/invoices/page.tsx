@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Invoice } from "@/models/Invoice";
+import { Invoice } from "@/Types/Invoices/index";
 
 export default function InvoicesList() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -52,7 +52,7 @@ export default function InvoicesList() {
           <tbody className="bg-white divide-y divide-gray-200">
             {invoices.map((invoice) => (
               <tr key={invoice.id}>
-                <td className="px-6 py-4 whitespace-nowrap">{invoice.clientName}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{invoice.client_name}</td>
                 <td className="px-6 py-4 whitespace-nowrap">FACT-{invoice.id}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{invoice.amount}€</td>
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -67,7 +67,7 @@ export default function InvoicesList() {
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  {new Date(invoice.dueDate).toLocaleDateString()}
+                  {new Date(invoice.due_date).toLocaleDateString()}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <Link href={`/dashboard/Services/prontaInvoices/invoices/${invoice.id}`} className="text-blue-600 hover:text-blue-900 mr-2">
