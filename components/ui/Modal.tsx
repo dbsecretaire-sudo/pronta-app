@@ -1,4 +1,4 @@
-import { ModalProps } from "@/app/models/Props";
+import { ModalProps } from "@/models/Props";
 
 export default function Modal({ isOpen, onClose, title, children, footer }: ModalProps) {
   if (!isOpen) return null;
