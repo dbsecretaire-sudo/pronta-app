@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Invoice } from "@/app/models/Invoice";
+import { Invoice } from "@/models/Invoice";
 
 export default function InvoicesList() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);

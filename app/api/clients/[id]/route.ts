@@ -1,7 +1,7 @@
 // app/api/clients/[id]/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import pool from '@/app/lib/db';
-import { Params } from '@/app/models/Id';
+import { Params } from '@/models/PropsAdditionnals';
 
 // DELETE /api/clients/[id]
 export async function DELETE(

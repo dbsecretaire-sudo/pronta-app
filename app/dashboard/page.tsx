@@ -3,9 +3,8 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react"; // ✅ Ajoute useSession
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Service } from "@/app/models/Service";
-import { AvailableService } from "@/app/models/AvailableService";
-import { Message } from "@/app/models/Message";
+import { Service, AvailableService } from "@/models/Service";
+import { Message } from "@/models/Message";
 
 export default function DashboardHome() {
   const { data: session, status } = useSession(); // ✅ Récupère la session

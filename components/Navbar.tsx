@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react"; // ✅ Importe signOut
 import { usePathname } from "next/navigation";
-import { NavbarProps } from "@/app/models/NavBarProps";
+import { NavbarProps } from "@/models/Props";
 
 export default function Navbar({
   children,

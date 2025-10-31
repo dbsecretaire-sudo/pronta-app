@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import FormInput from "@/app/components/ui/FormInput";
-import { ClientFormData, emptyClient } from "@/app/models/ClientFormData";
-import { ClientFormProps } from "@/app/models/ClientFormProps";
+import FormInput from "@/components/ui/FormInput";
+import { ClientFormData, emptyClient } from "@/models/Client";
+import { ClientFormProps } from "@/models/Client";
 
 export default function ClientForm({ client = emptyClient, onSubmit, isLoading = false }: ClientFormProps) {
   const [formData, setFormData] = useState<ClientFormData>(client);

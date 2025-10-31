@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
-import ClientForm from "@/app/components/clients/ClientForm";
-import { emptyClient } from "@/app/models/ClientFormData";
+import ClientForm from "@/components/clients/ClientForm";
+import { emptyClient } from "@/models/Client";
 
 export default function NewClientPage() {
   const router = useRouter();

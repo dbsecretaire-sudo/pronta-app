@@ -1,4 +1,4 @@
-import { Call } from "@/app/models/Call";
+import { Call } from "@/models/Call";
 
 const formatDuration = (duration?: number) => {
   if (!duration) return "--";

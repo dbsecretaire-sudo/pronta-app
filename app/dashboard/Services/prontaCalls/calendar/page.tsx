@@ -1,5 +1,5 @@
 // app/dashboard/calendar/page.tsx
-import Calendar from "@/app/components/Calendar";
+import Calendar from "@/components/Calendar";
 import { fetchCalendar } from "@/app/lib/api"; // Assurez-vous que cette fonction existe
 
 export default async function CalendarPage() {

@@ -1,7 +1,7 @@
 // components/clients/ClientCard.tsx
 import React from "react";
 import { PencilIcon, TrashIcon, EnvelopeIcon, PhoneIcon, BuildingOfficeIcon, MapPinIcon } from "@heroicons/react/24/outline";
-import { ClientCardProps } from "@/app/models/ClientCardsProps";
+import { ClientCardProps } from "@/models/Client";
 
 const ClientCard: React.FC<ClientCardProps> = ({
   client,

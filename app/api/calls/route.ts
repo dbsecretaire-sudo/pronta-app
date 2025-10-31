@@ -1,7 +1,7 @@
 // app/api/calls/route.ts
 import { NextResponse } from 'next/server';
 import pool from '@/app/lib/db';
-import { Call } from '@/app/models/Call';
+import { Call } from '@/models/Call';
 
 // Endpoint GET : Récupérer les appels (avec filtrage par nom/téléphone)
 export async function GET(request: Request) {

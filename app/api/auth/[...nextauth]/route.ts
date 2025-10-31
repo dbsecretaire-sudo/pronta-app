@@ -3,8 +3,7 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import pool from "@/app/lib/db";
 import { compare } from "bcryptjs";
-import { CustomUser } from "@/app/models/CustomUser";
-import { Session as CustomSession } from "@/app/models/Session";
+import { CustomUser, Session as CustomSession } from "@/models/PropsAdditionnals";
 
 declare module "next-auth" {
   interface Session extends CustomSession {}

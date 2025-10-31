@@ -1,8 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import ClientForm from "@/app/components/clients/ClientForm";
-import { ClientFormData } from "@/app/models/ClientFormData";
+import ClientForm from "@/components/clients/ClientForm";
+import { ClientFormData } from "@/models/Client";
 
 export default function EditClientPage() {
   const [client, setClient] = useState<ClientFormData | null>(null);

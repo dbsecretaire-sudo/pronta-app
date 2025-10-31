@@ -2,7 +2,7 @@
 import { Calendar as BigCalendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { CalendarEvent } from "../lib/types";
+import { CalendarEvent } from "@/models/CalendarEvent";
 
 const localizer = momentLocalizer(moment);
 

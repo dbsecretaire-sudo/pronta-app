@@ -1,5 +1,5 @@
 // components/CallStats.tsx
-import { CallStatsProps } from "../models/CallStatsProps";
+import { CallStatsProps } from "@/models/Call";
 
 export default function CallStats({ totalToday, missedToday, answerRate }: CallStatsProps) {
   return (

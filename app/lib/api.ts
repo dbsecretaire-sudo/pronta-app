@@ -1,4 +1,4 @@
-import { CalendarEvent } from "./types";
+import { CalendarEvent } from "@/models/CalendarEvent";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL; // Remplacez par l’URL de votre backend
 

@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { SetStateAction, useState } from "react";
 import { PencilIcon, TrashIcon, PlusIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import Table from "@/app/components/ui/Table";
-import Pagination from "@/app/components/ui/Pagination";
-import Modal from "@/app/components/ui/Modal";
-import { Client } from "@/app/models/Client";
+import Table from "@/components/ui/Table";
+import Pagination from "@/components/ui/Pagination";
+import Modal from "@/components/ui/Modal";
+import { Client } from "@/models/Client";
 import Link from "next/link";
-import { ClientListProps } from "@/app/models/ClientListProps";
+import { ClientListProps } from "@/models/Client";
 
 export default function ClientList({
   clients,
