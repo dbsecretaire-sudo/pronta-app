@@ -46,10 +46,10 @@ export async function POST(
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { userId: string } } // Pas besoin de `Promise`, Next.js le résout automatiquement
+  { params }: { params: Promise<{ userId: string }> } // Pas besoin de `Promise`, Next.js le résout automatiquement
 ) {
   try {
-    const { userId } = params; // `params` est déjà résolu
+    const { userId } = await params; // `params` est déjà résolu
     const { serviceId } = await request.json();
     const id = Number(userId);
 
