@@ -9,6 +9,12 @@ declare module "next-auth" {
       email: string;
       name?: string;
     } & DefaultSession["user"];
+    auth?: {  // Ajoute auth en optionnel
+      userId: string;
+      email: string;
+      name?: string;
+      // Ajoute d'autres champs si nécessaire
+    };
   }
 }
 
