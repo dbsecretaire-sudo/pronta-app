@@ -63,9 +63,9 @@ export default function DashboardHome() {
         }
       };
 
-      fetchData();
-    } else {
-      setLoading(false);
+    //   fetchData();
+    // } else {
+    //   setLoading(false);
     }
    }, [status, session]);
 
