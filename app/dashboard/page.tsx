@@ -87,8 +87,8 @@ export default function DashboardHome() {
           ...service,
           isSubscribed: subscribedServices.some((s: Service) => s.id === service.id)
         }));
-
         setServices(subscribedServices);
+        console.log(services);
         setAvailableServices(servicesWithStatus);
       }
     } catch (error) {
