@@ -1,4 +1,4 @@
-import pool from "@/lib/db";
+import pool from "@/app/lib/db";
 import { User, CreateUser, UpdateUser, UserFilter } from "./type";
 
 export class UserModel {

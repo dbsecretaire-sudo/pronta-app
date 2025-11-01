@@ -31,7 +31,7 @@ export default function ClientsPage() {
     fetchClients();
   }, [currentPage, searchTerm]);
 
-  const handleDelete = async (clientId: string) => {
+  const handleDelete = async (clientId: number) => {
     try {
       const res = await fetch(`/api/clients/${clientId}`, {
         method: "DELETE",

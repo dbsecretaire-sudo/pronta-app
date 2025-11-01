@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import { useState } from "react";
 import { PencilIcon, TrashIcon, PlusIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";

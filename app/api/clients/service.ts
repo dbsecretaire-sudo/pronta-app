@@ -1,5 +1,4 @@
-import { ClientModel } from "@/app/Types/Clients/index";
-import { Client, CreateClient, ClientFilter } from "./types";
+import { ClientModel, Client, CreateClient, ClientFilter } from "./types";
 import { validateClient } from "./utils";
 
 export class ClientService {

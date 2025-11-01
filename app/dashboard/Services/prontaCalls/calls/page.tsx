@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import CallList from "@/app/Types/Components/Calls/CallList";
 import CallFilter from "@/app/Types/Components/Calls/CallFilter";
-import { fetchCalls } from "@/lib/api";
+import { fetchCalls } from "@/app/lib/api";
 import { CallFilter as CallFilterType } from "@/app/Types/Calls/index";
 
 export default function Calls() {

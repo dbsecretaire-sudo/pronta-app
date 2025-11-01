@@ -1,7 +1,7 @@
 // app/api/invoices/controller.ts
 import { InvoiceService } from './service';
 import { CreateInvoiceItem, UpdateInvoiceStatus, InvoiceStatus } from './types';
-import pool from '@/lib/db';
+import pool from '@/app/lib/db';
 
 const invoiceService = new InvoiceService();
 

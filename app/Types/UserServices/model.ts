@@ -1,5 +1,5 @@
 import { UserService, AssignServiceToUser, UserServiceWithDetails, UpdateUserServicePermissions } from "./type";
-import pool from "@/lib/db";
+import pool from "@/app/lib/db";
 
 export class UserServiceModel {
     constructor(public data:UserService) {}

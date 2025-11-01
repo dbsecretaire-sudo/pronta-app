@@ -1,5 +1,5 @@
 import { Call, CallFilter } from "./type";
-import pool from "@/lib/db";
+import pool from "@/app/lib/db";
 
 export class CallModel {
     constructor(public data: Call) {}

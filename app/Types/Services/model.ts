@@ -1,5 +1,5 @@
 import { Service } from "./type";
-import pool from "@/lib/db";
+import pool from "@/app/lib/db";
 
 export class ServiceModel {
     constructor(public data:Service) {}

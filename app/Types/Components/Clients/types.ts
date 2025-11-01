@@ -37,6 +37,6 @@ export interface ClientListProps {
   itemsPerPage: number;
   onPageChange: (page: number) => void;
   onSearch: (term: string) => void;
-  onDelete: (id: string) => void;
+  onDelete: (id: number) => void;
   loading?: boolean;
 }

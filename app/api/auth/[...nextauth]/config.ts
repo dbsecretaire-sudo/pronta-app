@@ -2,7 +2,7 @@ import { NextAuthOptions } from "next-auth";
 import type { Session } from "next-auth";
 import type { JWT as NextAuthJWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
-import pool from "@/lib/db";
+import pool from "@/app/lib/db";
 import { compare } from "bcryptjs";
 
 const providers = [

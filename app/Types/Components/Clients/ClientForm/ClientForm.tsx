@@ -1,7 +1,8 @@
+"use client";
 import { useState, useEffect } from "react";
 import { emptyClient } from "@/app/Types/Clients/index";
-import FormInput from "@/app/Types/Components/FormInput/FormInput"; // ✅ Corrigé : chemin vers FormInput
-import { ClientFormData, ClientFormProps, validateClientForm } from "@/app/Types/Components/Clients/index"; // ✅ Import depuis types.ts
+import FormInput from "@/app/Types/Components/FormInput/FormInput";
+import { ClientFormData, ClientFormProps, validateClientForm } from "@/app/Types/Components/Clients/index";
 
 export default function ClientForm({
   client = emptyClient,
@@ -37,10 +38,10 @@ export default function ClientForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { isValid, errors: newErrors } = validateClientForm(formData); // ✅ Utilise validateClientForm
+    const { isValid, errors: newErrors } = validateClientForm(formData);
     setErrors(newErrors);
     if (isValid) {
-      await onSubmit(formData);
+      await onSubmit(formData); // Appelle la fonction passée en prop
     }
   };
 

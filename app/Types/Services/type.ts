@@ -8,12 +8,7 @@ export interface Service {
 
 export type CreateService = Omit<Service, "id">;
 
-export interface AvailableService {
-  id: number;
-  name: string;
-  description: string;
-  route: string;
-  icon: string;
+export interface AvailableService extends Service {
   isSubscribed: boolean;
 }
 
