@@ -29,6 +29,8 @@ export async function fetchCalls(filter: CallFilter) {
 }
 
 export async function fetchCalendar(): Promise<CalendarEvent[]> {
-  const res = await fetch(`${API_URL}/api/calendar`);
+
+  const url = `${API_URL}/api/calendar`;
+  const res = await fetch(url);
   return res.json();
 }
