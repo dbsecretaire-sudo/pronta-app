@@ -16,16 +16,8 @@ export default function DashboardHome() {
   const router = useRouter();
 
   useEffect(() => {
-    if (status === "loading") {
-        return;
-    }
-    if (status === "unauthenticated") {
-      setLoading(false);
-      return;
-    }
-
-    console.log(status);
-
+    if (status === "loading") { return; }
+    if (status === "unauthenticated") { setLoading(false);  return; }
     if (status === "authenticated") {
       const fetchData = async () => {
         try {
@@ -34,19 +26,13 @@ export default function DashboardHome() {
             fetch('/api/services', {credentials: 'include'})
           ]);
 
-          if (!subscribedRes.ok) {
-            throw new Error(`Erreur HTTP: ${subscribedRes.status}`);
-          }
-
-          if (!allServicesRes.ok) {
-            throw new Error(`Erreur HTTP: ${allServicesRes.status}`);
-          }
+          if (!subscribedRes.ok) { throw new Error(`Erreur HTTP: ${subscribedRes.status}`);}
+          if (!allServicesRes.ok) { throw new Error(`Erreur HTTP: ${allServicesRes.status}`); }
 
           const subscribedServices = await subscribedRes.json();
           const allServices = await allServicesRes.json();
 
           if (!Array.isArray(subscribedServices)) {
-            console.error("subscribedServices n'est pas un tableau :", subscribedServices);
             setServices([]);
             setAvailableServices(
               allServices.map((service: AvailableService) => ({
@@ -72,8 +58,10 @@ export default function DashboardHome() {
       };
 
       fetchData();
+    } else {
+      setLoading(false);
     }
-   }, [status]);
+   }, [status, session]);
 
   const handleSubscribe = async (serviceId: number) => {
     try {
