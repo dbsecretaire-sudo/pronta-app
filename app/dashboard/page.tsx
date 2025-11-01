@@ -19,27 +19,20 @@ export default function DashboardHome() {
     if (status === "loading") { return; }
     if (status === "unauthenticated") { setLoading(false);  return; }
     if (status === "authenticated") {
-      console.log(session);
-      
-      if (!session?.user?.id) {
-        console.error("ID utilisateur manquant dans la session");
-        setLoading(false);
-        return;
-      }
-
       const fetchData = async () => {
         try {
+          console.log("Hello");
           const [subscribedRes, allServicesRes] = await Promise.all([
             fetch(`/api/UserServices/${session.user.id}`, {credentials: 'include'}),
             fetch('/api/services', {credentials: 'include'})
           ]);
-
+console.log("Hello1");
           if (!subscribedRes.ok) { throw new Error(`Erreur HTTP: ${subscribedRes.status}`);}
           if (!allServicesRes.ok) { throw new Error(`Erreur HTTP: ${allServicesRes.status}`); }
 
           const subscribedServices = await subscribedRes.json();
           const allServices = await allServicesRes.json();
-
+console.log("Hello2");
           if (!Array.isArray(subscribedServices)) {
             setServices([]);
             setAvailableServices(
@@ -50,14 +43,16 @@ export default function DashboardHome() {
             );
             return;
           }
-
+console.log("Hello3");
           const servicesWithStatus = allServices.map((service: AvailableService) => ({
             ...service,
             isSubscribed: subscribedServices.some((s: Service) => s.id === service.id)
           }));
-
+console.log("Hello4");
           setServices(subscribedServices);
+          console.log("Hello5");
           setAvailableServices(servicesWithStatus);
+          console.log("Hello6");
         } catch (error) {
           console.error("Erreur lors de la récupération des données:", error);
         } finally {
