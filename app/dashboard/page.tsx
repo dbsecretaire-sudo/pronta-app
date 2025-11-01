@@ -107,7 +107,7 @@ export default function DashboardHome() {
         <h2 className="text-xl font-semibold mb-4">Mes services</h2>
         {services.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* {services.map((service) => (
+            {services.map((service) => (
               <Link
                 key={service.id}
                 href={service.route}
@@ -122,7 +122,7 @@ export default function DashboardHome() {
                   Accéder →
                 </div>
               </Link>
-            ))} */}
+            ))}
           </div>
         ) : (
           <div className="bg-blue-50 p-6 rounded-lg mb-6">
@@ -132,7 +132,7 @@ export default function DashboardHome() {
       </section>
 
       {/* Services disponibles */}
-      {/* {availableServices.some(s => !s.isSubscribed) && (
+      {availableServices.some(s => !s.isSubscribed) && (
         <section className="mb-10">
           <h2 className="text-xl font-semibold mb-4">Services disponibles</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -149,7 +149,7 @@ export default function DashboardHome() {
                   </div>
                   <p className="text-gray-600 mb-4">{service.description}</p>
                   <button
-                    onClick={() => handleSubscribe(service.id)}
+                    // onClick={() => handleSubscribe(service.id)}
                     className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
                   >
                     Souscrire
@@ -158,7 +158,7 @@ export default function DashboardHome() {
               ))}
           </div>
         </section>
-      )} */}
+      )}
 
       {/* Section Messagerie intégrée */}
       <section className="mb-10 bg-white rounded-lg shadow-md p-6">
@@ -169,7 +169,7 @@ export default function DashboardHome() {
           </span>
         </div>
 
-        {/* {messages.length > 0 ? (
+        {messages.length > 0 ? (
           <div className="divide-y divide-gray-200">
             {messages.slice(0, 3).map((message) => (
               <div
@@ -194,7 +194,7 @@ export default function DashboardHome() {
           </div>
         ) : (
           <p className="text-gray-500 italic">Aucun message pour le moment.</p>
-        )} */}
+        )}
       </section>
 
       {/* Section Mon Compte (résumé) */}
