@@ -19,6 +19,12 @@ export default function DashboardHome() {
     if (status === "loading") { return; }
     if (status === "unauthenticated") { setLoading(false);  return; }
     if (status === "authenticated") {
+      if (!session?.user?.id) {
+        console.error("ID utilisateur manquant dans la session");
+        setLoading(false);
+        return;
+      }
+
       const fetchData = async () => {
         try {
           const [subscribedRes, allServicesRes] = await Promise.all([
