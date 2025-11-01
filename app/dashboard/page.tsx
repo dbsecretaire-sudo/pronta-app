@@ -19,6 +19,8 @@ export default function DashboardHome() {
     if (status === "loading") { return; }
     if (status === "unauthenticated") { setLoading(false);  return; }
     if (status === "authenticated") {
+      console.log(session);
+      
       if (!session?.user?.id) {
         console.error("ID utilisateur manquant dans la session");
         setLoading(false);
@@ -63,7 +65,7 @@ export default function DashboardHome() {
         }
       };
 
-    //   fetchData();
+      fetchData();
     // } else {
     //   setLoading(false);
     }
