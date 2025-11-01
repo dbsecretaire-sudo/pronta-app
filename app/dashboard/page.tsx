@@ -24,6 +24,8 @@ export default function DashboardHome() {
       return;
     }
 
+    console.log(status);
+
   //   if (status === "authenticated") {
   //     const fetchData = async () => {
   //       try {
