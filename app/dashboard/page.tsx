@@ -136,7 +136,7 @@ export default function DashboardHome() {
         <section className="mb-10">
           <h2 className="text-xl font-semibold mb-4">Services disponibles</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {availableServices
+            {/* {availableServices
               .filter(s => !s.isSubscribed)
               .map((service) => (
                 <div
@@ -149,13 +149,13 @@ export default function DashboardHome() {
                   </div>
                   <p className="text-gray-600 mb-4">{service.description}</p>
                   <button
-                    // onClick={() => handleSubscribe(service.id)}
+                    onClick={() => handleSubscribe(service.id)}
                     className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
                   >
                     Souscrire
                   </button>
                 </div>
-              ))}
+              ))} */}
           </div>
         </section>
       )}
