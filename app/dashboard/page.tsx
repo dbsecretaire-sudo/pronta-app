@@ -19,10 +19,10 @@ export default function DashboardHome() {
     if (status === "loading") {
         return;
     }
-  //   if (status === "unauthenticated") {
-  //     setLoading(false);
-  //     return;
-  //   }
+    if (status === "unauthenticated") {
+      setLoading(false);
+      return;
+    }
 
   //   if (status === "authenticated") {
   //     const fetchData = async () => {
