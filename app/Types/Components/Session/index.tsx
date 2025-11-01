@@ -1,1 +1,1 @@
-export type { Session, CustomUser } from "./Session";
+export type { CustomUser } from "./Session";

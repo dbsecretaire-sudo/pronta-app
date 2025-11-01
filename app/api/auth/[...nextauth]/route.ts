@@ -3,11 +3,7 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import pool from "@/app/lib/db";
 import { compare } from "bcryptjs";
-import { CustomUser, Session as CustomSession } from "@/app/Types/Components/Session/index";
-
-declare module "next-auth" {
-  interface Session extends CustomSession {}
-}
+import { CustomUser} from "@/app/Types/Components/Session/index";
 
 export const authOptions: import("next-auth").NextAuthOptions = {
   providers: [
@@ -56,22 +52,26 @@ export const authOptions: import("next-auth").NextAuthOptions = {
   ],
   callbacks: {
     async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-      }
-      return token;
+        if (user) token.id = user.id;
+        return token;
     },
     async session({ session, token }) {
-      if (token.id) {
+        if (token.id) {
         session.user = {
-          id: token.id as string,
-          email: token.email as string,
-          name: token.name as string,
+            id: token.id as string,
+            email: token.email as string,
+            name: token.name as string,
         };
-      }
-      return session;
+
+        session.auth = {
+            userId: token.id as string,
+            email: token.email as string,
+            name: token.name as string,
+        };
+        }
+        return session;
     },
-  },
+    },
   secret: process.env.NEXTAUTH_SECRET,
   cookies: {
     sessionToken: {

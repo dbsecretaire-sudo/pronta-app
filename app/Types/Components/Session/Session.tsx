@@ -1,16 +1,34 @@
 import { User } from "@/app/Types/Users/index";
+import { DefaultSession, DefaultUser } from "next-auth";
+import { JWT } from "next-auth/jwt";
 
-export interface Session {
-  user: {
+declare module "next-auth" {
+  interface User {
     id: string;
     email: string;
-    name: string;
-  };
-  auth?: {  // ✅ Optionnel
-    userId: string;
+    name?: string;
+  }
+
+  interface Session {
+    user: {
+      id: string;
+      email: string;
+      name?: string;
+    } & DefaultSession["user"];
+    auth?: {
+      userId: string;
+      email: string;
+      name?: string;
+    };
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    id: string;
     email: string;
-    name: string;
-  };
+    name?: string;
+  }
 }
 
 export interface CustomUser extends Omit<User, 'id' | "password_hash" | "role" | "payment_method" | "created_at" | "subsciption_plan" | "subscription_end_date" > {
