@@ -31,6 +31,7 @@ export default function DashboardHome() {
           if (!allServicesRes.ok) { throw new Error(`Erreur HTTP: ${allServicesRes.status}`); }
           const subscribedServicesData = await subscribedRes.json();
           const subscribedServices = subscribedServicesData.map((subscription: any) => subscription.service);
+          console.log(subscribedServicesData);
           const allServices = await allServicesRes.json();
 
           if (!Array.isArray(subscribedServices)) {
@@ -49,7 +50,7 @@ export default function DashboardHome() {
             isSubscribed: subscribedServices.some((s: Service) => s.id === service.id)
           }));
 
-          setServices(subscribedServices);
+          setServices(subscribedServicesData);
           setAvailableServices(servicesWithStatus);
           
         } catch (error) {
@@ -91,8 +92,6 @@ export default function DashboardHome() {
         }));
         setServices(subscribedServices);
         setAvailableServices(servicesWithStatus);
-        console.log("Services abonnés :", subscribedServices);
-console.log("Services disponibles (avec statut) :", servicesWithStatus);
       }
     } catch (error) {
       console.error("Erreur lors de l'abonnement:", error);
