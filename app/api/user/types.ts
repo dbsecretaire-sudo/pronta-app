@@ -6,5 +6,5 @@ export type {
     CreateUser, 
     UpdateUser, 
     UserFilter 
-} from "@/app/src/Types/Users/index";
-export { UserModel } from "@/app/src/Types/Users/model";
+} from "@/src/Types/Users/index";
+export { UserModel } from "@/src/Types/Users/model";

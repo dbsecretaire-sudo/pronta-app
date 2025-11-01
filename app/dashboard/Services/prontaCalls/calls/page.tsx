@@ -1,9 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
-import CallList from "@/app/src/Components/Calls/CallList";
-import CallFilter from "@/app/src/Components/Calls/CallFilter";
-import { fetchCalls } from "@/app/src/lib/api";
-import { CallFilter as CallFilterType } from "@/app/src/Types/Calls/index";
+import { CallList, CallFilter } from "@/src/Components/index";
+import { fetchCalls } from "@/src/lib/api";
+import { CallFilter as CallFilterType } from "@/src/Types/Calls/index";
 
 export default function Calls() {
   const [calls, setCalls] = useState([]);

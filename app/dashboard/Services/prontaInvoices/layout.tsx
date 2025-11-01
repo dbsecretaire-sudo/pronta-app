@@ -1,6 +1,6 @@
 "use client";
 import { usePathname } from "next/navigation";
-import Navbar from "@/app/src/Components/NavBar/index";
+import { NavBar } from "@/src/Components/index";
 
 export default function ProntaInvoicesLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -37,7 +37,7 @@ export default function ProntaInvoicesLayout({ children }: { children: React.Rea
       </nav>
 
       {/* Navbar partagé */}
-      <Navbar
+      <NavBar
         navItems={navItems}
         showLogo={false}
         isInService={true}
@@ -46,7 +46,7 @@ export default function ProntaInvoicesLayout({ children }: { children: React.Rea
         <div className="p-6 bg-gray-50 min-h-screen">
           {children}
         </div>
-      </Navbar>
+      </NavBar>
     </>
   );
 }

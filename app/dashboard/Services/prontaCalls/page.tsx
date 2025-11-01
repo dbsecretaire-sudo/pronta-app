@@ -1,76 +1,13 @@
 // app/dashboard/Services/prontaCalls/page.tsx
 "use client";
-
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
-import CallStats from "@/app/src/Components/Calls/CallStats";
-import CallList from "@/app/src/Components/Calls/CallList";
-import CallFilter from '@/app/src/Components/Calls/CallFilter';
-import { Call, CallFilter as CallFilterType } from "@/app/src/Types/Calls/index";
+import { CallStats, CallList, CallFilter } from "@/src/Components/index";
+import { useCalls } from "@/src/Hook/useCalls";
 
 export default function ProntaCallsDashboard() {
   const { data: session } = useSession();
-  const [calls, setCalls] = useState<Call[]>([]);
-  const [stats, setStats] = useState({
-    totalToday: 0,
-    missedToday: 0,
-    answerRate: 0,
-  });
-  const [filter, setFilter] = useState<CallFilterType>({
-    userId: 0,          // Valeur initiale (sera mise à jour plus tard)
-    byName: "",
-    byPhone: "",
-  });
-  const [loading, setLoading] = useState(true);
+  const { calls, stats, loading, filter, handleFilterChange } = useCalls(session?.user?.id);
 
-  useEffect(() => {
-    const loadCalls = async () => {
-      if (!session?.user?.id) return;
-      try {
-        setLoading(true);
-        const response = await fetch(
-          `/api/calls?userId=${session.user.id}&byName=${filter.byName}&byPhone=${filter.byPhone}`
-        );
-        if (!response.ok) {
-          throw new Error("Erreur lors de la récupération des appels");
-        }
-        const data: Call[] = await response.json();
-
-        // Convertir chaque `call.date` en objet Date
-        const callsWithDateObjects = data.map((call) => ({
-          ...call,
-          date: new Date(call.date),
-        }));
-
-        setCalls(callsWithDateObjects);
-
-        // Calcul des statistiques
-        const today = new Date().toISOString().split('T')[0];
-        const todayCalls = callsWithDateObjects.filter((call) =>
-          call.date.toISOString().startsWith(today)
-        );
-        const missedToday = todayCalls.filter((call) => call.type === 'missed').length;
-        setStats({
-          totalToday: todayCalls.length,
-          missedToday: missedToday,
-          answerRate: todayCalls.length > 0
-            ? Math.round(((todayCalls.length - missedToday) / todayCalls.length) * 100)
-            : 0,
-        });
-      } catch (error) {
-        console.error("Erreur lors du chargement des appels:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadCalls();
-  }, [session, filter]);
-  
-  const handleFilterChange = (newFilters: CallFilterType) => {
-    setFilter(newFilters);
-  };
-  
   if (loading) {
     return (
       <div className="p-8 max-w-7xl mx-auto">

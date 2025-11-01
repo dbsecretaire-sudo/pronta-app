@@ -1,8 +1,8 @@
 // app/dashboard/page.tsx
 "use client";
 import { useSession } from "next-auth/react";
-import { useServices } from '@/app/src/Hook/useServices';
-import { ServiceCard, MessageList, AccountSummary } from '@/app/src/Modules/Dashboard/index';
+import { useServices } from '@/src/Hook/useServices';
+import { ServiceCard, MessageList, AccountSummary } from '@/src/Modules/index';
 
 export default function DashboardHome() {
   const { data: session, status } = useSession();

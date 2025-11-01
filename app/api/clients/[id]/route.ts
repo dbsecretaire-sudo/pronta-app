@@ -1,6 +1,6 @@
 // app/api/clients/[id]/route.ts
 import { NextResponse } from 'next/server';
-import pool from '@/app/src/lib/db';
+import pool from '@/src/lib/db';
 
 // DELETE /api/clients/[id]
 export async function DELETE(

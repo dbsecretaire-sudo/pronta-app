@@ -1,6 +1,6 @@
 "use client";
 import { useRouter, usePathname } from "next/navigation";
-import Navbar from "@/app/src/Components/NavBar/index";
+import { NavBar } from "@/src/Components/index";
 import { useEffect } from "react";
 
 export default function ProntaCallsLayout({ children }: { children: React.ReactNode }) {
@@ -44,7 +44,7 @@ export default function ProntaCallsLayout({ children }: { children: React.ReactN
         </div>
       </nav>
 
-      <Navbar
+      <NavBar
         navItems={navItems}
         showLogo={false}  // On masque le logo car on a déjà la barre de retour
         isInService={true}  // Indique qu'on est dans un service spécifique
@@ -54,7 +54,7 @@ export default function ProntaCallsLayout({ children }: { children: React.ReactN
         <div className="p-6 bg-gray-50 min-h-screen">
           {children}
         </div>
-      </Navbar>
+      </NavBar>
     </>
   );
 }

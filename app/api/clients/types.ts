@@ -2,6 +2,6 @@ export type {
     Client, 
     CreateClient, 
     ClientFilter
-} from "@/app/src/Types/Clients/index";
+} from "@/src/Types/Clients/index";
 
-export { ClientModel } from "@/app/src/Types/Clients/model";
+export { ClientModel } from "@/src/Types/Clients/model";

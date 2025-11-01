@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { login } from "@/app/src/lib/auth";
+import { login } from "@/src/lib/auth";
 
 export default function Login() {
   const [email, setEmail] = useState("");     // Champ vide par défaut

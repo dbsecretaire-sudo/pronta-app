@@ -1,9 +1,9 @@
 // auth/[...nextauth]/route.ts
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import pool from "@/app/src/lib/db";
+import pool from "@/src/lib/db";
 import { compare } from "bcryptjs";
-import { CustomUser} from "@/app/src/Components/Session/index";
+import { CustomUser} from "@/src/Components/index";
 
 export const authOptions: import("next-auth").NextAuthOptions = {
   providers: [

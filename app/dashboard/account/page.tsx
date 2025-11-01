@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { Tab } from '@headlessui/react';
-import Navbar from "@/app/src/Components/NavBar/index";
+import { NavBar } from "@/src/Components/index";
 
 export default function AccountPage() {
   const [activeTab, setActiveTab] = useState('profile');
@@ -58,7 +58,7 @@ export default function AccountPage() {
   ];
 
   return (
-    <Navbar
+    <NavBar
       navItems={navItems}
       showLogo={true}
       isInService={false}
@@ -242,6 +242,6 @@ export default function AccountPage() {
           </div>
         )}
       </div>
-    </Navbar>
+    </NavBar>
   );
 }

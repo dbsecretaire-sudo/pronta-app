@@ -1,7 +1,7 @@
 // app/dashboard/layout.tsx
 "use client";
 import { usePathname } from "next/navigation";
-import Navbar from "@/app/src/Components/NavBar/index";
+import { NavBar } from "@/src/Components/index";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -34,12 +34,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <Navbar
+    <NavBar
       navItems={allNavItems}
       showServicesSection={!isInService}
       isInService={isInService}
     >
         {children}
-    </Navbar>
+    </NavBar>
   );
 }

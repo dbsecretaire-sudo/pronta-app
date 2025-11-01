@@ -1,10 +1,8 @@
 // app/dashboard/Services/prontaInvoices/page.tsx
 "use client";
 import { useSession } from "next-auth/react";
-import InvoicesStats from "@/app/src/Components/Invoices/InvoicesStats";
-import InvoicesList from "@/app/src/Components/Invoices/InvoicesList";
-import InvoicesFilter from "@/app/src/Components/Invoices/InvoicesFilter";
-import { useInvoices } from "@/app/src/Hook/useInvoices";
+import { InvoicesStats, InvoicesList, InvoicesFilter } from "@/src/Components/index";
+import { useInvoices } from "@/src/Hook/useInvoices";
 
 export default function ProntaInvoicesDashboard() {
   const { data: session } = useSession();
