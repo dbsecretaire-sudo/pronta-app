@@ -132,11 +132,11 @@ export default function DashboardHome() {
       </section>
 
       {/* Services disponibles */}
-      {availableServices.some(s => !s.isSubscribed) && (
+      {/* {availableServices.some(s => !s.isSubscribed) && (
         <section className="mb-10">
           <h2 className="text-xl font-semibold mb-4">Services disponibles</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* {availableServices
+            {availableServices
               .filter(s => !s.isSubscribed)
               .map((service) => (
                 <div
@@ -155,10 +155,10 @@ export default function DashboardHome() {
                     Souscrire
                   </button>
                 </div>
-              ))} */}
+              ))}
           </div>
         </section>
-      )}
+      )} */}
 
       {/* Section Messagerie intégrée */}
       <section className="mb-10 bg-white rounded-lg shadow-md p-6">
