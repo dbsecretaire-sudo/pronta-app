@@ -25,7 +25,6 @@ export default function DashboardHome() {
             fetch(`/api/UserServices/${session.user.id}`, {credentials: 'include'}),
             fetch('/api/services', {credentials: 'include'})
           ]);
-          console.log("subscribedRes, allServicesRes: ", subscribedRes, allServicesRes);
 
           if (!subscribedRes.ok) { throw new Error(`Erreur HTTP: ${subscribedRes.status}`);}
           if (!allServicesRes.ok) { throw new Error(`Erreur HTTP: ${allServicesRes.status}`); }
@@ -99,6 +98,7 @@ export default function DashboardHome() {
 
   if (loading) return <div className="p-8">Chargement...</div>;
 console.log(services);
+console.log(availableServices);
   return (
     <div className="p-8 max-w-7xl mx-auto">
       <h1 className="text-2xl font-bold mb-8">Tableau de bord</h1>
