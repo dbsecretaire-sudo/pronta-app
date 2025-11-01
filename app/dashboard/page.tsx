@@ -28,8 +28,8 @@ export default function DashboardHome() {
 
           if (!subscribedRes.ok) { throw new Error(`Erreur HTTP: ${subscribedRes.status}`);}
           if (!allServicesRes.ok) { throw new Error(`Erreur HTTP: ${allServicesRes.status}`); }
-          const subscribedServices = await subscribedRes.json();
-          // const subscribedServices = subscribedServicesData.map((subscription: any) => subscription.service);
+          const subscribedServicesData = await subscribedRes.json();
+          const subscribedServices = subscribedServicesData.map((subscription: any) => subscription.service);
           const allServices = await allServicesRes.json();
 
           if (!Array.isArray(subscribedServices)) {
@@ -84,11 +84,11 @@ export default function DashboardHome() {
         const subscribedServicesData = await subscribedRes.json();
         const allServices = await allServicesRes.json();
 
-const subscribedServices = subscribedServicesData.map((subscription: any) => subscription.service);
+        const subscribedServices = subscribedServicesData.map((subscription: any) => subscription.service);
 
         const servicesWithStatus = allServices.map((service: AvailableService) => ({
           ...service,
-          isSubscribed: !subscribedServices.some((s: Service) => s.id === service.id)
+          isSubscribed: subscribedServices.some((s: Service) => s.id === service.id)
         }));
         setServices(subscribedServices);
         setAvailableServices(servicesWithStatus);
