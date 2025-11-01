@@ -15,10 +15,10 @@ export default function DashboardHome() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  // useEffect(() => {
-  //   if (status === "loading") {
-  //       return;
-  //   }
+  useEffect(() => {
+    if (status === "loading") {
+        return;
+    }
   //   if (status === "unauthenticated") {
   //     setLoading(false);
   //     return;
@@ -71,7 +71,7 @@ export default function DashboardHome() {
 
   //     fetchData();
   //   }
-  // }, [status]);
+   }, [status]);
 
   const handleSubscribe = async (serviceId: number) => {
     try {
