@@ -16,7 +16,7 @@ export default function ProntaInvoicesDashboard() {
     statusCounts: { draft: 0, sent: 0, paid: 0, overdue: 0 } as Record<InvoiceStatus, number>,
   });
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<InvoiceFilter>({ userId: 0 });
+  const [filter, setFilter] = useState<InvoiceFilter>({ userId: undefined });
 
   useEffect(() => {
     const loadInvoices = async () => {
