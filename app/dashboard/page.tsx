@@ -97,7 +97,7 @@ export default function DashboardHome() {
   };
 
   if (loading) return <div className="p-8">Chargement...</div>;
-services.map((service) => console.log(service)); //services souscrits
+services.map((service) => console.log("service souscrit: ", service.description)); //services souscrits
 console.log(availableServices); //services disponibles
   return (
     <div className="p-8 max-w-7xl mx-auto">
