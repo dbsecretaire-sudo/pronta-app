@@ -99,8 +99,7 @@ export default function DashboardHome() {
   };
 
   if (loading) return <div className="p-8">Chargement...</div>;
-services.map((service) => console.log("service souscrit: ", service.description)); //services souscrits
-console.log(availableServices); //services disponibles
+
   return (
     <div className="p-8 max-w-7xl mx-auto">
       <h1 className="text-2xl font-bold mb-8">Tableau de bord</h1>
@@ -108,7 +107,7 @@ console.log(availableServices); //services disponibles
       {/* Services souscrits */}
       <section className="mb-10">
         <h2 className="text-xl font-semibold mb-4">Mes services</h2>
-        {/* {services.length > 0 ? (
+        {services.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {services.map((service) => (
               <Link
@@ -131,7 +130,7 @@ console.log(availableServices); //services disponibles
           <div className="bg-blue-50 p-6 rounded-lg mb-6">
             <p className="text-gray-700 mb-4">Vous n'avez souscrit à aucun service pour le moment.</p>
           </div>
-        )} */}
+        )}
       </section>
 
       {/* Services disponibles */}
