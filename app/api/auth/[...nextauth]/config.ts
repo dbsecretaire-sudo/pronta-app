@@ -54,7 +54,7 @@ const callbacks = {
   async session({ session, token }: { session: Session; token: NextAuthJWT }): Promise<Session> {
     if (token.id) {
       session.user = {
-        id: token.id,
+        id: token.id as string,
         email: token.email as string,
         name: token.name as string,
       };
