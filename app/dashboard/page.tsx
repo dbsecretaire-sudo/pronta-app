@@ -45,7 +45,7 @@ export default function DashboardHome() {
 
           const servicesWithStatus = allServices.map((service: AvailableService) => ({
             ...service,
-            isSubscribed: subscribedServices.some((s: Service) => s.id === service.id)
+            isSubscribed: subscribedServices.some((s: Service) => s.id !== service.id)
           }));
 
           setServices(subscribedServices);
@@ -86,7 +86,7 @@ export default function DashboardHome() {
 
         const servicesWithStatus = allServices.map((service: AvailableService) => ({
           ...service,
-          isSubscribed: subscribedServices.some((s: Service) => s.id === service.id)
+          isSubscribed: !subscribedServices.some((s: Service) => s.id === service.id)
         }));
         setServices(subscribedServices);
         setAvailableServices(servicesWithStatus);
