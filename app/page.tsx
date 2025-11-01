@@ -7,18 +7,11 @@ export default function Home() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  useEffect(() => {
+   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login");
-    } else if (status === "authenticated") {
-      // Redirige vers une page protégée si authentifié
-      router.push("/dashboard");
     }
-  }, [status, router]);
-
-  if (status === "loading") {
-    return <div>Chargement...</div>;
-  }
+  }, [status]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
