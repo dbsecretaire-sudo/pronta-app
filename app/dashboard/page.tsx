@@ -10,6 +10,11 @@ export default function DashboardHome() {
 
   if (loading) return <div className="p-8">Chargement...</div>;
 
+  const userServicesMap = new Map<number, any>();
+  availableServices.forEach((s) => {
+    if (s.userService) userServicesMap.set(s.id, s.userService);
+  });
+
   return (
     <div className="p-8 max-w-7xl mx-auto">
       <h1 className="text-2xl font-bold mb-8">Tableau de bord</h1>
@@ -24,6 +29,7 @@ export default function DashboardHome() {
                 service={service}
                 isSubscribed
                 onDeactivate={handleDeactivate}
+                userService={userServicesMap.get(service.id)}
               />
             ))}
           </div>
@@ -45,7 +51,6 @@ export default function DashboardHome() {
                   key={service.id}
                   service={service}
                   onSubscribe={handleSubscribe}
-                  onDeactivate={handleDeactivate}
                 />
               ))}
           </div>

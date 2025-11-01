@@ -1,12 +1,54 @@
 // src/Hook/useServices.ts
 import { useState, useEffect } from 'react';
 import { Service, AvailableService } from '@/src/Types/Services/index';
-import { fetchUserServices, fetchAllServices, subscribeToService, deactivateUserService  } from '@/src/lib/api';
+import { UserServiceWithDetails } from '@/src/Types/UserServices';
+import { fetchUserServices, fetchAllServices, subscribeToService, deactivateUserService } from '@/src/lib/api';
 
 export const useServices = (userId: string | undefined, status: string) => {
   const [services, setServices] = useState<Service[]>([]);
   const [availableServices, setAvailableServices] = useState<AvailableService[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchData = async () => {
+    if (!userId) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Récupère les abonnements utilisateur (user_services) avec isActive
+      const [userServices, allServices] = await Promise.all([
+        fetchUserServices(userId), // Retourne UserService[] (avec isActive)
+        fetchAllServices(),
+      ]);
+
+      // Extraire les services abonnés (avec isActive)
+      const subscribedServices = Array.isArray(userServices)
+      ? userServices
+          .filter((us: UserServiceWithDetails) => us.is_active)
+          .map((us: UserServiceWithDetails) => us.service) // ✅ Retourne Service
+      : [];
+
+      // Met à jour le statut des services disponibles
+      const servicesWithStatus = allServices.map((service: AvailableService) => ({
+        ...service,
+        isSubscribed: userServices.some((us: UserServiceWithDetails) => us.service_id === service.id),
+        userService: userServices.find((us: UserServiceWithDetails) => us.service_id === service.id), // ✅ Ajoute l'abonnement complet
+      }));
+
+      setServices(subscribedServices);
+      setAvailableServices(servicesWithStatus);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des données:", error);
+      setError("Impossible de charger les services.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (status === "loading" || status === "unauthenticated") {
@@ -14,49 +56,12 @@ export const useServices = (userId: string | undefined, status: string) => {
       return;
     }
     if (status === "authenticated" && userId) {
-      const fetchData = async () => {
-        try {
-          const [subscribedServicesData, allServices] = await Promise.all([
-            fetchUserServices(userId),
-            fetchAllServices(),
-          ]);
-          const subscribedServices = Array.isArray(subscribedServicesData)
-            ? subscribedServicesData.map((subscription: any) => subscription.service)
-            : [];
-          const servicesWithStatus = allServices.map((service: AvailableService) => ({
-            ...service,
-            isSubscribed: subscribedServices.some((s: Service) => s.id === service.id),
-          }));
-          setServices(subscribedServices);
-          setAvailableServices(servicesWithStatus);
-        } catch (error) {
-          console.error("Erreur lors de la récupération des données:", error);
-        } finally {
-          setLoading(false);
-        }
-      };
       fetchData();
     }
   }, [status, userId]);
 
-  // Fonction pour rafraîchir les données après une modification
   const refreshServices = async () => {
-    if (!userId) return;
-    try {
-      const [subscribedServicesData, allServices] = await Promise.all([
-        fetchUserServices(userId),
-        fetchAllServices(),
-      ]);
-      const subscribedServices = subscribedServicesData.map((subscription: any) => subscription.service);
-      const servicesWithStatus = allServices.map((service: AvailableService) => ({
-        ...service,
-        isSubscribed: subscribedServices.some((s: Service) => s.id === service.id),
-      }));
-      setServices(subscribedServices);
-      setAvailableServices(servicesWithStatus);
-    } catch (error) {
-      console.error("Erreur lors du rafraîchissement des services:", error);
-    }
+    await fetchData();
   };
 
   const handleSubscribe = async (serviceId: number) => {
@@ -65,18 +70,36 @@ export const useServices = (userId: string | undefined, status: string) => {
       await refreshServices();
     } catch (error) {
       console.error("Erreur lors de l'abonnement:", error);
+      setError("Échec de l'abonnement au service.");
     }
   };
 
-  // Nouvelle fonction pour se désabonner
   const handleDeactivate = async (serviceId: number) => {
+    if (!userId) return;
+
     try {
+      // Vérifie si l'utilisateur a un abonnement ACTIF à ce service
+      const userService = availableServices.find(
+        (s) => s.id === serviceId
+      )?.userService;
+
+      if (!userService) {
+        setError("Vous n'êtes pas abonné à ce service.");
+        return;
+      }
+
+      if (!userService.is_active) {
+        setError("Cet abonnement est déjà désactivé.");
+        return;
+      }
+
       await deactivateUserService(Number(userId), serviceId);
-      await refreshServices(); // Rafraîchit la liste après désactivation
+      await refreshServices();
     } catch (error) {
-      console.error("Erreur lors de la désactivation du service:", error);
+      console.error("Erreur lors de la désactivation:", error);
+      setError(error instanceof Error ? error.message : "Échec de la désactivation.");
     }
   };
 
-  return { services, availableServices, loading, handleSubscribe, handleDeactivate };
+  return { services, availableServices, loading, error, handleSubscribe, handleDeactivate };
 };

@@ -1,4 +1,5 @@
 // src/Modules/ServiceCard.tsx
+import { UserServiceWithDetails } from '@/src/Types/UserServices';
 import Link from 'next/link';
 
 interface ServiceCardProps {
@@ -6,9 +7,16 @@ interface ServiceCardProps {
   isSubscribed?: boolean;
   onSubscribe?: (serviceId: number) => void;
   onDeactivate?: (serviceId: number) => void;
+  userService?: UserServiceWithDetails;
 }
 
-export const ServiceCard = ({ service, isSubscribed, onSubscribe, onDeactivate }: ServiceCardProps) => (
+export const ServiceCard = ({ 
+  service, 
+  isSubscribed, 
+  onSubscribe, 
+  onDeactivate,
+  userService
+}: ServiceCardProps) => (
   <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100">
     <div className="flex items-center mb-3">
       <span className="text-2xl mr-3">{service.icon}</span>
@@ -23,12 +31,16 @@ export const ServiceCard = ({ service, isSubscribed, onSubscribe, onDeactivate }
         >
           Accéder →
         </Link>
-        <button
-          onClick={() => onDeactivate?.(service.id)} // Change onUnsubscribe en onDeactivate
-          className="bg-red-100 text-red-800 px-4 py-2 rounded-md hover:bg-red-200 transition-colors"
-        >
-          Désactiver
-        </button>
+        {userService?.is_active ? (
+          <button
+            onClick={() => onDeactivate?.(service.id)} // Change onUnsubscribe en onDeactivate
+            className="bg-red-100 text-red-800 px-4 py-2 rounded-md hover:bg-red-200 transition-colors"
+          >
+            Désactiver
+          </button>
+        ) : (
+          <span className="text-gray-500 text-sm">Abonnement désactivé</span>
+        )}
       </>
     ) : (
       <button
