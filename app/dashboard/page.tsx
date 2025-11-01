@@ -29,9 +29,8 @@ export default function DashboardHome() {
 
           if (!subscribedRes.ok) { throw new Error(`Erreur HTTP: ${subscribedRes.status}`);}
           if (!allServicesRes.ok) { throw new Error(`Erreur HTTP: ${allServicesRes.status}`); }
-          const subscribedServicesData = await subscribedRes.json();
-          const subscribedServices = subscribedServicesData.map((subscription: any) => subscription.service);
-          console.log(subscribedServicesData);
+          const subscribedServices = await subscribedRes.json();
+          // const subscribedServices = subscribedServicesData.map((subscription: any) => subscription.service);
           const allServices = await allServicesRes.json();
 
           if (!Array.isArray(subscribedServices)) {
@@ -50,7 +49,7 @@ export default function DashboardHome() {
             isSubscribed: subscribedServices.some((s: Service) => s.id === service.id)
           }));
 
-          setServices(subscribedServicesData);
+          setServices(subscribedServices);
           setAvailableServices(servicesWithStatus);
           
         } catch (error) {
@@ -99,7 +98,7 @@ export default function DashboardHome() {
   };
 
   if (loading) return <div className="p-8">Chargement...</div>;
-
+console.log(services);
   return (
     <div className="p-8 max-w-7xl mx-auto">
       <h1 className="text-2xl font-bold mb-8">Tableau de bord</h1>
