@@ -25,6 +25,7 @@ export default function DashboardHome() {
             fetch(`/api/UserServices/${session.user.id}`, {credentials: 'include'}),
             fetch('/api/services', {credentials: 'include'})
           ]);
+          console.log("subscribedRes, allServicesRes: ", subscribedRes, allServicesRes);
 
           if (!subscribedRes.ok) { throw new Error(`Erreur HTTP: ${subscribedRes.status}`);}
           if (!allServicesRes.ok) { throw new Error(`Erreur HTTP: ${allServicesRes.status}`); }
@@ -88,7 +89,6 @@ export default function DashboardHome() {
           isSubscribed: subscribedServices.some((s: Service) => s.id === service.id)
         }));
         setServices(subscribedServices);
-        console.log(services);
         setAvailableServices(servicesWithStatus);
       }
     } catch (error) {
