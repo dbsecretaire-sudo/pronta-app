@@ -1,7 +1,7 @@
-// app/hooks/useServices.ts
+// src/Hook/useServices.ts
 import { useState, useEffect } from 'react';
 import { Service, AvailableService } from '@/src/Types/Services/index';
-import { fetchUserServices, fetchAllServices, subscribeToService } from '@/src/lib/api';
+import { fetchUserServices, fetchAllServices, subscribeToService, deactivateUserService  } from '@/src/lib/api';
 
 export const useServices = (userId: string | undefined, status: string) => {
   const [services, setServices] = useState<Service[]>([]);
@@ -39,11 +39,12 @@ export const useServices = (userId: string | undefined, status: string) => {
     }
   }, [status, userId]);
 
-  const handleSubscribe = async (serviceId: number) => {
+  // Fonction pour rafraîchir les données après une modification
+  const refreshServices = async () => {
+    if (!userId) return;
     try {
-      await subscribeToService(serviceId);
       const [subscribedServicesData, allServices] = await Promise.all([
-        fetchUserServices(userId!),
+        fetchUserServices(userId),
         fetchAllServices(),
       ]);
       const subscribedServices = subscribedServicesData.map((subscription: any) => subscription.service);
@@ -54,9 +55,28 @@ export const useServices = (userId: string | undefined, status: string) => {
       setServices(subscribedServices);
       setAvailableServices(servicesWithStatus);
     } catch (error) {
+      console.error("Erreur lors du rafraîchissement des services:", error);
+    }
+  };
+
+  const handleSubscribe = async (serviceId: number) => {
+    try {
+      await subscribeToService(serviceId);
+      await refreshServices();
+    } catch (error) {
       console.error("Erreur lors de l'abonnement:", error);
     }
   };
 
-  return { services, availableServices, loading, handleSubscribe };
+  // Nouvelle fonction pour se désabonner
+  const handleDeactivate = async (serviceId: number) => {
+    try {
+      await deactivateUserService(serviceId);
+      await refreshServices(); // Rafraîchit la liste après désactivation
+    } catch (error) {
+      console.error("Erreur lors de la désactivation du service:", error);
+    }
+  };
+
+  return { services, availableServices, loading, handleSubscribe, handleDeactivate };
 };

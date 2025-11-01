@@ -1,7 +1,6 @@
 export { default as Table } from './Table/Table';
 export type { TableProps, TableColumn } from './Table/Table.types';
 export type { CustomUser } from "./Session";
-;
 export { default as Pagination } from './Pagination/Pagination';
 export type { PaginationProps } from './Pagination/Pagination.types';
 export { default as NavBar } from './NavBar/NavBar';

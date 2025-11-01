@@ -57,3 +57,18 @@ export const subscribeToService = async (serviceId: number) => {
   if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
   return res.json();
 };
+
+export const deactivateUserService = async (serviceId: number): Promise<void> => {
+  const response = await fetch('/api/UserServices/deactivate', {
+    method: 'PATCH', // ou 'POST' selon ton API
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify({ serviceId }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Erreur lors de la désactivation du service: ${response.status}`);
+  }
+};

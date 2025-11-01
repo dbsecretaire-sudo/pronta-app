@@ -6,21 +6,25 @@ import { ServiceCard, MessageList, AccountSummary } from '@/src/Modules/index';
 
 export default function DashboardHome() {
   const { data: session, status } = useSession();
-  const { services, availableServices, loading, handleSubscribe } = useServices(session?.user?.id, status);
+  const { services, availableServices, loading, handleSubscribe, handleDeactivate } = useServices(session?.user?.id, status);
 
   if (loading) return <div className="p-8">Chargement...</div>;
 
   return (
     <div className="p-8 max-w-7xl mx-auto">
       <h1 className="text-2xl font-bold mb-8">Tableau de bord</h1>
-
       {/* Services souscrits */}
       <section className="mb-10">
         <h2 className="text-xl font-semibold mb-4">Mes services</h2>
         {services.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {services.map((service) => (
-              <ServiceCard key={service.id} service={service} isSubscribed />
+              <ServiceCard
+                key={service.id}
+                service={service}
+                isSubscribed
+                onDeactivate={handleDeactivate}
+              />
             ))}
           </div>
         ) : (
@@ -29,7 +33,6 @@ export default function DashboardHome() {
           </div>
         )}
       </section>
-
       {/* Services disponibles */}
       {availableServices.some(s => !s.isSubscribed) && (
         <section className="mb-10">
@@ -42,21 +45,19 @@ export default function DashboardHome() {
                   key={service.id}
                   service={service}
                   onSubscribe={handleSubscribe}
+                  onDeactivate={handleDeactivate}
                 />
               ))}
           </div>
         </section>
       )}
-
       {/* Section Messagerie intégrée */}
       <section className="mb-10 bg-white rounded-lg shadow-md p-6">
         <div className="flex justify-between items-center mb-5">
           <h2 className="text-xl font-semibold">Messages importants</h2>
         </div>
-        {/* <MessageList messages={messages} /> */}
         <p className="text-gray-500 italic">Aucun message pour le moment.</p>
       </section>
-
       {/* Section Mon Compte */}
       <AccountSummary />
     </div>
