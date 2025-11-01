@@ -3,5 +3,5 @@ export type {
     CreateService,
     AvailableService,
     SubscriptionRequest
-} from "@/app/Types/Services/index";
-export { ServiceModel } from "@/app/Types/Services/model";
+} from "@/app/src/Types/Services/index";
+export { ServiceModel } from "@/app/src/Types/Services/model";

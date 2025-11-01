@@ -1,2 +1,2 @@
-export type { CalendarEvent, CalendarEventFilter, CreateCalendarEvent } from "@/app/Types/Calendar/index";
-export { CalendarEventModel } from "@/app/Types/Calendar/model";
+export type { CalendarEvent, CalendarEventFilter, CreateCalendarEvent } from "@/app/src/Types/Calendar/index";
+export { CalendarEventModel } from "@/app/src/Types/Calendar/model";

@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { Tab } from '@headlessui/react';
-import Navbar from "@/app/Types/Components/NavBar/index";
+import Navbar from "@/app/src/Components/NavBar/index";
 
 export default function AccountPage() {
   const [activeTab, setActiveTab] = useState('profile');

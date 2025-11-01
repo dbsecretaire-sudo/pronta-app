@@ -1,6 +1,6 @@
 "use client";
 import { useRouter, usePathname } from "next/navigation";
-import Navbar from "@/app/Types/Components/NavBar/index";
+import Navbar from "@/app/src/Components/NavBar/index";
 import { useEffect } from "react";
 
 export default function ProntaCallsLayout({ children }: { children: React.ReactNode }) {

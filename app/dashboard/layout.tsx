@@ -1,7 +1,7 @@
 // app/dashboard/layout.tsx
 "use client";
 import { usePathname } from "next/navigation";
-import Navbar from "@/app/Types/Components/NavBar/index";
+import Navbar from "@/app/src/Components/NavBar/index";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();

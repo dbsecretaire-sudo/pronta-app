@@ -6,6 +6,6 @@ export type {
     CreateInvoiceItem, 
     InvoiceFilter, 
     UpdateInvoiceStatus 
-} from "@/app/Types/Invoices/index";
+} from "@/app/src/Types/Invoices/index";
 
-export { InvoiceModel } from "@/app/Types/Invoices/model";
+export { InvoiceModel } from "@/app/src/Types/Invoices/model";

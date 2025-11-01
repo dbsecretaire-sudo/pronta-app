@@ -3,10 +3,10 @@
 
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import CallStats from "@/app/Types/Components/Calls/CallStats";
-import CallList from "@/app/Types/Components/Calls/CallList";
-import CallFilter from '@/app/Types/Components/Calls/CallFilter';
-import { Call, CallFilter as CallFilterType } from "@/app/Types/Calls/index";
+import CallStats from "@/app/src/Components/Calls/CallStats";
+import CallList from "@/app/src/Components/Calls/CallList";
+import CallFilter from '@/app/src/Components/Calls/CallFilter';
+import { Call, CallFilter as CallFilterType } from "@/app/src/Types/Calls/index";
 
 export default function ProntaCallsDashboard() {
   const { data: session } = useSession();

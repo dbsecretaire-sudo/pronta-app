@@ -5,6 +5,6 @@ export type {
   UpdateUserServicePermissions ,
   CreateUserService,
   UpdateUserService
-} from "@/app/Types/UserServices/index";
+} from "@/app/src/Types/UserServices/index";
 
-export { UserServiceModel } from "@/app/Types/UserServices/model";
+export { UserServiceModel } from "@/app/src/Types/UserServices/model";
