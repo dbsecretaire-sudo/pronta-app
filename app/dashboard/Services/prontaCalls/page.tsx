@@ -26,7 +26,6 @@ export default function ProntaCallsDashboard() {
   useEffect(() => {
     const loadCalls = async () => {
       if (!session?.user?.id) return;
-
       try {
         setLoading(true);
         const response = await fetch(
@@ -36,15 +35,21 @@ export default function ProntaCallsDashboard() {
           throw new Error("Erreur lors de la récupération des appels");
         }
         const data: Call[] = await response.json();
-        setCalls(data);
+
+        // Convertir chaque `call.date` en objet Date
+        const callsWithDateObjects = data.map((call) => ({
+          ...call,
+          date: new Date(call.date),
+        }));
+
+        setCalls(callsWithDateObjects);
 
         // Calcul des statistiques
         const today = new Date().toISOString().split('T')[0];
-        const todayCalls = data.filter((call: Call) =>
+        const todayCalls = callsWithDateObjects.filter((call) =>
           call.date.toISOString().startsWith(today)
         );
-        const missedToday = todayCalls.filter((call: Call) => call.type === 'missed').length;
-
+        const missedToday = todayCalls.filter((call) => call.type === 'missed').length;
         setStats({
           totalToday: todayCalls.length,
           missedToday: missedToday,
@@ -58,7 +63,7 @@ export default function ProntaCallsDashboard() {
         setLoading(false);
       }
     };
-    
+
     loadCalls();
   }, [session, filter]);
   
