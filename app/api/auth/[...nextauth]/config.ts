@@ -19,7 +19,7 @@ const providers = [
 
       try {
         const { rows } = await pool.query(
-          "SELECT id, email, password_hash, name, role FROM users WHERE email = $1",
+          "SELECT id, email, password_hash, name FROM users WHERE email = $1",
           [credentials.email]
         );
 

@@ -1,19 +1,40 @@
-import { Router } from "express";
-import {
-  getClientsByUserId,
-  searchClients,
-  createClient,
-} from "./controller";
-import idRouter from "./[id]/route"; // Routes dynamiques (GET/:id, PUT/:id, DELETE/:id)
+// app/api/clients/route.ts
+import { NextResponse } from 'next/server';
+import { getClientsByUserId, createClient } from './controller'; // Importez vos fonctions
 
-const router = Router();
+// GET /api/clients
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get('userId');
 
-// Routes statiques
-router.get("/", getClientsByUserId);          // GET /api/clients
-router.get("/search", searchClients);        // GET /api/clients/search
-router.post("/", createClient);              // POST /api/clients
+    if (!userId) {
+      return NextResponse.json(
+        { error: "userId is required" },
+        { status: 400 }
+      );
+    }
 
-// Routes dynamiques (déplacées dans [id]/route.ts)
-router.use("/:id", idRouter); // Capture GET/:id, PUT/:id, DELETE/:id
+    const clients = await getClientsByUserId(Number(userId));
+    return NextResponse.json(clients);
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to fetch clients" },
+      { status: 500 }
+    );
+  }
+}
 
-export default router;
+// POST /api/clients
+export async function POST(request: Request) {
+  try {
+    const clientData = await request.json();
+    const newClient = await createClient(clientData);
+    return NextResponse.json(newClient, { status: 201 });
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to create client" },
+      { status: 500 }
+    );
+  }
+}

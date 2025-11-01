@@ -1,3 +1,4 @@
+// app/api/calls/[id]/route.ts
 import { NextResponse } from 'next/server';
 import { CallService } from '../service';
 
@@ -10,16 +11,18 @@ export async function GET(
 ) {
   try {
     const call = await callService.getCallById(Number(params.id));
+
     if (!call) {
       return NextResponse.json(
-        { error: "Call not found" },
+        { error: 'Call not found' },
         { status: 404 }
       );
     }
+
     return NextResponse.json(call);
   } catch (error) {
     return NextResponse.json(
-      { error: "Failed to fetch call" },
+      { error: 'Failed to fetch call' },
       { status: 500 }
     );
   }
@@ -36,7 +39,7 @@ export async function PUT(
     return NextResponse.json(updatedCall);
   } catch (error) {
     return NextResponse.json(
-      { error: "Failed to update call" },
+      { error: 'Failed to update call' },
       { status: 500 }
     );
   }
@@ -49,10 +52,10 @@ export async function DELETE(
 ) {
   try {
     await callService.deleteCall(Number(params.id));
-    return NextResponse.json({}, { status: 204 });
+    return new NextResponse(null, { status: 204 });
   } catch (error) {
     return NextResponse.json(
-      { error: "Failed to delete call" },
+      { error: 'Failed to delete call' },
       { status: 500 }
     );
   }

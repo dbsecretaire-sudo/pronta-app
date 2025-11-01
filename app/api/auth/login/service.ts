@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import pool from '@/lib/db';
-import { User } from '@/Types/Users/index';
+import { User } from '@/app/Types/Users/index';
 import { LoginCredentials } from './types';
 
 export async function authenticateUser(credentials: LoginCredentials): Promise<User | null> {

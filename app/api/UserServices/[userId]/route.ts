@@ -1,19 +1,44 @@
-import { Router } from "express";
+// app/api/user-services/[userId]/route.ts
+import { NextResponse } from 'next/server';
 import {
   getUserServices,
-  updateUserService,
-  revokeUserService,
-} from "../controller";
+  assignServiceToUser
+} from '../controller';
 
-const router = Router({ mergeParams: true });
+// GET /api/user-services/[userId] (liste les services d'un utilisateur)
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ userId: string }> } 
+) {
+  try {
+    const { userId } = await params; 
+    const services = await getUserServices(Number(userId));
+    return NextResponse.json(services);
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Erreur serveur" },
+      { status: 500 }
+    );
+  }
+}
 
-// GET /api/userServices/:userId - Liste les services d'un utilisateur
-router.get("/", getUserServices);
-
-// PATCH /api/userServices/:userId/:serviceId - Met à jour les permissions d'un service utilisateur
-router.patch("/:serviceId", updateUserService);
-
-// DELETE /api/userServices/:userId/:serviceId - Révoque un service pour un utilisateur
-router.delete("/:serviceId", revokeUserService);
-
-export default router;
+// POST /api/user-services/[userId] (assigner un service à un utilisateur)
+export async function POST(
+  request: Request,
+  { params }: { params: { userId: string } }
+) {
+  try {
+    const userId = Number(params.userId);
+    const data = await request.json();
+    const newUserService = await assignServiceToUser({
+      user_id: userId,
+      ...data
+    });
+    return NextResponse.json(newUserService, { status: 201 });
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Failed to assign service" },
+      { status: error instanceof Error && error.message.includes("required") ? 400 : 500 }
+    );
+  }
+}

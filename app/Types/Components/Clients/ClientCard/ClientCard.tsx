@@ -1,6 +1,6 @@
 import React from "react";
 import { PencilIcon, TrashIcon, EnvelopeIcon, PhoneIcon, BuildingOfficeIcon, MapPinIcon } from "@heroicons/react/24/outline";
-import { ClientCardProps } from "@/Types/Components/Clients/index"; // ✅ Import depuis types.ts
+import { ClientCardProps } from "@/app/Types/Components/Clients/index"; // ✅ Import depuis types.ts
 
 const ClientCard: React.FC<ClientCardProps> = ({
   client,

@@ -1,11 +1,15 @@
-import { Request, Response } from "express";
+import { NextResponse } from 'next/server';
 import { loginController } from './controller';
 
-export const login = async (req: Request, res: Response) => {
+export async function POST(request: Request) {
   try {
-    const result = await loginController(req.body); // Passe req.body au lieu de req
-    res.status(200).json(result);
+    const body = await request.json(); // Récupère le body de la requête
+    const result = await loginController(body);
+    return NextResponse.json(result, { status: 200 });
   } catch (error) {
-    res.status(401).json({ error: error instanceof Error ? error.message : "Login failed" });
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Login failed" },
+      { status: 401 }
+    );
   }
-};
+}

@@ -1,4 +1,4 @@
-import { CreateService } from "@/Types/Services/index";
+import { CreateService } from "@/app/Types/Services/index";
 
 export const validateService = (service: Partial<CreateService>): boolean => {
   return !!service.name && !!service.route;

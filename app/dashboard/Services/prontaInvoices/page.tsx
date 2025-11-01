@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Invoice } from "@/Types/Invoices/index";
+import { Invoice } from "@/app/Types/Invoices/index";
 
 export default function ProntaInvoicesDashboard() {
   const [stats, setStats] = useState({

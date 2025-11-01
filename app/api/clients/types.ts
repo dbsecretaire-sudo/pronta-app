@@ -1,1 +1,1 @@
-export type { Client, CreateClient, ClientFilter } from "@/Types/Clients/index";
+export type { Client, CreateClient, ClientFilter } from "@/app/Types/Clients/index";

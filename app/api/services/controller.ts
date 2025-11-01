@@ -1,55 +1,28 @@
-import { Request, Response } from "express";
-import { ServiceService } from "./service";
+import { ServiceService as Service } from './service';
+import { CreateService, Service as ServiceType } from "./types";
 
-const serviceService = new ServiceService();
+const service = new Service(); // Instanciez la classe Service
 
-export const getAllServices = async (req: Request, res: Response) => {
-  try {
-    const services = await serviceService.getAllServices();
-    res.status(200).json(services);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to fetch services" });
-  }
+export const getAllServices = async (): Promise<ServiceType[]> => {
+  return await service.getAllServices();
 };
 
-export const getServiceById = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const service = await serviceService.getServiceById(Number(id));
-    if (!service) return res.status(404).json({ error: "Service not found" });
-    res.status(200).json(service);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to fetch service" });
+export const getServiceById = async (id: number): Promise<ServiceType> => {
+  const foundService = await service.getServiceById(id);
+  if (!foundService) {
+    throw new Error(`Service with ID ${id} not found`);
   }
+  return foundService;
 };
 
-export const createService = async (req: Request, res: Response) => {
-  try {
-    const service = req.body;
-    const newService = await serviceService.createService(service);
-    res.status(201).json(newService);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to create service" });
-  }
+export const createService = async (serviceData: CreateService): Promise<ServiceType> => {
+  return await service.createService(serviceData);
 };
 
-export const updateService = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const service = req.body;
-    const updatedService = await serviceService.updateService(Number(id), service);
-    res.status(200).json(updatedService);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to update service" });
-  }
+export const updateService = async (id: number, serviceData: Partial<ServiceType>): Promise<ServiceType> => {
+  return await service.updateService(id, serviceData);
 };
 
-export const deleteService = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    await serviceService.deleteService(Number(id));
-    res.status(204).end();
-  } catch (error) {
-    res.status(500).json({ error: "Failed to delete service" });
-  }
+export const deleteService = async (id: number): Promise<void> => {
+  return await service.deleteService(id);
 };

@@ -1,4 +1,4 @@
-import { CreateUser, Role } from "@/Types/Users/index";
+import { CreateUser, Role } from "@/app/Types/Users/index";
 import bcrypt from "bcryptjs";
 
 export const validateUser = (user: Partial<CreateUser>): boolean => {

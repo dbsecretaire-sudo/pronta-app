@@ -4,7 +4,8 @@ import {
   UserServiceWithDetails,
   AssignServiceToUser,
   UpdateUserServicePermissions
-} from "@/Types/UserServices/index";
+} from "@/app/Types/UserServices/index";
+
 import { validateUserServiceAssignment } from "./types";
 
 export class UserServiceService {

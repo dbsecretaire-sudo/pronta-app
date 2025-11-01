@@ -1,19 +1,67 @@
-import { Router } from "express";
+// app/api/user/[id]/route.ts
+import { NextResponse } from 'next/server';
 import {
   getUserById,
   updateUser,
-  deleteUser,
-} from "../controller";
+  deleteUser
+} from '../controller';
 
-const router = Router({ mergeParams: true });
+// GET /api/user/[id]
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const id = await params;
+    const user = await getUserById(Number(id));
 
-// GET /api/user/:id - Récupère un utilisateur spécifique
-router.get("/", getUserById);
+    if (!user) {
+      return NextResponse.json(
+        { error: "User not found" },
+        { status: 404 }
+      );
+    }
 
-// PUT /api/user/:id - Met à jour un utilisateur
-router.put("/", updateUser);
+    return NextResponse.json(user);
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to fetch user" },
+      { status: 500 }
+    );
+  }
+}
 
-// DELETE /api/user/:id - Supprime un utilisateur
-router.delete("/", deleteUser);
+// PUT /api/user/[id]
+export async function PUT(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const id = Number(params.id);
+    const userData = await request.json();
+    const updatedUser = await updateUser(id, userData);
+    return NextResponse.json(updatedUser);
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to update user" },
+      { status: 500 }
+    );
+  }
+}
 
-export default router;
+// DELETE /api/user/[id]
+export async function DELETE(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const id = Number(params.id);
+    await deleteUser(id);
+    return new NextResponse(null, { status: 204 });
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to delete user" },
+      { status: 500 }
+    );
+  }
+}

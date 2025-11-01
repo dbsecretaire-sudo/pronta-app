@@ -2,7 +2,9 @@ export type {
     UserService,
     UserServiceWithDetails,
     AssignServiceToUser,
-    UpdateUserServicePermissions
+    UpdateUserServicePermissions,
+    CreateUserService,
+    UpdateUserService,
 } from "./type";
 
 export { UserServiceModel } from "./model";

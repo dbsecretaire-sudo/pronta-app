@@ -1,4 +1,4 @@
-import { User } from "@/Types/Users/index";
+import { User } from "@/app/Types/Users/index";
 
 export {}; 
 

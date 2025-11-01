@@ -1,34 +1,41 @@
-import { Router } from "express";
+// app/api/invoices/route.ts
+import { NextResponse } from 'next/server';
 import {
   getInvoicesByUserId,
-  getInvoiceById,
-  getInvoicesByClient,
-  filterInvoices,
-  createInvoice,
-  addInvoiceItem,
-  updateInvoice,
-  updateInvoiceStatus,
-  deleteInvoice,
-  deleteInvoiceItem,
-} from "./controller";
-import itemRouter from "./[id]/items/route";
+  createInvoice
+} from './controller';
 
-const router = Router();
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get('userId');
 
-// Routes pour /api/invoices
-router.get("/", getInvoicesByUserId);
-router.get("/client", getInvoicesByClient);
-router.get("/filter", filterInvoices);
-router.post("/", createInvoice);
-router.post("/:invoiceId/items", addInvoiceItem);
+    if (!userId) {
+      return NextResponse.json(
+        { error: "userId is required" },
+        { status: 400 }
+      );
+    }
 
-// Routes dynamiques
-router.get("/:id", getInvoiceById);
-router.put("/:id", updateInvoice);
-router.patch("/:id/status", updateInvoiceStatus);
-router.delete("/:id", deleteInvoice);
+    const invoices = await getInvoicesByUserId(Number(userId));
+    return NextResponse.json(invoices);
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to fetch invoices" },
+      { status: 500 }
+    );
+  }
+}
 
-// Routes pour les items de facture
-router.use("/:invoiceId/items", itemRouter);
-
-export default router;
+export async function POST(request: Request) {
+  try {
+    const invoiceData = await request.json();
+    const newInvoice = await createInvoice(invoiceData);
+    return NextResponse.json(newInvoice, { status: 201 });
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to create invoice" },
+      { status: 500 }
+    );
+  }
+}

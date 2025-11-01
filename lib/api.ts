@@ -1,5 +1,5 @@
-import { CalendarEvent } from "@/Types/Calendar/index";
-import { CallFilter } from "@/Types/Calls/index"; 
+import { CalendarEvent } from "@/app/Types/Calendar/index";
+import { CallFilter } from "@/app/Types/Calls/index"; 
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL; // Remplacez par l’URL de votre backend
 

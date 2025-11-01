@@ -1,4 +1,4 @@
-import { CallModel } from "@/Types/Calls/index";
+import { CallModel } from "@/app/Types/Calls/index";
 import { Call, CallFilter } from "./types";
 
 export class CallService {

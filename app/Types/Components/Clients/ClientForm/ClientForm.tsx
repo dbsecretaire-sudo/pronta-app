@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { emptyClient } from "@/Types/Clients/index";
-import FormInput from "@/Types/Components/FormInput/FormInput"; // ✅ Corrigé : chemin vers FormInput
-import { ClientFormData, ClientFormProps, validateClientForm } from "@/Types/Components/Clients/index"; // ✅ Import depuis types.ts
+import { emptyClient } from "@/app/Types/Clients/index";
+import FormInput from "@/app/Types/Components/FormInput/FormInput"; // ✅ Corrigé : chemin vers FormInput
+import { ClientFormData, ClientFormProps, validateClientForm } from "@/app/Types/Components/Clients/index"; // ✅ Import depuis types.ts
 
 export default function ClientForm({
   client = emptyClient,

@@ -6,4 +6,4 @@ export type {
     CreateUser, 
     UpdateUser, 
     UserFilter 
-} from "@/Types/Users/index";
+} from "@/app/Types/Users/index";

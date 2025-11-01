@@ -1,4 +1,4 @@
-import { InvoiceModel, Invoice, InvoiceItem, CreateInvoice, CreateInvoiceItem, InvoiceFilter, UpdateInvoiceStatus } from "@/Types/Invoices/index";
+import { InvoiceModel, Invoice, InvoiceItem, CreateInvoice, CreateInvoiceItem, InvoiceFilter, UpdateInvoiceStatus } from "@/app/Types/Invoices/index";
 import { validateInvoice, validateInvoiceItem, isValidInvoiceStatus } from "./utils";
 
 export class InvoiceService {

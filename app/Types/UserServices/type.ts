@@ -1,4 +1,4 @@
-import { Service } from '@/Types/Services/index';
+import { Service } from '@/app/Types/Services/index';
 
 export interface UserService {
   user_id: number;
@@ -24,3 +24,6 @@ export type UpdateUserServicePermissions = {
   can_write?: boolean;
   can_delete?: boolean;
 };
+
+export type CreateUserService = Omit<UserService, 'id' | 'createdAt' | 'updatedAt'>;
+export type UpdateUserService = Partial<CreateUserService>;
