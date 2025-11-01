@@ -7,4 +7,3 @@ export type {
     UpdateUser, 
     UserFilter 
 } from "./type";
-export { UserModel } from "./model";

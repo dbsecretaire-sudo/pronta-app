@@ -1,4 +1,4 @@
-import { ServiceModel, Service, CreateService } from "@/app/Types/Services/index";
+import { ServiceModel, Service, CreateService } from "./types";
 import { validateService } from "./utils";
 
 export class ServiceService {

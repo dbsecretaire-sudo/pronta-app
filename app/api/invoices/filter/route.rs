@@ -1,6 +1,6 @@
 // app/api/invoices/filter/route.ts
-import { NextResponse } from 'next/server';
-import { filterInvoices } from '../controller';
+import { NextResponse } from "next/server";
+import { filterInvoices } from "../controller";
 
 export async function GET(request: Request) {
   try {

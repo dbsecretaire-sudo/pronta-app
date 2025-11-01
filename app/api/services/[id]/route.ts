@@ -9,11 +9,11 @@ import {
 // GET /api/services/[id]
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = Number(params.id);
-    const service = await getServiceById(id);
+    const { id } = await params;
+    const service = await getServiceById(Number(id));
     return NextResponse.json(service);
   } catch (error) {
     if (error instanceof Error && error.message.includes("not found")) {
@@ -32,12 +32,12 @@ export async function GET(
 // PUT /api/services/[id]
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = Number(params.id);
+    const { id } = await params;
     const serviceData = await request.json();
-    const updatedService = await updateService(id, serviceData);
+    const updatedService = await updateService(Number(id), serviceData);
     return NextResponse.json(updatedService);
   } catch (error) {
     return NextResponse.json(
@@ -50,11 +50,11 @@ export async function PUT(
 // DELETE /api/services/[id]
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = Number(params.id);
-    await deleteService(id);
+    const { id } = await params;
+    await deleteService(Number(id));
     return new NextResponse(null, { status: 204 });
   } catch (error) {
     return NextResponse.json(

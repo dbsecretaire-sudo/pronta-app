@@ -4,11 +4,12 @@ import { updateInvoiceStatus } from '../../controller';
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { status } = await request.json();
-    const updatedInvoice = await updateInvoiceStatus(Number(params.id), status);
+    const updatedInvoice = await updateInvoiceStatus(Number(id), status);
     return NextResponse.json(updatedInvoice);
   } catch (error) {
     return NextResponse.json(

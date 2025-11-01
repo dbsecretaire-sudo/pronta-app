@@ -12,7 +12,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = await params;
+    const { id } = await params;
     const user = await getUserById(Number(id));
 
     if (!user) {
@@ -34,12 +34,12 @@ export async function GET(
 // PUT /api/user/[id]
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = Number(params.id);
+    const { id } = await params;
     const userData = await request.json();
-    const updatedUser = await updateUser(id, userData);
+    const updatedUser = await updateUser(Number(id), userData);
     return NextResponse.json(updatedUser);
   } catch (error) {
     return NextResponse.json(
@@ -52,11 +52,11 @@ export async function PUT(
 // DELETE /api/user/[id]
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = Number(params.id);
-    await deleteUser(id);
+    const { id } = await params;
+    await deleteUser(Number(id));
     return new NextResponse(null, { status: 204 });
   } catch (error) {
     return NextResponse.json(

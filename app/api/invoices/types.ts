@@ -7,3 +7,5 @@ export type {
     InvoiceFilter, 
     UpdateInvoiceStatus 
 } from "@/app/Types/Invoices/index";
+
+export { InvoiceModel } from "@/app/Types/Invoices/model";

@@ -4,9 +4,8 @@ import {
   UserServiceWithDetails,
   AssignServiceToUser,
   UpdateUserServicePermissions
-} from "@/app/Types/UserServices/index";
-
-import { validateUserServiceAssignment } from "./types";
+} from "./types";
+import { validateUserServiceAssignment } from "./utils";
 
 export class UserServiceService {
   private userServiceModel = new UserServiceModel({} as UserService);

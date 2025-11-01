@@ -4,4 +4,3 @@ export type {
     AvailableService,
     SubscriptionRequest
 } from "./type";
-export { ServiceModel } from "./model";

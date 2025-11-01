@@ -1,8 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
-import { emptyClient } from "@/app/Types/Clients/index";
 import FormInput from "@/app/Types/Components/FormInput/FormInput";
 import { ClientFormData, ClientFormProps, validateClientForm } from "@/app/Types/Components/Clients/index";
+import { emptyClient } from "@/app/Types/Clients/index";
 
 export default function ClientForm({
   client = emptyClient,

@@ -1,4 +1,4 @@
-import { CalendarEvent, CreateCalendarEvent } from "@/app/Types/Calendar/index";
+import { CalendarEvent, CreateCalendarEvent } from "./types";
 
 export const validateCalendarEvent = (event: Partial<CreateCalendarEvent>): boolean => {
   return !!event.title && !!event.user_id && !!event.start_time && !!event.end_time;

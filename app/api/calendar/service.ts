@@ -1,4 +1,4 @@
-import { CalendarEventModel, CalendarEvent, CreateCalendarEvent, CalendarEventFilter } from "@/app/Types/Calendar/index";
+import { CalendarEventModel, CalendarEvent, CreateCalendarEvent, CalendarEventFilter } from "./types";
 import { validateCalendarEvent } from "./utils";
 
 export class CalendarEventService {

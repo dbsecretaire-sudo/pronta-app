@@ -1,4 +1,4 @@
-import { User, CreateUser, UpdateUser, UserFilter, UserModel } from "@/app/Types/Users/index";
+import { User, CreateUser, UpdateUser, UserFilter, UserModel } from "./types";
 import { validateUser, hashPassword, isValidRole, isSubscriptionActive } from "./utils";
 
 export class UserService {

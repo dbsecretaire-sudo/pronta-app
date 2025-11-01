@@ -5,14 +5,14 @@ import pool from '@/app/lib/db';
 // DELETE /api/clients/[id]
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = Number(params.id);
+    const { id } = await params;
 
     // Vérifie si le client est lié à des factures
     const checkQuery = 'SELECT 1 FROM invoices WHERE client_id = $1 LIMIT 1';
-    const checkRes = await pool.query(checkQuery, [id]);
+    const checkRes = await pool.query(checkQuery, [Number(id)]);
 
     if (checkRes.rows.length > 0) {
       return NextResponse.json(
@@ -23,7 +23,7 @@ export async function DELETE(
 
     // Supprime le client
     const deleteQuery = 'DELETE FROM clients WHERE id = $1 RETURNING *';
-    const { rows } = await pool.query(deleteQuery, [id]);
+    const { rows } = await pool.query(deleteQuery, [Number(id)]);
 
     if (rows.length === 0) {
       return NextResponse.json(
@@ -45,10 +45,10 @@ export async function DELETE(
 // PUT /api/clients/[id]
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = Number(params.id);
+    const { id } = await params;
     const { name, email, phone, address, company } = await request.json();
 
     if (!name || !email) {
@@ -65,7 +65,7 @@ export async function PUT(
       RETURNING *
     `;
 
-    const { rows } = await pool.query(query, [name, email, phone, address, company, id]);
+    const { rows } = await pool.query(query, [name, email, phone, address, company, Number(id)]);
 
     if (rows.length === 0) {
       return NextResponse.json(
@@ -93,12 +93,12 @@ export async function PUT(
 // GET /api/clients/[id]
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = Number(params.id);
+    const { id } = await params;
     const query = 'SELECT * FROM clients WHERE id = $1';
-    const { rows } = await pool.query(query, [id]);
+    const { rows } = await pool.query(query, [Number(id)]);
 
     if (rows.length === 0) {
       return NextResponse.json(

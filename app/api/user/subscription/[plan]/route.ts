@@ -5,10 +5,11 @@ import { getUsersBySubscriptionPlan } from '../../controller';
 // GET /api/user/subscription/[plan]
 export async function GET(
   request: Request,
-  { params }: { params: { plan: string } }
+  { params }: { params: Promise<{ plan: string }> }
 ) {
   try {
-    const users = await getUsersBySubscriptionPlan(params.plan);
+    const { plan } = await params;
+    const users = await getUsersBySubscriptionPlan(plan);
     return NextResponse.json(users);
   } catch (error) {
     return NextResponse.json(

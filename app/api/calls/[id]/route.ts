@@ -7,10 +7,11 @@ const callService = new CallService();
 // GET /api/calls/[id]
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const call = await callService.getCallById(Number(params.id));
+    const { id } = await params;
+    const call = await callService.getCallById(Number(id));
 
     if (!call) {
       return NextResponse.json(
@@ -31,11 +32,12 @@ export async function GET(
 // PUT /api/calls/[id]
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const call = await request.json();
-    const updatedCall = await callService.updateCall(Number(params.id), call);
+    const updatedCall = await callService.updateCall(Number(id), call);
     return NextResponse.json(updatedCall);
   } catch (error) {
     return NextResponse.json(
@@ -48,10 +50,11 @@ export async function PUT(
 // DELETE /api/calls/[id]
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await callService.deleteCall(Number(params.id));
+    const { id } = await params;
+    await callService.deleteCall(Number(id));
     return new NextResponse(null, { status: 204 });
   } catch (error) {
     return NextResponse.json(

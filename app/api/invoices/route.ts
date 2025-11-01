@@ -1,9 +1,6 @@
 // app/api/invoices/route.ts
 import { NextResponse } from 'next/server';
-import {
-  getInvoicesByUserId,
-  createInvoice
-} from './controller';
+import { getInvoicesByUserId, createInvoice } from './controller';
 
 export async function GET(request: Request) {
   try {

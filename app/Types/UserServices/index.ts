@@ -6,5 +6,3 @@ export type {
     CreateUserService,
     UpdateUserService,
 } from "./type";
-
-export { UserServiceModel } from "./model";

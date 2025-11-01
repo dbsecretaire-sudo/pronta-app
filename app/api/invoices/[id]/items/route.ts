@@ -4,11 +4,12 @@ import { addInvoiceItem, deleteInvoiceItem } from '../../controller';
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const itemData = await request.json();
-    const newItem = await addInvoiceItem(Number(params.id), itemData);
+    const newItem = await addInvoiceItem(Number(id), itemData);
     return NextResponse.json(newItem, { status: 201 });
   } catch (error) {
     return NextResponse.json(
@@ -20,9 +21,10 @@ export async function POST(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { searchParams } = new URL(request.url);
     const itemId = searchParams.get('itemId');
 
@@ -33,7 +35,7 @@ export async function DELETE(
       );
     }
 
-    await deleteInvoiceItem(Number(params.id), Number(itemId));
+    await deleteInvoiceItem(Number(id), Number(itemId));
     return new NextResponse(null, { status: 204 });
   } catch (error) {
     return NextResponse.json(

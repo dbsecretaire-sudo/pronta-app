@@ -7,3 +7,4 @@ export type {
     UpdateUser, 
     UserFilter 
 } from "@/app/Types/Users/index";
+export { UserModel } from "@/app/Types/Users/model";
