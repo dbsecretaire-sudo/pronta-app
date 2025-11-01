@@ -58,20 +58,16 @@ export const authOptions: import("next-auth").NextAuthOptions = {
     async session({ session, token }) {
         if (token.id) {
         session.user = {
-            id: token.id as string,
-            email: token.email as string,
-            name: token.name as string,
+            id: token.id,
+            email: token.email,
+            name: token.name,
         };
-
-        session.auth = {
-            userId: token.id as string,
-            email: token.email as string,
-            name: token.name as string,
-        };
+        // ❌ Supprime temporairement `session.auth`
+        // session.auth = { ... };
         }
         return session;
     },
-    },
+},
   secret: process.env.NEXTAUTH_SECRET,
   cookies: {
     sessionToken: {
