@@ -62,9 +62,14 @@ const callbacks = {
         email: token.email as string,
         name: token.name as string,
       };
+      session.auth = {  // Remplis session.auth
+        userId: token.id,
+        email: token.email as string,
+        name: token.name as string,
+      };
     }
     return session;
-  },
+  }
 };
 
 export const authOptions: NextAuthOptions = {
