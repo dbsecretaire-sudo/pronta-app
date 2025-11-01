@@ -21,18 +21,16 @@ export default function DashboardHome() {
     if (status === "authenticated") {
       const fetchData = async () => {
         try {
-          console.log("Hello");
           const [subscribedRes, allServicesRes] = await Promise.all([
             fetch(`/api/UserServices/${session.user.id}`, {credentials: 'include'}),
             fetch('/api/services', {credentials: 'include'})
           ]);
-console.log("Hello1");
+
           if (!subscribedRes.ok) { throw new Error(`Erreur HTTP: ${subscribedRes.status}`);}
           if (!allServicesRes.ok) { throw new Error(`Erreur HTTP: ${allServicesRes.status}`); }
-
           const subscribedServices = await subscribedRes.json();
           const allServices = await allServicesRes.json();
-console.log("Hello2");
+
           if (!Array.isArray(subscribedServices)) {
             setServices([]);
             setAvailableServices(
@@ -43,16 +41,15 @@ console.log("Hello2");
             );
             return;
           }
-console.log("Hello3");
+
           const servicesWithStatus = allServices.map((service: AvailableService) => ({
             ...service,
             isSubscribed: subscribedServices.some((s: Service) => s.id === service.id)
           }));
-console.log("Hello4");
+
           setServices(subscribedServices);
-          console.log("Hello5");
           setAvailableServices(servicesWithStatus);
-          console.log("Hello6");
+          
         } catch (error) {
           console.error("Erreur lors de la récupération des données:", error);
         } finally {
@@ -61,13 +58,14 @@ console.log("Hello4");
       };
 
       fetchData();
-    // } else {
-    //   setLoading(false);
+
     }
    }, [status, session]);
 
   const handleSubscribe = async (serviceId: number) => {
     try {
+      console.log(serviceId);
+      console.log("Hello");
       const response = await fetch('/api/user/services', {
         method: 'POST',
         headers: {
