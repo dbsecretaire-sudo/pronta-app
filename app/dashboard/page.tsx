@@ -165,11 +165,11 @@ export default function DashboardHome() {
         <div className="flex justify-between items-center mb-5">
           <h2 className="text-xl font-semibold">Messages importants</h2>
           <span className="text-sm text-gray-500">
-            {messages.filter(m => !m.isRead).length} non lus
+            {/* {messages.filter(m => !m.isRead).length} non lus */}
           </span>
         </div>
 
-        {messages.length > 0 ? (
+        {/* {messages.length > 0 ? (
           <div className="divide-y divide-gray-200">
             {messages.slice(0, 3).map((message) => (
               <div
@@ -194,7 +194,7 @@ export default function DashboardHome() {
           </div>
         ) : (
           <p className="text-gray-500 italic">Aucun message pour le moment.</p>
-        )}
+        )} */}
       </section>
 
       {/* Section Mon Compte (résumé) */}
