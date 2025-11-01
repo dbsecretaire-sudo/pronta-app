@@ -44,22 +44,3 @@ export async function POST(
   }
 }
 
-export async function PATCH(
-  request: Request,
-  { params }: { params: Promise<{ userId: string }> } // Pas besoin de `Promise`, Next.js le résout automatiquement
-) {
-  try {
-    const { userId } = await params; // `params` est déjà résolu
-    const { serviceId } = await request.json();
-    const id = Number(userId);
-
-    const result = await deactivateUserService(id, serviceId);
-    return NextResponse.json(result);
-  } catch (error) {
-    console.error("Erreur lors de la désactivation du service:", error);
-    return NextResponse.json(
-      { error: 'Erreur lors de la désactivation du service' },
-      { status: 500 }
-    );
-  }
-}

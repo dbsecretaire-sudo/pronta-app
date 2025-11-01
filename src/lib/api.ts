@@ -58,17 +58,17 @@ export const subscribeToService = async (serviceId: number) => {
   return res.json();
 };
 
-export const deactivateUserService = async (serviceId: number): Promise<void> => {
-  const response = await fetch('/api/UserServices/deactivate', {
-    method: 'PATCH', // ou 'POST' selon ton API
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-    body: JSON.stringify({ serviceId }),
+export const deactivateUserService = async (userId: number, serviceId: number): Promise<void> => {
+    const response = await fetch(`/api/UserServices/${userId}/${serviceId}`, {
+    method: 'DELETE',
+    credentials: 'include', // Pour les cookies d'authentification
   });
 
   if (!response.ok) {
-    throw new Error(`Erreur lors de la désactivation du service: ${response.status}`);
+    const error = await response.json();
+    console.error(error.error);
+  } else {
+    const result = await response.json();
+    console.log("Service désactivé:", result);
   }
 };

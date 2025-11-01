@@ -71,7 +71,7 @@ export const useServices = (userId: string | undefined, status: string) => {
   // Nouvelle fonction pour se désabonner
   const handleDeactivate = async (serviceId: number) => {
     try {
-      await deactivateUserService(serviceId);
+      await deactivateUserService(Number(userId), serviceId);
       await refreshServices(); // Rafraîchit la liste après désactivation
     } catch (error) {
       console.error("Erreur lors de la désactivation du service:", error);
