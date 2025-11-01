@@ -1,5 +1,5 @@
 import pool from '@/app/lib/db';
-import { InvoiceStatus, Invoice, InvoiceItem, CreateInvoice, CreateInvoiceItem } from "./type";
+import { InvoiceFilter, InvoiceStatus, Invoice, InvoiceItem, CreateInvoice, CreateInvoiceItem } from "./type";
 
 export class InvoiceModel {
     constructor(public data:Invoice) {}
@@ -40,14 +40,7 @@ export class InvoiceModel {
       return res.rows;
     }
 
-    async filterInvoices(filters: {
-      userId?: number;
-      clientId?: number;
-      clientName?:string;
-      status?: InvoiceStatus;
-      startDate?: Date;
-      endDate?: Date;
-    }): Promise<Invoice[]> {
+    async filterInvoices(filters: InvoiceFilter): Promise<Invoice[]> {
       let query = "SELECT * FROM invoices WHERE 1=1";
       const params: any[] = [];
       let paramIndex = 1;
@@ -57,26 +50,31 @@ export class InvoiceModel {
         params.push(filters.userId);
         paramIndex++;
       }
+
       if (filters.clientId) {
         query += ` AND client_id = $${paramIndex}`;
         params.push(filters.clientId);
         paramIndex++;
       }
+
       if (filters.clientName) {
-        query += ` AND client_name = $${paramIndex}`;
-        params.push(filters.clientName);
+        query += ` AND client_name ILIKE $${paramIndex}`;
+        params.push(`%${filters.clientName}%`);
         paramIndex++;
       }
+
       if (filters.status) {
         query += ` AND status = $${paramIndex}`;
         params.push(filters.status);
         paramIndex++;
       }
+
       if (filters.startDate) {
         query += ` AND created_at >= $${paramIndex}`;
         params.push(filters.startDate);
         paramIndex++;
       }
+
       if (filters.endDate) {
         query += ` AND created_at <= $${paramIndex}`;
         params.push(filters.endDate);
@@ -84,6 +82,7 @@ export class InvoiceModel {
       }
 
       query += " ORDER BY created_at DESC";
+
       const res = await pool.query(query, params);
       return res.rows;
     }

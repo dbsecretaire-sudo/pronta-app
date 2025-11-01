@@ -1,6 +1,6 @@
 // app/api/invoices/controller.ts
 import { InvoiceService } from './service';
-import { CreateInvoiceItem, UpdateInvoiceStatus, InvoiceStatus } from './types';
+import { CreateInvoiceItem, UpdateInvoiceStatus, InvoiceStatus, InvoiceFilter } from './types';
 import pool from '@/app/lib/db';
 
 const invoiceService = new InvoiceService();
@@ -17,7 +17,7 @@ export const getInvoicesByClient = async (clientId: number) => {
   return await invoiceService.getInvoicesByClient(clientId);
 };
 
-export const filterInvoices = async (filters: Record<string, string>) => {
+export const filterInvoices = async (filters: InvoiceFilter) => {
   return await invoiceService.filterInvoices(filters);
 };
 

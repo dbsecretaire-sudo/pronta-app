@@ -28,6 +28,7 @@ export type CreateInvoiceItem = Omit<InvoiceItem, "id" >;
 export interface InvoiceFilter {
   userId?: number;
   clientId?: number;
+  clientName?: string;
   status?: InvoiceStatus;
   startDate?: Date;
   endDate?: Date;
