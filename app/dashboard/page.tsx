@@ -81,8 +81,10 @@ export default function DashboardHome() {
           fetch('/api/services', {credentials: 'include'})
         ]);
 
-        const subscribedServices = await subscribedRes.json();
+        const subscribedServicesData = await subscribedRes.json();
         const allServices = await allServicesRes.json();
+
+const subscribedServices = subscribedServicesData.map((subscription: any) => subscription.service);
 
         const servicesWithStatus = allServices.map((service: AvailableService) => ({
           ...service,
