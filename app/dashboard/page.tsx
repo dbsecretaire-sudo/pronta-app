@@ -97,8 +97,8 @@ export default function DashboardHome() {
   };
 
   if (loading) return <div className="p-8">Chargement...</div>;
-console.log(services);
-console.log(availableServices);
+services.map((service) => console.log(service)); //services souscrits
+console.log(availableServices); //services disponibles
   return (
     <div className="p-8 max-w-7xl mx-auto">
       <h1 className="text-2xl font-bold mb-8">Tableau de bord</h1>
