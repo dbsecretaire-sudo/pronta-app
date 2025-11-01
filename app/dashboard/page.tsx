@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react"; // ✅ Ajoute useSession
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Service, AvailableService } from "@/app/Types/Services/index";
@@ -8,70 +8,70 @@ import { UserService } from "@/app/Types/UserServices/index";
 import { Message } from "@/app/Types/Components/Message/Message";
 
 export default function DashboardHome() {
-  const { data: session, status } = useSession(); // ✅ Récupère la session
+  const { data: session, status } = useSession();
   const [services, setServices] = useState<Service[]>([]);
   const [availableServices, setAvailableServices] = useState<AvailableService[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  useEffect(() => {
-    if (status === "loading") {
-        return;
-    }
-    if (status === "unauthenticated") {
-      setLoading(false);
-      return;
-    }
+  // useEffect(() => {
+  //   if (status === "loading") {
+  //       return;
+  //   }
+  //   if (status === "unauthenticated") {
+  //     setLoading(false);
+  //     return;
+  //   }
 
-    if (status === "authenticated") {
-      const fetchData = async () => {
-        try {
-          const [subscribedRes, allServicesRes] = await Promise.all([
-            fetch(`/api/UserServices/${session.user.id}`, {credentials: 'include'}),
-            fetch('/api/services', {credentials: 'include'})
-          ]);
+  //   if (status === "authenticated") {
+  //     const fetchData = async () => {
+  //       try {
+  //         const [subscribedRes, allServicesRes] = await Promise.all([
+  //           fetch(`/api/UserServices/${session.user.id}`, {credentials: 'include'}),
+  //           fetch('/api/services', {credentials: 'include'})
+  //         ]);
 
-          if (!subscribedRes.ok) {
-            throw new Error(`Erreur HTTP: ${subscribedRes.status}`);
-          }
+  //         if (!subscribedRes.ok) {
+  //           throw new Error(`Erreur HTTP: ${subscribedRes.status}`);
+  //         }
 
-          if (!allServicesRes.ok) {
-            throw new Error(`Erreur HTTP: ${allServicesRes.status}`);
-          }
+  //         if (!allServicesRes.ok) {
+  //           throw new Error(`Erreur HTTP: ${allServicesRes.status}`);
+  //         }
 
-          const subscribedServices = await subscribedRes.json();
-          const allServices = await allServicesRes.json();
+  //         const subscribedServices = await subscribedRes.json();
+  //         const allServices = await allServicesRes.json();
 
-          if (!Array.isArray(subscribedServices)) {
-            console.error("subscribedServices n'est pas un tableau :", subscribedServices);
-            setServices([]);
-            setAvailableServices(
-              allServices.map((service: AvailableService) => ({
-                ...service,
-                isSubscribed: false
-              }))
-            );
-            return;
-          }
+  //         if (!Array.isArray(subscribedServices)) {
+  //           console.error("subscribedServices n'est pas un tableau :", subscribedServices);
+  //           setServices([]);
+  //           setAvailableServices(
+  //             allServices.map((service: AvailableService) => ({
+  //               ...service,
+  //               isSubscribed: false
+  //             }))
+  //           );
+  //           return;
+  //         }
 
-          const servicesWithStatus = allServices.map((service: AvailableService) => ({
-            ...service,
-            isSubscribed: subscribedServices.some((s: Service) => s.id === service.id)
-          }));
+  //         const servicesWithStatus = allServices.map((service: AvailableService) => ({
+  //           ...service,
+  //           isSubscribed: subscribedServices.some((s: Service) => s.id === service.id)
+  //         }));
 
-          setServices(subscribedServices);
-          setAvailableServices(servicesWithStatus);
-        } catch (error) {
-          console.error("Erreur lors de la récupération des données:", error);
-        } finally {
-          setLoading(false);
-        }
-      };
+  //         setServices(subscribedServices);
+  //         setAvailableServices(servicesWithStatus);
+  //       } catch (error) {
+  //         console.error("Erreur lors de la récupération des données:", error);
+  //       } finally {
+  //         setLoading(false);
+  //       }
+  //     };
 
-      fetchData();
-    }
-  }, [status]);
+  //     fetchData();
+  //   }
+  // }, [status]);
 
   const handleSubscribe = async (serviceId: number) => {
     try {
