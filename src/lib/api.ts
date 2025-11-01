@@ -69,6 +69,6 @@ export const deactivateUserService = async (userId: number, serviceId: number): 
     console.error(error.error);
   } else {
     const result = await response.json();
-    console.log("Service désactivé:", result);
+    console.log(`Service désactivé: userId: ${userId}, serviceId: ${serviceId}`, result);
   }
 };
