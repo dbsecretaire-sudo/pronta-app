@@ -16,23 +16,19 @@ const providers = [
       if (!credentials?.email || !credentials?.password) {
         throw new Error("Email et mot de passe requis");
       }
-
       try {
         const { rows } = await pool.query(
           "SELECT id, email, password_hash, name FROM users WHERE email = $1",
           [credentials.email]
         );
-
         const user = rows[0];
         if (!user) {
           throw new Error("Email ou mot de passe incorrect");
         }
-
         const isValid = await compare(credentials.password, user.password_hash);
         if (!isValid) {
           throw new Error("Email ou mot de passe incorrect");
         }
-
         return {
           id: user.id.toString(),
           email: user.email,
@@ -47,7 +43,7 @@ const providers = [
 ];
 
 const callbacks = {
-  async jwt({ token, user } : {token: NextAuthJWT; user?: any }): Promise<NextAuthJWT> {
+  async jwt({ token, user }: { token: NextAuthJWT; user?: any }): Promise<NextAuthJWT> {
     if (user) {
       token.id = user.id;
       token.email = user.email || '';
@@ -62,11 +58,8 @@ const callbacks = {
         email: token.email as string,
         name: token.name as string,
       };
-      session.auth = {  // Remplis session.auth
-        userId: token.id,
-        email: token.email as string,
-        name: token.name as string,
-      };
+      // ❌ Retire cette ligne si tu n'utilises pas `session.auth`
+      // session.auth = { userId: token.id, email: token.email as string, name: token.name as string };
     }
     return session;
   }
