@@ -1,6 +1,6 @@
 // app/api/invoices/[userId]/route.ts
 import { NextResponse, NextRequest } from 'next/server';
-import { InvoiceService } from "../service";
+import { InvoiceService } from "../../service";
 
 const invoiceService = new InvoiceService;
 
