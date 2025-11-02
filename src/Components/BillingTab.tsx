@@ -1,4 +1,5 @@
 // src/components/BillingTab.tsx
+"use client";
 import { useState } from "react";
 import { Button } from "@/src/Components";
 

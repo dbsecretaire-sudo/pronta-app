@@ -1,4 +1,6 @@
 // src/components/MessagesTab.tsx
+"use client";
+
 export function MessagesTab() {
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
