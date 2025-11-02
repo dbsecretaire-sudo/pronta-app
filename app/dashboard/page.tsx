@@ -53,8 +53,7 @@ export default function DashboardHome() {
                   service={service}
                   isSubscribed={!!service.userService}
                   onSubscribe={!service.userService ? handleSubscribe : undefined}
-                  onDeactivate={service.userService?.is_active ? handleDeactivate : undefined}
-                  onReactivate={shouldShowReactivate ? handleReactivate : undefined}
+                  onReactivate = {!service.userService ? handleReactivate : undefined}
                   userService={service.userService}
                 />
               );
