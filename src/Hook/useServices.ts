@@ -134,6 +134,7 @@ export const useServices = (userId: string | undefined, status: string) => {
 
   const handleReactivate = async (service: Service) => {
     if (!userId) return;
+    console.log("service: ", service);
     try {
       await reactivateUserService(Number(userId), service.id);
       await updateUserSubscription(Number(userId), {
