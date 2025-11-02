@@ -43,7 +43,7 @@ export const ServiceCard = ({
           </button>
         ) : (
           <button
-            onClick={() => {console.log("Réactiver cliqué pour:", service.id); onReactivate?.(service.id);}} // ✅ Bouton "Réactiver" pour les services désactivés
+            onClick={() => {console.log("Bouton Réactiver cliqué pour le service:", service.id); onReactivate?.(service.id);}} // ✅ Bouton "Réactiver" pour les services désactivés
             className="bg-green-100 text-green-800 px-4 py-2 rounded-md hover:bg-green-200"
           >
             Réactiver

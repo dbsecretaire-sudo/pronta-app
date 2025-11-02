@@ -45,6 +45,7 @@ export default function DashboardHome() {
           <h2 className="text-xl font-semibold mb-4">Services disponibles</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {availableServices.map((service) => {
+              const shouldShowReactivate = service.isSubscribed && !service.userService?.is_active;
               console.log("Service:", service.id, {
                 isSubscribed: service.isSubscribed,
                 isActive: service.userService?.is_active,
@@ -59,7 +60,7 @@ export default function DashboardHome() {
                   isSubscribed={service.isSubscribed}
                   onSubscribe={!service.isSubscribed ? handleSubscribe : undefined}
                   onDeactivate={service.isSubscribed && service.userService?.is_active ? handleDeactivate : undefined}
-                  onReactivate={service.isSubscribed && !service.userService?.is_active ? handleReactivate : undefined}
+                  onReactivate={shouldShowReactivate ? handleReactivate : undefined}
                   userService={service.userService}
                 />
               );

@@ -130,6 +130,7 @@ allServices.forEach((service:Service) => {
   };
 
   const handleReactivate = async (serviceId: number) => {
+    console.log("handleReactivate appelée pour:", serviceId, userId);
   if (!userId) return;
 
   try {
