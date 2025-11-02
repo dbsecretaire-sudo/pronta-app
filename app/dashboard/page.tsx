@@ -13,8 +13,7 @@ export default function DashboardHome() {
   const subscribedServices = availableServices.filter(s => s.userService?.is_active);
   const servicesToReactivate = availableServices.filter(s => !s.userService?.is_active);
   const servicesToSubscribe = availableServices.filter(s => !s.userService);
-  console.log(servicesToReactivate);
-console.log(servicesToSubscribe);
+
   return (
     <div className="p-8 max-w-7xl mx-auto">
       <h1 className="text-2xl font-bold mb-8">Tableau de bord</h1>
