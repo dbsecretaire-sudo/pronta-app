@@ -45,17 +45,17 @@ export default function DashboardLayout({
 
   return (
     <div className="flex flex-col min-h-screen">
-      {!isInService && (
+
         <NavBar
           showLogo={true}
           logoText="Pronta"
           isInService={isInService}
           userServices={userServices}
         />
-      )}
+      
 
       {/* Contenu principal avec marge si navbar est affichée */}
-      <main className={`flex-1 ${!isInService ? 'md:ml-64' : ''} transition-all duration-200`}>
+      <main className={`flex-1 transition-all duration-200`}>
         {children}
       </main>
     </div>
