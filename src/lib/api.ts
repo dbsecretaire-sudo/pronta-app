@@ -155,11 +155,10 @@ export const updateUserSubscription =  async (userId: number, data: {
   next_payment_date?: Date,
   subscription_status?: string;
 }) => {
-  console.log("updateUserSubscription");
+  console.log("updateUserSubscription", data);
   const res = await fetch(`/api/user/${userId}/subscription`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
     body: JSON.stringify({ data }),
   });
   if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
