@@ -40,19 +40,20 @@ export default function DashboardHome() {
         )}
       </section>
       {/* Services disponibles */}
-      {availableServices.some(s => !s.isSubscribed) && (
+      {availableServices.length > 0 && (
         <section className="mb-10">
           <h2 className="text-xl font-semibold mb-4">Services disponibles</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {availableServices
-              .filter(s => !s.isSubscribed)
-              .map((service) => (
-                <ServiceCard
-                  key={service.id}
-                  service={service}
-                  onSubscribe={handleSubscribe}
-                />
-              ))}
+            {availableServices.map((service) => (
+              <ServiceCard
+                key={service.id}
+                service={service}
+                isSubscribed={service.isSubscribed}
+                onSubscribe={!service.isSubscribed ? handleSubscribe : undefined}
+                onDeactivate={service.isSubscribed && !service.userService?.is_active ? handleDeactivate : undefined}
+                userService={service.userService}
+              />
+            ))}
           </div>
         </section>
       )}
