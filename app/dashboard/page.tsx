@@ -41,12 +41,12 @@ export default function DashboardHome() {
       </section>
 
       {/* Services disponibles (à réactiver ou à souscrire) */}
-      {(servicesToReactivate.length > 0 || servicesToSubscribe.length > 0) && (
-        <section className="mb-10">
-          <h2 className="text-xl font-semibold mb-4">Services disponibles</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Services à réactiver */}
-            {servicesToReactivate.map((service) => (
+      <section className="mb-10">
+        <h2 className="text-xl font-semibold mb-4">Services disponibles</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Services à réactiver */}
+          {servicesToReactivate.length > 0 &&
+            servicesToReactivate.map((service) => (
               <ServiceCard
                 key={service.id}
                 service={service}
@@ -55,8 +55,9 @@ export default function DashboardHome() {
                 userService={service.userService}
               />
             ))}
-            {/* Services à souscrire */}
-            {servicesToSubscribe.map((service) => (
+          {/* Services à souscrire */}
+          {servicesToSubscribe.length > 0 &&
+            servicesToSubscribe.map((service) => (
               <ServiceCard
                 key={service.id}
                 service={service}
@@ -65,9 +66,8 @@ export default function DashboardHome() {
                 userService={service.userService}
               />
             ))}
-          </div>
-        </section>
-      )}
+        </div>
+      </section>
 
       {/* Section Messagerie intégrée */}
       <section className="mb-10 bg-white rounded-lg shadow-md p-6">
