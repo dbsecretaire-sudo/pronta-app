@@ -36,4 +36,8 @@ export class UserServiceService {
   async deactivateUserService(userId: number, serviceId: number): Promise<UserService> {
     return this.userServiceModel.deactivateUserService(userId, serviceId);
   }
+
+  async reactivateUserService(userId: number, serviceId: number): Promise<UserService> {
+    return this.userServiceModel.reactivateUserService(userId, serviceId);
+  }
 }

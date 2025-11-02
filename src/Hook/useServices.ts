@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Service, AvailableService } from '@/src/Types/Services/index';
 import { UserServiceWithDetails } from '@/src/Types/UserServices';
-import { fetchUserServices, fetchAllServices, subscribeToService, deactivateUserService } from '@/src/lib/api';
+import { fetchUserServices, fetchAllServices, subscribeToService, deactivateUserService, reactivateUserService } from '@/src/lib/api';
 
 export const useServices = (userId: string | undefined, status: string) => {
   const [services, setServices] = useState<Service[]>([]);
@@ -115,5 +115,36 @@ export const useServices = (userId: string | undefined, status: string) => {
     }
   };
 
-  return { services, availableServices, loading, error, handleSubscribe, handleDeactivate};
+  const handleReactivate = async (serviceId: number) => {
+    if (!userId) return;
+
+    try {
+      const userServices = await Promise.all([
+        fetchUserServices(userId),
+      ]);
+
+      const userService = userServices.find(
+        (us: UserServiceWithDetails) => us.service_id === serviceId
+      );
+
+      if (!userService) {
+        setError("Vous n'êtes pas abonné à ce service.");
+        return;
+      }
+
+      if (userService.is_active) {
+        setError("Cet abonnement est déjà actif.");
+        return;
+      }
+
+      // Appelle une fonction API pour réactiver le service
+      await reactivateUserService(Number(userId), serviceId);
+      await refreshServices();
+    } catch (error) {
+      console.error("Erreur lors de la réactivation:", error);
+      setError(error instanceof Error ? error.message : "Échec de la réactivation.");
+    }
+  };
+
+  return { services, availableServices, loading, error, handleSubscribe, handleDeactivate, handleReactivate};
 };

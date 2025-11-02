@@ -6,7 +6,7 @@ import { ServiceCard, MessageList, AccountSummary } from '@/src/Modules/index';
 
 export default function DashboardHome() {
   const { data: session, status } = useSession();
-  const { services, availableServices, loading, handleSubscribe, handleDeactivate } = useServices(session?.user?.id, status);
+  const { services, availableServices, loading, handleSubscribe, handleDeactivate, handleReactivate } = useServices(session?.user?.id, status);
 
   if (loading) return <div className="p-8">Chargement...</div>;
 
@@ -52,6 +52,7 @@ export default function DashboardHome() {
                 onSubscribe={!service.isSubscribed ? handleSubscribe : undefined}
                 onDeactivate={service.isSubscribed && !service.userService?.is_active ? handleDeactivate : undefined}
                 userService={service.userService}
+                onReactivate={service.isSubscribed && !service.userService?.is_active ? handleReactivate : undefined} 
               />
             ))}
           </div>

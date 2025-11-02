@@ -121,4 +121,15 @@ export class UserServiceModel {
     );
     return res.rows[0];
   }
+
+  async reactivateUserService(userId: number, serviceId: number): Promise<UserService> {
+    const res = await pool.query(
+      `UPDATE user_services
+       SET is_active = TRUE
+       WHERE user_id = $1 AND service_id = $2
+       RETURNING *`,
+      [userId, serviceId]
+    );
+    return res.rows[0];
+  }
 }

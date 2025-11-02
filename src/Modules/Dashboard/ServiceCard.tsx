@@ -7,6 +7,7 @@ interface ServiceCardProps {
   isSubscribed?: boolean;
   onSubscribe?: (serviceId: number) => void;
   onDeactivate?: (serviceId: number) => void;
+  onReactivate?: (serviceId: number) => void;
   userService?: UserService;
 }
 
@@ -15,6 +16,7 @@ export const ServiceCard = ({
   isSubscribed, 
   onSubscribe, 
   onDeactivate,
+  onReactivate,
   userService
 }: ServiceCardProps) => (
   <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100">
@@ -22,18 +24,27 @@ export const ServiceCard = ({
       <span className="text-2xl mr-3">{service.icon}</span>
       <h3 className="text-lg font-medium">{service.name}</h3>
     </div>
-    <p className="text-gray-600 mb-4">{service.description}</p>
+    <p className="text-gray-600 mb-4">{service.description}</p>    
+    
+    {/* Actions */}
     {isSubscribed ? (
       <>
-        <Link href={service.route} className="text-sm text-blue-600 font-medium block mb-2">
-          Accéder →
-        </Link>
+        {userService?.is_active && ( // ✅ Affiche "Accéder" uniquement si actif
+          <Link href={service.route} className="text-sm text-blue-600 font-medium block mb-2">
+            Accéder →
+          </Link>
+        )}
         {userService?.is_active ? (
-          <span className="text-gray-500 text-sm">Abonnement actif</span>
+          <button
+            onClick={() => onDeactivate?.(service.id)} // ✅ Bouton "Désactiver" pour les services actifs
+            className="bg-red-100 text-red-800 px-4 py-2 rounded-md hover:bg-red-200"
+          >
+            Désactiver
+          </button>
         ) : (
           <button
-            onClick={() => onDeactivate?.(service.id)}
-            className="bg-red-100 text-red-800 px-4 py-2 rounded-md hover:bg-red-200"
+            onClick={() => onReactivate?.(service.id)} // ✅ Bouton "Réactiver" pour les services désactivés
+            className="bg-green-100 text-green-800 px-4 py-2 rounded-md hover:bg-green-200"
           >
             Réactiver
           </button>
@@ -41,11 +52,12 @@ export const ServiceCard = ({
       </>
     ) : (
       <button
-        onClick={() => onSubscribe?.(service.id)}
+        onClick={() => onSubscribe?.(service.id)} // ✅ Bouton "Souscrire" pour les services non abonnés
         className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
       >
         Souscrire
       </button>
     )}
+    
   </div>
 );

@@ -42,3 +42,10 @@ export const deactivateUserService = async (
 ): Promise<UserService> => {
   return await userServiceService.deactivateUserService(userId, serviceId);
 };
+
+export const reactivateUserService = async (
+  userId: number,
+  serviceId: number
+): Promise<UserService> => {
+  return await userServiceService.reactivateUserService(userId, serviceId);
+};

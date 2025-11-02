@@ -72,3 +72,18 @@ export const deactivateUserService = async (userId: number, serviceId: number): 
     console.log(`Service désactivé: userId: ${userId}, serviceId: ${serviceId}`, result);
   }
 };
+
+export const reactivateUserService = async (userId: number, serviceId: number): Promise<void> => {
+    const response = await fetch(`/api/UserServices/${userId}/${serviceId}`, {
+    method: 'DELETE',
+    credentials: 'include', // Pour les cookies d'authentification
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    console.error(error.error);
+  } else {
+    const result = await response.json();
+    console.log(`Service réactivé: userId: ${userId}, serviceId: ${serviceId}`, result);
+  }
+};
