@@ -10,7 +10,7 @@ export function BillingTab({ data, onEdit, isUpdating = false }: BillingTabProps
     billing: false,
     payment: false,
   });
-
+  console.log("BillingTab.tsx: ", data);
   const [formData, setFormData] = useState({
     subscription_plan: data.subscription_plan || "",
     next_payment_date: data.next_payment_date || undefined,
@@ -30,6 +30,7 @@ export function BillingTab({ data, onEdit, isUpdating = false }: BillingTabProps
     },
   });
 
+console.log("BillingTab.tsx: ", formData);
   const handleSubmit = async (e: React.FormEvent, type: "billing" | "payment") => {
     e.preventDefault();
     const payload = type === "billing" ? { billing_address: formData.billing_address } : { payment_method: formData.payment_method };
