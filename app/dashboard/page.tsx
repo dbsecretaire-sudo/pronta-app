@@ -44,17 +44,26 @@ export default function DashboardHome() {
         <section className="mb-10">
           <h2 className="text-xl font-semibold mb-4">Services disponibles</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {availableServices.map((service) => (
-              <ServiceCard
-                key={service.id}
-                service={service}
-                isSubscribed={service.isSubscribed}
-                onSubscribe={!service.isSubscribed ? handleSubscribe : undefined}
-                onDeactivate={service.isSubscribed && service.userService?.is_active ? handleDeactivate : undefined}
-                onReactivate={service.isSubscribed && !service.userService?.is_active ? handleReactivate : undefined} 
-                userService={service.userService}
-              />
-            ))}
+            {availableServices.map((service) => {
+              console.log("Service:", service.id, {
+                isSubscribed: service.isSubscribed,
+                isActive: service.userService?.is_active,
+                userService: service.userService,
+                onReactivateCondition: service.isSubscribed && !service.userService?.is_active
+              }); // ✅ Log correctement placé
+
+              return (
+                <ServiceCard
+                  key={service.id}
+                  service={service}
+                  isSubscribed={service.isSubscribed}
+                  onSubscribe={!service.isSubscribed ? handleSubscribe : undefined}
+                  onDeactivate={service.isSubscribed && service.userService?.is_active ? handleDeactivate : undefined}
+                  onReactivate={service.isSubscribed && !service.userService?.is_active ? handleReactivate : undefined}
+                  userService={service.userService}
+                />
+              );
+            })}
           </div>
         </section>
       )}
