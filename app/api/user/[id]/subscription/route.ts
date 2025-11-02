@@ -10,8 +10,8 @@ export async function PUT(
   try {
     const { id } = await params;
     const userData = await request.json();
-    console.log("user/[id]/subscription");
     const updatedUser = await updateUserSubscription(Number(id), userData);
+    console.log("user/[id]/subscription", updatedUser);
     return NextResponse.json(updatedUser);
   } catch (error) {
     return NextResponse.json(
