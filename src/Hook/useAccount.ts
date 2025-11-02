@@ -51,6 +51,9 @@ export function useAccount() {
       };
       is_default?: boolean;
     };
+    subscription_end_date?: Date;
+    next_payment_date?: Date;
+    subscription_status?: string;
   }) => {
     setIsUpdating(true);
     try {
@@ -76,37 +79,7 @@ export function useAccount() {
     }
   };
 
-  const handleSubscriptionUpdate = async (updatedData: {
-    subscription_plan?: string;
-    subscription_end_date?: Date;
-    next_payment_date?: Date;
-    subscription_status?: string;
-  }) => {
-    setIsUpdating(true);
-    try {
-      const response = await fetch(`/api/users/${userData?.id}/subscription`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedData),
-      });
-
-      if (!response.ok) {
-        throw new Error("Échec de la mise à jour des informations de souscription");
-      }
-
-      await mutate();
-      return { success: true, message: "Informations de souscription mises à jour !" };
-    } catch (error) {
-      console.error("Erreur:", error);
-      return { success: false, message: "Erreur lors de la mise à jour" };
-    } finally {
-      setIsUpdating(false);
-    }
-  };
-
-  return {
+    return {
     userData,
     loading,
     error,
@@ -114,7 +87,6 @@ export function useAccount() {
     setActiveTab,
     isUpdating,
     handleProfileUpdate,
-    handleBillingUpdate,
-    handleSubscriptionUpdate,
+    handleBillingUpdate
   };
 }
