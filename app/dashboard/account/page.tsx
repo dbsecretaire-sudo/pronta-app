@@ -17,7 +17,7 @@ export default function AccountPage() {
   if (loading) return <div className="text-center py-8">Chargement...</div>;
   if (error) return <div className="text-center py-8 text-red-500">Erreur: {error}</div>;
   if (!userData) return <div className="text-center py-8">Utilisateur non trouvé</div>;
-
+console.log("account/page.tsx: ", userData);
   const tabs = [
     {
       id: "profile",
