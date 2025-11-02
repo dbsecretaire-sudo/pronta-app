@@ -149,7 +149,7 @@ export async function updateBilling(userId: number, data: {
 }
 
 
-export const updateUserSubscription =  async (action: string, userId: number, data: {
+export const updateUserSubscription =  async (userId: number, data: {
   subscription_plan?: string;
   subscription_end_date?: Date;
   next_payment_date?: Date,
