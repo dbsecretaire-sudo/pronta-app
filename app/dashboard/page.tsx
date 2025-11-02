@@ -51,7 +51,7 @@ console.log(servicesToSubscribe);
               <ServiceCard
                 key={service.id}
                 service={service}
-                isSubscribed={false}
+                isSubscribed={true}
                 onReactivate={handleReactivate}
                 userService={service.userService}
               />
