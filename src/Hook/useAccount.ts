@@ -2,6 +2,7 @@
 import { useUser } from "@/src/Hook/useUser";
 import { useState } from "react";
 import { updateProfile, updateBilling } from "@/src/lib/api";
+import { User } from "@/src/Types/Users";
 
 export function useAccount() {
   const { userData, loading, error, mutate } = useUser();
@@ -13,6 +14,11 @@ export function useAccount() {
     phone: string;
     company: string;
   }) => {
+    if(!userData?.id){
+      console.error('User data is not available');
+      return { success: false, message: "Utilisateur non trouvé"};
+    }
+
     setIsUpdating(true);
     try {
       await updateProfile(userData.id, updatedData);
@@ -29,25 +35,36 @@ export function useAccount() {
   const handleBillingUpdate = async (updatedData: {
     subscription_plan?: string;
     billing_address?: {
-      street: string;
-      city: string;
-      state: string;
-      postal_code: number;
-      country: string;
+      street?: string;
+      city?: string;
+      state?: string;
+      postal_code?: number;
+      country?: string;
     };
     payment_method?: {
-      type: string;
-      details: {
+      type?: string;
+      details?: {
         card_last_four?: string;
         card_brand?: string;
         paypal_email?: string;
       };
-      is_default: boolean;
+      is_default?: boolean;
     };
   }) => {
     setIsUpdating(true);
     try {
-      await updateBilling(userData.id, updatedData);
+      const response = await fetch(`/api/users/${userData?.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Échec de la mise à jour des informations de facturation");
+      }
+
       await mutate();
       return { success: true, message: "Informations de facturation mises à jour !" };
     } catch (error) {

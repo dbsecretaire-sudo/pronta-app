@@ -2,7 +2,8 @@ export type {
     User, 
     Role, 
     BillingAddress, 
-    PaymentMethod, 
+    PaymentMethod,
+    PaymentMethodDetails, 
     CreateUser, 
     UpdateUser, 
     UserFilter 

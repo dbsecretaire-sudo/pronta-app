@@ -1,10 +1,13 @@
-// src/app/dashboard/account/page.tsx
 "use client";
-import { NavBar, ProfileTab, BillingTab, MessagesTab, Tabs } from "@/src/Components";
+import { useAppLayout } from "@/src/Hook/useAppLayout";
+import { ProfileTab, BillingTab, MessagesTab } from "@/src/Components";
 import { useAccount } from "@/src/Hook/useAccount";
 
-
 export default function AccountPage() {
+  // Utilisation de notre hook global
+  const { userServices } = useAppLayout();
+
+  // Utilisation du hook spécifique au compte
   const {
     userData,
     loading,
@@ -19,11 +22,6 @@ export default function AccountPage() {
   if (loading) return <div className="text-center py-8">Chargement...</div>;
   if (error) return <div className="text-center py-8 text-red-500">Erreur: {error}</div>;
   if (!userData) return <div className="text-center py-8">Utilisateur non trouvé</div>;
-
-  const navItems = [
-    { name: "Tableau de bord", path: "/dashboard", icon: "📊" },
-    { name: "Mon compte", path: "/dashboard/account", icon: "👤" },
-  ];
 
   const tabs = [
     {
@@ -65,8 +63,9 @@ export default function AccountPage() {
   ];
 
   return (
-    <NavBar navItems={navItems} showLogo={true} isInService={false}>
-      <div className="p-8 max-w-4xl mx-auto">
+    <div className="flex flex-col h-screen">
+      {/* Le contenu sera enveloppé par AppLayout qui gère la navbar globale */}
+      <div className="p-8 max-w-4xl mx-auto w-full">
         <h1 className="text-2xl font-bold mb-8">Mon compte</h1>
 
         {/* Version mobile */}
@@ -108,6 +107,6 @@ export default function AccountPage() {
         {/* Contenu de l'onglet actif */}
         {tabs.find(tab => tab.id === activeTab)?.content}
       </div>
-    </NavBar>
+    </div>
   );
 }

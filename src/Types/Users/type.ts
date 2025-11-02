@@ -4,17 +4,19 @@ export interface BillingAddress {
   street?: string;
   city?: string;
   state?: string;
-  postal_code?: string;
+  postal_code?: number;
   country?: string;
 }
 
+export interface PaymentMethodDetails {
+  card_last_four?: string;
+  card_brand?: string;
+  paypal_email?: string;
+}
+
 export interface PaymentMethod {
-  type?: 'credit_card' | 'paypal' | 'bank_transfer';
-  details?: {
-    card_last_four?: string;
-    card_brand?: string;
-    paypal_email?: string;
-  };
+  type?: string;
+  details?: PaymentMethodDetails;
   is_default?: boolean;
 }
 
@@ -33,6 +35,7 @@ export interface User {
   next_payment_date?: Date,
   subscription_status?: string;
   role: Role;
+  // messages?: Message[]; // Si vous avez besoin des messages
 }
 
 export type CreateUser = Omit<User, "id" | "created_at" | "password_hash"> & {

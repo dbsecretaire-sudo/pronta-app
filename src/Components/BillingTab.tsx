@@ -2,46 +2,19 @@
 "use client";
 import { useState } from "react";
 import { Button } from "@/src/Components";
+import { BillingAddress, PaymentMethod } from "../Types/Users";
 
 interface BillingTabProps {
   data: {
     subscription_plan?: string;
     subscription_end_date?: Date;
-    billing_address?: {
-      street: string;
-      city: string;
-      state: string;
-      postal_code: number;
-      country: string;
-    };
-    payment_method?: {
-      type: string;
-      details: {
-        card_last_four?: string;
-        card_brand?: string;
-        paypal_email?: string;
-      };
-      is_default: boolean;
-    };
-  };
+    billing_address?: BillingAddress;
+    payment_method?: PaymentMethod;
+  }
   onEdit: (data: {
     subscription_plan?: string;
-    billing_address?: {
-      street: string;
-      city: string;
-      state: string;
-      postal_code: number;
-      country: string;
-    };
-    payment_method?: {
-      type: string;
-      details: {
-        card_last_four?: string;
-        card_brand?: string;
-        paypal_email?: string;
-      };
-      is_default: boolean;
-    };
+    billing_address?: BillingAddress;
+    payment_method?: PaymentMethod;
   }) => Promise<{ success: boolean; message: string }>;
   isUpdating?: boolean;
 }
@@ -241,12 +214,14 @@ export function BillingTab({ data, onEdit, isUpdating = false }: BillingTabProps
           <div className="flex justify-between items-center">
             <div>
               <h3 className="font-medium mb-2">Méthode de paiement</h3>
-              <p className="capitalize">{data.payment_method.type.replace('_', ' ')}</p>
-              {data.payment_method.type === 'credit_card' && (
-                <p>•••• {data.payment_method.details?.card_last_four}</p>
+              {data.payment_method.type && (  // Vérification supplémentaire
+                <p className="capitalize">{data.payment_method.type.replace('_', ' ')}</p>
               )}
-              {data.payment_method.type === 'paypal' && (
-                <p>{data.payment_method.details?.paypal_email}</p>
+              {data.payment_method.type === 'credit_card' && data.payment_method.details?.card_last_four && (
+                <p>•••• {data.payment_method.details.card_last_four}</p>
+              )}
+              {data.payment_method.type === 'paypal' && data.payment_method.details?.paypal_email && (
+                <p>{data.payment_method.details.paypal_email}</p>
               )}
             </div>
             <Button
