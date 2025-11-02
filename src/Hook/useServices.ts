@@ -1,7 +1,7 @@
 // src/Hook/useServices.ts
 import { useState, useEffect } from 'react';
 import { Service, AvailableService } from '@/src/Types/Services/index';
-import { UserServiceWithDetails } from '@/src/Types/UserServices';
+import { UserService, UserServiceWithDetails } from '@/src/Types/UserServices';
 import { fetchUserServices, fetchAllServices, subscribeToService, deactivateUserService, reactivateUserService } from '@/src/lib/api';
 
 export const useServices = (userId: string | undefined, status: string) => {
@@ -12,59 +12,70 @@ export const useServices = (userId: string | undefined, status: string) => {
   const [userServices, setUserServices] = useState<UserServiceWithDetails[]>([]);
 
   const fetchData = async () => {
-    if (!userId) {
-      setLoading(false);
-      return;
-    }
+  if (!userId) {
+    setLoading(false);
+    return;
+  }
 
-    try {
-      setLoading(true);
-      setError(null);
+  try {
+    setLoading(true);
+    setError(null);
 
-      const [fetchedUserServices, allServices] = await Promise.all([
-        fetchUserServices(userId),
-        fetchAllServices(),
-      ]);
+    const [fetchedUserServices, allServices] = await Promise.all([
+      fetchUserServices(Number(userId)),
+      fetchAllServices(),
+    ]);
 
-      setUserServices(fetchedUserServices);
+    console.log("userServices bruts:", fetchedUserServices);  // ✅ Log pour debugging
+    console.log("allServices:", allServices);  // ✅ Log pour debugging
 
-      // Services abonnés et actifs
-      const subscribedServices = Array.isArray(userServices)
-        ? userServices
-            .filter((us: UserServiceWithDetails) => us.is_active)
-            .map((us: UserServiceWithDetails) => us.service)
-        : [];
-
-      // Services disponibles = services non abonnés OU abonnés mais désactivés
-      const servicesWithStatus = allServices.map((service: Service) => {
-        const userService = userServices.find((us: UserServiceWithDetails) => us.service_id === service.id);
-        const isSubscribed = !!userService;
-        const isActive = userService?.is_active;
-
-        return {
-          ...service,
-          isSubscribed,
-          isActive, 
-          userService,
-        };
-      });
-
-      // Filtre les services disponibles :
-      // - Non abonnés (isSubscribed = false)
-      // - OU abonnés mais désactivés (isSubscribed = true && isActive = false)
-      const availableServices = servicesWithStatus.filter(
-        (s: AvailableService) => !s.isSubscribed || (s.isSubscribed && !s.userService?.is_active)
+    // Services abonnés et actifs (pour la section "Mes services")
+    const subscribedServices = Array.isArray(fetchedUserServices)
+      ? fetchedUserServices
+          .filter((us: UserServiceWithDetails) => us.is_active)
+          .map((us: UserServiceWithDetails) => us.service)
+      : [];
+console.log("Mappage des services:");
+allServices.forEach((service:Service) => {
+  const userService = fetchedUserServices.find((us:UserService) => us.service_id === service.id);
+  console.log(`Service ${service.id} (${service.name}):`, {
+    userServiceExists: !!userService,
+    userService: userService,
+    isActive: userService?.is_active
+  });
+});
+    // Services avec statut (pour la section "Services disponibles")
+    const servicesWithStatus = allServices.map((service: Service) => {
+      const userService = fetchedUserServices.find(
+        (us: UserServiceWithDetails) => us.service_id === service.id
       );
 
-      setServices(subscribedServices);
-      setAvailableServices(availableServices); // ✅ Met à jour avec la nouvelle logique
-    } catch (error) {
-      console.error("Erreur lors de la récupération des données:", error);
-      setError("Impossible de charger les services.");
-    } finally {
-      setLoading(false);
-    }
-  };
+      console.log(`Service ${service.id}: userService =`, userService);  // ✅ Log pour debugging
+
+      return {
+        ...service,
+        isSubscribed: !!userService,
+        isActive: userService?.is_active ?? false,
+        userService,  // ✅ Peut être undefined pour les services non abonnés
+      };
+    });
+
+    // Filtre les services disponibles
+    const availableServices = servicesWithStatus.filter(
+      (s: UserService) => !s.subscription_date || (s.subscription_date && !s.is_active)
+    );
+
+    console.log("availableServices:", availableServices);  // ✅ Log pour debugging
+
+    setServices(subscribedServices);
+    setAvailableServices(availableServices);
+  } catch (error) {
+    console.error("Erreur:", error);
+    setError("Impossible de charger les services.");
+  } finally {
+    setLoading(false);
+  }
+};
 
 
   useEffect(() => {

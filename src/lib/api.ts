@@ -35,7 +35,7 @@ export async function fetchCalendar(): Promise<CalendarEvent[]> {
   return res.json();
 }
 
-export const fetchUserServices = async (userId: string) => {
+export const fetchUserServices = async (userId: number) => {
   const res = await fetch(`/api/UserServices/${userId}`, { credentials: 'include' });
   if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
   return res.json();
