@@ -135,37 +135,28 @@ export const useServices = (userId: string | undefined, status: string) => {
   const handleReactivate = async (service: Service) => {
     if (!userId) return;
     try {
-      const userService = userServices.find(
-        (us: UserServiceWithDetails) => us.service_id === service.id
-      );
-
-      const now = new Date();
-      const defaultEndDate = new Date(now);
-      defaultEndDate.setMonth(now.getMonth() + 1);
-
-      if (!userService) {
-        setError("Vous n'êtes pas abonné à ce service.");
-        return;
-      }
-
-      if (userService.is_active) { 
-        setError("Cet abonnement est déjà actif.");
-        return;
-      }
-
       await reactivateUserService(Number(userId), service.id);
       await updateUserSubscription(Number(userId), {
         subscription_plan: service.name,
-        subscription_end_date: new Date(now),
-        next_payment_date: new Date(defaultEndDate),
+        subscription_end_date: endDate,
+        next_payment_date: new Date(endDate),
         subscription_status: "actif",
-      })
+      });
       await refreshServices();
     } catch (error) {
       console.error("Erreur lors de la réactivation:", error);
-      setError(error instanceof Error ? error.message : "Échec de la réactivation.");
+      let errorMessage = "Échec de la réactivation.";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+        if (error.message.includes("reactivate")) {
+          errorMessage = "Échec de la réactivation du service.";
+        } else if (error.message.includes("subscription")) {
+          errorMessage = "Échec de la mise à jour de l'abonnement.";
+        }
+      }
+      setError(errorMessage);
     }
-  };
+  }
 
   return { services, availableServices, loading, error, handleSubscribe, handleDeactivate, handleReactivate};
 };
