@@ -45,7 +45,7 @@ export function BillingTab({ data, onEdit, isUpdating = false }: BillingTabProps
       },
     });
   };
-
+console.log("data: ", data);
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
       <h2 className="text-xl font-semibold mb-6">Facturation</h2>

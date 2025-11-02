@@ -158,7 +158,6 @@ export const updateUserSubscription = async (
     subscription_status?: string;
   }
 ) => {
-  console.log("updateUserSubscription - Début", { userId, data });
 
   // Préparation des données pour l'API
   const requestData = {
@@ -172,7 +171,6 @@ export const updateUserSubscription = async (
     })
   };
 
-  console.log("Données envoyées à l'API:", requestData);
 
   try {
     const res = await fetch(`/api/user/${userId}/subscription`, {
@@ -182,8 +180,6 @@ export const updateUserSubscription = async (
       },
       body: JSON.stringify(requestData), // Pas besoin de { data: ... }
     });
-
-    console.log("Réponse brute:", res);
 
     if (!res.ok) {
       const errorData = await res.json().catch(() => ({}));
@@ -195,7 +191,6 @@ export const updateUserSubscription = async (
     }
 
     const result = await res.json();
-    console.log("Réponse réussie:", result);
     return result;
   } catch (error) {
     console.error("Erreur dans updateUserSubscription:", error);

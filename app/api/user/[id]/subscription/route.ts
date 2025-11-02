@@ -11,7 +11,7 @@ export async function PUT(
     const { id } = await params;
     const userData = await request.json();
     const updatedUser = await updateUserSubscription(Number(id), userData);
-    console.log("user/[id]/subscription", updatedUser);
+;
     return NextResponse.json(updatedUser);
   } catch (error) {
     return NextResponse.json(
