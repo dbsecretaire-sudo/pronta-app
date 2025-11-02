@@ -1,112 +1,109 @@
-"use client";
+// src/components/ProfileTab.tsx
 import { useState } from "react";
+import { Button } from "@/src/Components";
 
-type ProfileData = {
-  email: string;
-  phone: string;
-  company: string;
-};
-
-type ProfileTabProps = {
-  data: ProfileData;
-  onEdit: (updatedData: ProfileData) => Promise<void>;
-};
-
-export function ProfileTab({ data, onEdit }: ProfileTabProps) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [editData, setEditData] = useState<ProfileData>({ ...data });
-
-  const handleEdit = () => {
-    setIsEditing(true);
+interface ProfileTabProps {
+  data: {
+    email: string;
+    phone: string;
+    company: string;
   };
+  onEdit: (data: { email: string; phone: string; company: string }) => Promise<{ success: boolean; message: string }>;
+  isUpdating?: boolean;
+}
 
-  const handleSave = async () => {
-    await onEdit(editData);
-    setIsEditing(false);
-  };
+export function ProfileTab({ data, onEdit, isUpdating = false }: ProfileTabProps) {
+  const [formData, setFormData] = useState(data);
+  const [editMode, setEditMode] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setEditData((prev) => ({ ...prev, [name]: value }));
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const result = await onEdit(formData);
+    if (result.success) {
+      setEditMode(false);
+    }
+    alert(result.message);
   };
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-xl font-semibold mb-4">Informations personnelles</h2>
-      <div className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <h2 className="text-xl font-semibold mb-6">Informations personnelles</h2>
+
+      {editMode ? (
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">Email</label>
-            {isEditing ? (
-              <input
-                type="email"
-                name="email"
-                value={editData.email}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2"
-              />
-            ) : (
-              <p className="mt-1">{data.email}</p>
-            )}
+            <input
+              type="email"
+              value={formData.email}
+              onChange={(e) => setFormData({...formData, email: e.target.value})}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              required
+            />
           </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-700">Téléphone</label>
-            {isEditing ? (
-              <input
-                type="text"
-                name="phone"
-                value={editData.phone}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2"
-              />
-            ) : (
-              <p className="mt-1">{data.phone}</p>
-            )}
+            <input
+              type="tel"
+              value={formData.phone}
+              onChange={(e) => setFormData({...formData, phone: e.target.value})}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            />
           </div>
-        </div>
-        <div className="mt-4">
-          <label className="block text-sm font-medium text-gray-700">Entreprise</label>
-          {isEditing ? (
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Entreprise</label>
             <input
               type="text"
-              name="company"
-              value={editData.company}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2"
+              value={formData.company}
+              onChange={(e) => setFormData({...formData, company: e.target.value})}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />
-          ) : (
-            <p className="mt-1">{data.company}</p>
-          )}
-        </div>
-        <div className="mt-6 flex space-x-3">
-          {isEditing ? (
-            <>
-              <button
-                onClick={handleSave}
-                className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-              >
-                Sauvegarder
-              </button>
-              <button
-                onClick={() => {
-                  setIsEditing(false);
-                  setEditData({ ...data });
-                }}
-                className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300"
-              >
-                Annuler
-              </button>
-            </>
-          ) : (
-            <button
-              onClick={handleEdit}
-              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+          </div>
+
+          <div className="flex space-x-3">
+            <Button
+              type="submit"
+              disabled={isUpdating}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
             >
-              Modifier les informations
-            </button>
-          )}
+              {isUpdating ? "Enregistrement..." : "Enregistrer"}
+            </Button>
+            <Button
+              type="button"
+              onClick={() => {
+                setEditMode(false);
+                setFormData(data);
+              }}
+              className="bg-gray-200 hover:bg-gray-300"
+            >
+              Annuler
+            </Button>
+          </div>
+        </form>
+      ) : (
+        <div className="space-y-4">
+          <div>
+            <p className="text-sm font-medium text-gray-500">Email</p>
+            <p>{data.email}</p>
+          </div>
+          <div>
+            <p className="text-sm font-medium text-gray-500">Téléphone</p>
+            <p>{data.phone || "Non renseigné"}</p>
+          </div>
+          <div>
+            <p className="text-sm font-medium text-gray-500">Entreprise</p>
+            <p>{data.company || "Non renseigné"}</p>
+          </div>
+          <Button
+            onClick={() => setEditMode(true)}
+            className="bg-blue-600 hover:bg-blue-700 text-white mt-4"
+          >
+            Modifier
+          </Button>
         </div>
-      </div>
+      )}
     </div>
   );
 }

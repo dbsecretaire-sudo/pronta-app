@@ -4,7 +4,7 @@ export type { CustomUser } from "./Session";
 export { default as Pagination } from './Pagination/Pagination';
 export type { PaginationProps } from './Pagination/Pagination.types';
 export { default as NavBar } from './NavBar/NavBar';
-export type { NavbarProps, NavItem, ServiceItem } from './NavBar/NavBar.types';
+export type { NavbarProps, ServiceItem } from './NavBar/NavBar.types';
 export { default as Modal } from './Modal/Modal';
 export type { ModalProps } from './Modal/Modal.types';
 export { default as InvoicesFilter } from "./Invoices/InvoicesFilter";
@@ -25,4 +25,8 @@ export { formatDuration, formatDate } from "./Calls/utils";
 export { default as Calendar } from "./Calendar";
 export { AccountTabs } from "./AccountTabs";
 export { ProfileTab } from './ProfileTab';
-export { Tabs } from './Tabs'
+export { Tabs } from './Tabs';
+export { BillingTab } from "./BillingTab";
+export { MessagesTab } from "./MessagesTab";
+export { Button } from "./Button";
+export { AppLayout } from "./Layouts/AppLayout";

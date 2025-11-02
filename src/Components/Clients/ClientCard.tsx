@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { PencilIcon, TrashIcon, EnvelopeIcon, PhoneIcon, BuildingOfficeIcon, MapPinIcon } from "@heroicons/react/24/outline";
-import { ClientCardProps } from "@/src/Components/index"; 
+import { ClientCardProps } from "@/src/Components"; 
 
 const ClientCard: React.FC<ClientCardProps> = ({
   client,

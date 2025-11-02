@@ -1,6 +1,6 @@
 // app/dashboard/Services/prontaInvoices/clients/[id]/page.tsx
 "use client";
-import { ClientForm } from "@/src/Components/index";
+import { ClientForm } from "@/src/Components";
 import { useEditClient } from "@/src/Hook/useEditClient";
 
 export default function EditClientPage() {

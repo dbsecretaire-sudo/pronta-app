@@ -2,10 +2,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { PencilIcon, TrashIcon, PlusIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import Table from "@/src/Components/Table/Table"; // ✅ Corrigé : chemin vers Table
-import Pagination from "@/src/Components/Pagination/Pagination"; // ✅ Corrigé : chemin vers Pagination
-import Modal from "@/src/Components/Modal/Modal"; // ✅ Corrigé : chemin vers Modal
-import { Client, ClientListProps } from "@/src/Components/index"; // ✅ Import depuis types.ts
+import {Table, Pagination, Modal, Client, ClientListProps} from "@/src/Components";
 
 export default function ClientList({
   clients,

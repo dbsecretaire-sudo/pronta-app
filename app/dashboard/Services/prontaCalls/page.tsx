@@ -1,7 +1,7 @@
 // app/dashboard/Services/prontaCalls/page.tsx
 "use client";
 import { useSession } from "next-auth/react";
-import { CallStats, CallList, CallFilter } from "@/src/Components/index";
+import { CallStats, CallList, CallFilter } from "@/src/Components";
 import { useCalls } from "@/src/Hook/useCalls";
 
 export default function ProntaCallsDashboard() {

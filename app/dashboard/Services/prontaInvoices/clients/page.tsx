@@ -1,6 +1,6 @@
 // app/dashboard/Clients/page.tsx
 "use client";
-import { ClientList } from "@/src/Components/index";
+import { ClientList } from "@/src/Components";
 import { useClients } from "@/src/Hook/useClients";
 
 export default function ClientsPage() {

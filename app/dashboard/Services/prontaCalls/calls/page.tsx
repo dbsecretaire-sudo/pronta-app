@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { CallList, CallFilter } from "@/src/Components/index";
+import { CallList, CallFilter } from "@/src/Components";
 import { fetchCalls } from "@/src/lib/api";
 import { CallFilter as CallFilterType } from "@/src/Types/Calls/index";
 

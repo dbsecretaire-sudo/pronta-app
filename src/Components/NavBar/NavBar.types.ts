@@ -1,23 +1,14 @@
-import { ReactNode } from 'react';
-
-export interface NavItem {
-  name: string;
-  path: string;
-  icon?: string | ReactNode;
-}
-
+// src/Components/NavBar.types.ts
 export interface ServiceItem {
   name: string;
   path: string;
-  icon: string | ReactNode;
+  icon: string | React.ReactNode;
 }
 
 export interface NavbarProps {
-  children: ReactNode;
-  navItems: NavItem[];
+  children?: React.ReactNode;
   showLogo?: boolean;
   logoText?: string;
   isInService?: boolean;
-  services?: ServiceItem[];
-  showServicesSection?: boolean;
+  userServices?: ServiceItem[];
 }
