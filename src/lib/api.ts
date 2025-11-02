@@ -59,8 +59,8 @@ export const subscribeToService = async (serviceId: number) => {
 };
 
 export const deactivateUserService = async (userId: number, serviceId: number): Promise<void> => {
-    const response = await fetch(`/api/UserServices/${userId}/${serviceId}`, {
-    method: 'DELETE',
+    const response = await fetch(`/api/UserServices/${userId}/${serviceId}/deactivate`, {
+    method: 'PUT',
     credentials: 'include', // Pour les cookies d'authentification
   });
 
@@ -74,8 +74,8 @@ export const deactivateUserService = async (userId: number, serviceId: number): 
 };
 
 export const reactivateUserService = async (userId: number, serviceId: number): Promise<void> => {
-    const response = await fetch(`/api/UserServices/${userId}/${serviceId}`, {
-    method: 'DELETE',
+    const response = await fetch(`/api/UserServices/${userId}/${serviceId}/reactivate`, {
+    method: 'PUT',
     credentials: 'include', // Pour les cookies d'authentification
   });
 

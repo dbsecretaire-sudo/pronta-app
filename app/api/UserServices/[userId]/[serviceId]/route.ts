@@ -47,20 +47,4 @@ export async function PUT(
   }
 }
 
-// DELETE /api/user-services/[userId]/[serviceId]
-export async function DELETE(
-  request: Request,
-  { params }: { params: Promise<{ userId: string; serviceId: string }> }
-) {
-  try {
-    const { userId, serviceId } = await params; // ✅ Utilisez await pour obtenir les valeurs
-    const deactivatedService = await deactivateUserService(Number(userId), Number(serviceId));
-    return NextResponse.json(deactivatedService);
-  } catch (error) {
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to deactivate service" },
-      { status: 500 }
-    );
-  }
-}
 
