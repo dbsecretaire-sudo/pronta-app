@@ -236,29 +236,29 @@ export class UserModel {
     const values: any[] = [];
     let paramIndex = id;
 
-    if (user.subscription_plan !== undefined) {
-      fields.push(`subscription_plan = $${paramIndex}`);
-      values.push(user.subscription_plan);
-      paramIndex++;
-    }
+    // if (user.subscription_plan !== undefined) {
+    //   fields.push(`subscription_plan = $${paramIndex}`);
+    //   values.push(user.subscription_plan);
+    //   paramIndex++;
+    // }
 
-    if (user.subscription_end_date !== undefined) {
-      fields.push(`subscription_end_date = $${paramIndex}`);
-      values.push(user.subscription_end_date);
-      paramIndex++;
-    }
+    // if (user.subscription_end_date !== undefined) {
+    //   fields.push(`subscription_end_date = $${paramIndex}`);
+    //   values.push(user.subscription_end_date);
+    //   paramIndex++;
+    // }
 
-    if (user.next_payment_date !== undefined) {
-      fields.push(`next_payment_date = $${paramIndex}`);
-      values.push(user.next_payment_date);
-      paramIndex++;
-    }
+    // if (user.next_payment_date !== undefined) {
+    //   fields.push(`next_payment_date = $${paramIndex}`);
+    //   values.push(user.next_payment_date);
+    //   paramIndex++;
+    // }
 
-    if (user.subscription_status !== undefined) {
-      fields.push(`subscription_status = $${paramIndex}`);
-      values.push(user.subscription_status);
-      paramIndex++;
-    }
+    // if (user.subscription_status !== undefined) {
+    //   fields.push(`subscription_status = $${paramIndex}`);
+    //   values.push(user.subscription_status);
+    //   paramIndex++;
+    // }
 
     if (fields.length === 0) {
       return this.getUserById(id) || Promise.reject(new Error('No fields to update'));
