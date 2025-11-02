@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { reactivateUserService } from '../../controller';
+import { reactivateUserService } from '../../../controller';
 
 export async function PATCH(
   request: Request,
