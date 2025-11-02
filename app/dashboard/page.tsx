@@ -14,6 +14,7 @@ export default function DashboardHome() {
   availableServices.forEach((s) => {
     if (s.userService && !s.userService?.is_active) userServicesMap.set(s.id, s.userService);
   });
+   console.log(userServicesMap);
 
   return (
     <div className="p-8 max-w-7xl mx-auto">
@@ -40,20 +41,19 @@ export default function DashboardHome() {
         )}
       </section>
       {/* Services disponibles */}
-      {availableServices.length > 0 && (
+      {userServicesMap.size > 0 && (
         <section className="mb-10">
           <h2 className="text-xl font-semibold mb-4">Services disponibles</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {availableServices.map((service) => {
-              const shouldShowReactivate = service.isSubscribed && !service.userService?.is_active;
-console.log(availableServices);
+            {Array.from(userServicesMap.values()).map((service) => {
+              const shouldShowReactivate = service.userService && !service.userService.is_active;
               return (
                 <ServiceCard
                   key={service.id}
                   service={service}
-                  isSubscribed={service.isSubscribed}
-                  onSubscribe={!service.isSubscribed ? handleSubscribe : undefined}
-                  onDeactivate={service.isSubscribed && service.userService?.is_active ? handleDeactivate : undefined}
+                  isSubscribed={!!service.userService}
+                  onSubscribe={!service.userService ? handleSubscribe : undefined}
+                  onDeactivate={service.userService?.is_active ? handleDeactivate : undefined}
                   onReactivate={shouldShowReactivate ? handleReactivate : undefined}
                   userService={service.userService}
                 />
