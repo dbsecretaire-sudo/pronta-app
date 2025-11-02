@@ -7,9 +7,10 @@ interface ProfileTabProps {
   data: {
     email: string;
     phone: string;
-    company: string;
+    name: string;
+    role: string;
   };
-  onEdit: (data: { email: string; phone: string; company: string }) => Promise<{ success: boolean; message: string }>;
+  onEdit: (data: { email: string; phone: string; name: string; role: string }) => Promise<{ success: boolean; message: string }>;
   isUpdating?: boolean;
 }
 
@@ -26,12 +27,31 @@ export function ProfileTab({ data, onEdit, isUpdating = false }: ProfileTabProps
     alert(result.message);
   };
 
+  // Options pour le rôle
+  const roleOptions = [
+    { value: "admin", label: "Administrateur" },
+    { value: "user", label: "Utilisateur" },
+    { value: "editor", label: "Éditeur" },
+    { value: "viewer", label: "Lecteur" },
+  ];
+
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
       <h2 className="text-xl font-semibold mb-6">Informations personnelles</h2>
 
       {editMode ? (
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Nom complet</label>
+            <input
+              type="text"
+              value={formData.name}
+              onChange={(e) => setFormData({...formData, name: e.target.value})}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              required
+            />
+          </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-700">Email</label>
             <input
@@ -54,13 +74,19 @@ export function ProfileTab({ data, onEdit, isUpdating = false }: ProfileTabProps
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Entreprise</label>
-            <input
-              type="text"
-              value={formData.company}
-              onChange={(e) => setFormData({...formData, company: e.target.value})}
+            <label className="block text-sm font-medium text-gray-700">Rôle d'accès</label>
+            <select
+              value={formData.role}
+              onChange={(e) => setFormData({...formData, role: e.target.value})}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
+              required
+            >
+              {roleOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="flex space-x-3">
@@ -86,6 +112,10 @@ export function ProfileTab({ data, onEdit, isUpdating = false }: ProfileTabProps
       ) : (
         <div className="space-y-4">
           <div>
+            <p className="text-sm font-medium text-gray-500">Nom complet</p>
+            <p>{data.name || "Non renseigné"}</p>
+          </div>
+          <div>
             <p className="text-sm font-medium text-gray-500">Email</p>
             <p>{data.email}</p>
           </div>
@@ -94,8 +124,12 @@ export function ProfileTab({ data, onEdit, isUpdating = false }: ProfileTabProps
             <p>{data.phone || "Non renseigné"}</p>
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-500">Entreprise</p>
-            <p>{data.company || "Non renseigné"}</p>
+            <p className="text-sm font-medium text-gray-500">Rôle d'accès</p>
+            <p>
+              {roleOptions.find(option => option.value === data.role)?.label ||
+               data.role ||
+               "Non spécifié"}
+            </p>
           </div>
           <Button
             onClick={() => setEditMode(true)}
