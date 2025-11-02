@@ -54,9 +54,5 @@ export default function DashboardLayout({
           {children}
         </NavBar>
         
-      
-        
-
-    </div>
   );
 }
