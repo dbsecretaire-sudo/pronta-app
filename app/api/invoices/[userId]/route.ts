@@ -1,41 +1,24 @@
-// // app/api/invoices/[userId]/route.ts
-// import { NextResponse } from 'next/server';
-// import pool from "@/src/lib/db";
-// import { NextRequest } from 'next/server';
+// app/api/invoices/[userId]/route.ts
+import { NextResponse, NextRequest } from 'next/server';
+import { InvoiceService } from "../service";
 
-// export async function GET(
-//   request: NextRequest,
-//   { params }: { params: Promise<{ userId: string }> }
-// ) {
-//   try {
-//     const { userId } = await params;
+const invoiceService = new InvoiceService;
 
-//     if (!userId || isNaN(Number(userId))) {
-//       return NextResponse.json(
-//         { error: "Invalid user ID" },
-//         { status: 400 }
-//       );
-//     }
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ userId: string }> }
+) {  try {
+  const { userId } = await params;
 
-//     const client = await pool.connect();
-//     const result = await client.query(
-//       `SELECT id, date, amount, status, pdf_url
-//        FROM invoices
-//        WHERE user_id = $1
-//        ORDER BY date DESC`,
-//       [userId]
-//     );
-//     client.release();
-
-//     return NextResponse.json(result.rows);
-//   } catch (error) {
-//     console.error("Database error:", error);
-//     return NextResponse.json(
-//       { error: "Internal server error" },
-//       { status: 500 }
-//     );
-//   }
-// }
+  const invoice = await invoiceService.getInvoicesByUserId(Number(userId));
+    return NextResponse.json(invoice);
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to fetch invoice" },
+      { status: 500 }
+    );
+  }
+}
 
 // // POST /api/invoices/[userId]
 // export async function POST(
