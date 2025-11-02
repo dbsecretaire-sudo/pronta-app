@@ -43,6 +43,8 @@ console.log("account/page.tsx: ", userData);
           data={{
             subscription_plan: userData.subscription_plan,
             subscription_end_date: userData.subscription_end_date,
+            next_payment_date: userData.next_payment_date,
+            subscription_status: userData.subscription_status,
             billing_address: userData.billing_address,
             payment_method: userData.payment_method,
           }}
