@@ -270,7 +270,7 @@ export class UserModel {
       WHERE id = $${paramIndex}
       RETURNING *
     `;
-
+console.log("query: ",query);
     values.push(id);
 
     const res = await pool.query(query, values);
