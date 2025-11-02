@@ -47,8 +47,7 @@ export default function DashboardHome() {
         }
       );
 
-      // Rafraîchir les données
-      await mutate();
+
     } catch (error) {
       console.error(`Erreur lors de ${action}:`, error);
       const errorMessage = error instanceof Error
