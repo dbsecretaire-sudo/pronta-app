@@ -51,13 +51,10 @@ export function useAccount() {
       };
       is_default?: boolean;
     };
-    subscription_end_date?: Date;
-    next_payment_date?: Date;
-    subscription_status?: string;
   }) => {
     setIsUpdating(true);
     try {
-      const response = await fetch(`/api/user/${userData?.id}`, {
+      const response = await fetch(`/api/users/${userData?.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -79,7 +76,7 @@ export function useAccount() {
     }
   };
 
-    return {
+  return {
     userData,
     loading,
     error,
@@ -87,6 +84,6 @@ export function useAccount() {
     setActiveTab,
     isUpdating,
     handleProfileUpdate,
-    handleBillingUpdate
+    handleBillingUpdate,
   };
 }

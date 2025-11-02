@@ -25,7 +25,7 @@ export function BillingTab({ data, onEdit, isUpdating = false }: BillingTabProps
       is_default: false,
     },
   });
-
+console.log("BillingTab.tsx: ", data);
   const handleSubmit = async (e: React.FormEvent, type: "billing" | "payment") => {
     e.preventDefault();
     const payload = type === "billing" ? { billing_address: formData.billing_address } : { payment_method: formData.payment_method };
@@ -45,8 +45,7 @@ export function BillingTab({ data, onEdit, isUpdating = false }: BillingTabProps
       },
     });
   };
-console.log("data: ", data);
-console.log("data: ", formData);
+
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
       <h2 className="text-xl font-semibold mb-6">Facturation</h2>
