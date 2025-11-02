@@ -1,17 +1,87 @@
+// src/app/dashboard/page.tsx
 "use client";
 import { useSession } from "next-auth/react";
 import { useServices } from '@/src/Hook/useServices';
-import { ServiceCard, MessageList, AccountSummary } from '@/src/Modules/index';
+import { ServiceCard, AccountSummary } from '@/src/Modules/index';
+import { useState } from 'react';
+import { updateUserSubscription } from '@/src/lib/api';
+import { AvailableService } from "@/src/Types/Services";
 
 export default function DashboardHome() {
   const { data: session, status } = useSession();
-  const { services, availableServices, loading, handleSubscribe, handleDeactivate, handleReactivate } = useServices(session?.user?.id, status);
+  const { services, availableServices, loading } = useServices(
+    session?.user?.id,
+    status
+  );
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [currentAction, setCurrentAction] = useState<'subscribe' | 'deactivate' | 'reactivate' | null>(null);
 
-  if (loading) return <div className="p-8">Chargement...</div>;
+  // Fonction générique pour gérer les actions sur les services
+  const handleServiceAction = async (
+    action: 'subscribe' | 'deactivate' | 'reactivate',
+    service: AvailableService
+  ) => {
+    if (!session?.user?.id) return;
+
+    setIsUpdating(true);
+    setCurrentAction(action);
+
+    try {
+      // Calcul des dates pour les souscriptions/réactivations
+      const now = new Date();
+      const endDate = new Date(now);
+      endDate.setMonth(now.getMonth() + 1); // +1 mois
+
+      const nextPaymentDate = new Date(endDate);
+      nextPaymentDate.setMonth(nextPaymentDate.getMonth() + 1);
+
+      // Appel à notre fonction unifiée
+      await updateUserSubscription(
+        action,
+        Number(session.user.id),
+        {
+            subscription_plan: service.name,
+            subscription_end_date: now,
+            next_payment_date: endDate,
+            subscription_status: service.userService?.is_active ? "actif" : "inactif",
+        }
+      );
+
+      // Rafraîchir les données
+      await mutate();
+    } catch (error) {
+      console.error(`Erreur lors de ${action}:`, error);
+      const errorMessage = error instanceof Error
+        ? error.message
+        : `Une erreur est survenue lors de ${action} du service`;
+
+      alert(errorMessage);
+    } finally {
+      setIsUpdating(false);
+      setCurrentAction(null);
+    }
+  };
+
+  // Fonctions spécifiques pour chaque action (pour plus de clarté)
+  const handleSubscribe = (service: AvailableService) => handleServiceAction('subscribe', service);
+  const handleDeactivate = (serviceId: number) => {
+    const service = availableServices.find(s => s.id === serviceId);
+    if (service) handleServiceAction('deactivate', service);
+  };
+  const handleReactivate = (service: AvailableService) => handleServiceAction('reactivate', service);
+
+  if (loading) return (
+    <div className="flex items-center justify-center h-screen">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
+        <p>Chargement des services...</p>
+      </div>
+    </div>
+  );
 
   // Séparation des services
   const subscribedServices = availableServices.filter(s => s.userService?.is_active);
-  const servicesToReactivate = availableServices.filter(s => !s.userService?.is_active);
+  const servicesToReactivate = availableServices.filter(s => !s.userService?.is_active && s.userService);
   const servicesToSubscribe = availableServices.filter(s => !s.userService);
 
   return (
@@ -24,13 +94,15 @@ export default function DashboardHome() {
         {subscribedServices.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {subscribedServices.map((service) => (
-              <ServiceCard
-                key={service.id}
-                service={service}
-                isSubscribed={true}
-                onDeactivate={handleDeactivate}
-                userService={service.userService}
-              />
+              <div key={service.id} className="relative">
+                <ServiceCard
+                  service={service}
+                  isSubscribed={true}
+                  onDeactivate={() => handleDeactivate(service.id)}
+                  userService={service.userService}
+                  // disabled={isUpdating}
+                />
+              </div>
             ))}
           </div>
         ) : (
@@ -47,34 +119,30 @@ export default function DashboardHome() {
           {/* Services à réactiver */}
           {servicesToReactivate.length > 0 &&
             servicesToReactivate.map((service) => (
-              <ServiceCard
-                key={service.id}
-                service={service}
-                isSubscribed={true}
-                onReactivate={handleReactivate}
-                userService={service.userService}
-              />
+              <div key={service.id} className="relative">
+                <ServiceCard
+                  service={service}
+                  isSubscribed={true}
+                  onReactivate={() => handleReactivate(service)}
+                  userService={service.userService}
+                  // disabled={isUpdating}
+                />
+              </div>
             ))}
+
           {/* Services à souscrire */}
           {servicesToSubscribe.length > 0 &&
             servicesToSubscribe.map((service) => (
-              <ServiceCard
-                key={service.id}
-                service={service}
-                isSubscribed={false}
-                onSubscribe={handleSubscribe}
-                userService={service.userService}
-              />
+              <div key={service.id} className="relative">
+                <ServiceCard
+                  service={service}
+                  isSubscribed={false}
+                  onSubscribe={() => handleSubscribe(service)}
+                  // disabled={isUpdating}
+                />
+              </div>
             ))}
         </div>
-      </section>
-
-      {/* Section Messagerie intégrée */}
-      <section className="mb-10 bg-white rounded-lg shadow-md p-6">
-        <div className="flex justify-between items-center mb-5">
-          <h2 className="text-xl font-semibold">Messages importants</h2>
-        </div>
-        <p className="text-gray-500 italic">Aucun message pour le moment.</p>
       </section>
 
       {/* Section Mon Compte */}

@@ -59,4 +59,8 @@ export class UserService {
   async getUsersWithActiveSubscription(): Promise<User[]> {
     return this.userModel.getUsersWithActiveSubscription();
   }
+
+  async updateUserSubscription(id: number, updatedData: any): Promise<User> {
+    return this.userModel.updateUserSubscription(id, updatedData);
+  }
 }

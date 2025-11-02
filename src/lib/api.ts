@@ -1,6 +1,9 @@
 import { CalendarEvent } from "@/src/Types/Calendar/index";
 import { CallFilter } from "@/src/Types/Calls/index"; 
 import { Role } from "../Types/Users";
+import { User } from "@/src/Types/Users";
+import { UserService } from '@/src/Types/UserServices';
+import { AvailableService } from "@/src/Types/Services";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL; // Remplacez par l’URL de votre backend
 
@@ -144,3 +147,20 @@ export async function updateBilling(userId: number, data: {
 
   return response.json();
 }
+
+
+export const updateUserSubscription =  async (userId: number, data: {
+  subscription_plan?: string;
+  subscription_end_date?: Date;
+  next_payment_date?: Date,
+  subscription_status?: string;
+}) => {
+  const res = await fetch(`/api/user/${userId}/subscription`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ data }),
+  });
+  if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+  return res.json();
+};

@@ -46,6 +46,13 @@ export type UpdateUser = Partial<Omit<User, "id" | "created_at" | "password_hash
   password?: string;
 };
 
+export interface UpdateUserSubscription {
+  subscription_plan?: string;
+  subscription_end_date?: Date;
+  next_payment_date?: Date;
+  subscription_status?: 'active' | 'inactive' | 'pending' | 'cancelled' | 'overdue';
+}
+
 export interface UserFilter {
   role?: Role;
   searchTerm?: string;

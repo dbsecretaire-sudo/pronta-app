@@ -1,5 +1,5 @@
 import pool from "@/src/lib/db";
-import { User, CreateUser, UpdateUser, UserFilter, Role, BillingAddress, PaymentMethod } from "./type";
+import { User, CreateUser, UpdateUser, UserFilter, Role, BillingAddress, PaymentMethod, UpdateUserSubscription } from "./type";
 
 export class UserModel {
   constructor(public data: User) {}
@@ -91,7 +91,7 @@ export class UserModel {
   async updateUser(id: number, user: UpdateUser): Promise<User> {
     const fields: string[] = [];
     const values: any[] = [];
-    let paramIndex = 1;
+    let paramIndex = id;
 
     if (user.email !== undefined) {
       fields.push(`email = $${paramIndex}`);
@@ -229,5 +229,54 @@ export class UserModel {
       "SELECT * FROM users WHERE subscription_end_date > NOW() ORDER BY created_at DESC"
     );
     return res.rows.map(this.mapDbUserToUser);
+  }
+
+  async updateUserSubscription(id: number, user: UpdateUserSubscription): Promise<User> {
+    const fields: string[] = [];
+    const values: any[] = [];
+    let paramIndex = id;
+
+    if (user.subscription_plan !== undefined) {
+      fields.push(`subscription_plan = $${paramIndex}`);
+      values.push(user.subscription_plan);
+      paramIndex++;
+    }
+
+    if (user.subscription_end_date !== undefined) {
+      fields.push(`subscription_end_date = $${paramIndex}`);
+      values.push(user.subscription_end_date);
+      paramIndex++;
+    }
+
+    if (user.next_payment_date !== undefined) {
+      fields.push(`next_payment_date = $${paramIndex}`);
+      values.push(user.next_payment_date);
+      paramIndex++;
+    }
+
+    if (user.subscription_status !== undefined) {
+      fields.push(`subscription_status = $${paramIndex}`);
+      values.push(user.subscription_status);
+      paramIndex++;
+    }
+
+    if (fields.length === 0) {
+      return this.getUserById(id) || Promise.reject(new Error('No fields to update'));
+    }
+
+    const query = `
+      UPDATE users
+      SET ${fields.join(', ')}
+      WHERE id = $${paramIndex}
+      RETURNING *
+    `;
+
+    values.push(id);
+
+    const res = await pool.query(query, values);
+    if (res.rows.length === 0) {
+      throw new Error('User not found');
+    }
+    return this.mapDbUserToUser(res.rows[0]);
   }
 }
