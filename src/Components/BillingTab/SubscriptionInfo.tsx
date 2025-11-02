@@ -1,65 +1,63 @@
 "use client";
+import { SubscriptionFields } from "@/src/Types/Users";
 import { getStatusLabel, getStatusStyle } from "./utils";
 
 interface SubscriptionInfoProps {
   serviceName?: string;
-  subscriptionStatus?: string;
-  subscriptionStartDate?: Date;
-  nextPaymentDate?: Date;
-  subscriptionEndDate?: Date;
-  subscriptionPlan?: string;
+  subscriptions: SubscriptionFields[];
 }
 
 export const SubscriptionInfo = ({
   serviceName,
-  subscriptionStatus,
-  subscriptionStartDate,
-  nextPaymentDate,
-  subscriptionEndDate,
-  subscriptionPlan,
+  subscriptions = [],
 }: SubscriptionInfoProps) => {
   return (
     <div className="bg-blue-50 p-4 rounded-lg mb-6">
-      <div className="space-y-3">
-        {serviceName ? (
-          <>
-            <div className="flex justify-between items-start">
-              <div>
-                <h3 className="font-medium">Service souscrit</h3>
-                <p className="font-semibold text-lg">{serviceName}</p>
-              </div>
-              <span className={`px-3 py-1 rounded-full text-sm ${getStatusStyle(subscriptionStatus)}`}>
-                {getStatusLabel(subscriptionStatus)}
-              </span>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-              {subscriptionStartDate && (
+      <div className="space-y-4">
+        {serviceName && (
+          <h3 className="font-medium text-lg mb-2">Services souscrits</h3>
+        )}
+
+        {/* Boucle sur les abonnements */}
+        {subscriptions.length > 0 ? (
+          subscriptions.map((subscription, index) => (
+            <div key={index} className="space-y-3 p-4 bg-white rounded-lg shadow-sm">
+              <div className="flex justify-between items-start">
                 <div>
-                  <p className="text-gray-500">Date de souscription</p>
-                  <p>{new Date(subscriptionStartDate).toLocaleDateString('fr-FR')}</p>
+                  <h4 className="font-medium">Abonnement {index + 1}</h4>
+                  <p className="font-semibold">{subscription.plan}</p>
                 </div>
-              )}
-              {nextPaymentDate && (
-                <div>
-                  <p className="text-gray-500">Prochaine échéance</p>
-                  <p>{new Date(nextPaymentDate).toLocaleDateString('fr-FR')}</p>
-                </div>
-              )}
-              {subscriptionEndDate && (
-                <div>
-                  <p className="text-gray-500">Fin d'abonnement</p>
-                  <p>{new Date(subscriptionEndDate).toLocaleDateString('fr-FR')}</p>
-                </div>
-              )}
-            </div>
-          </>
-        ) : (
-            <div className="flex justify-between items-center">
-                <span className="font-medium">Plan actuel</span>
-                <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
-                {subscriptionPlan || "Aucun"}
+                <span className={`px-3 py-1 rounded-full text-sm ${getStatusStyle(subscription.status)}`}>
+                  {getStatusLabel(subscription.status)}
                 </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                {subscription.start_date && (
+                  <div>
+                    <p className="text-gray-500">Date de souscription</p>
+                    <p>{new Date(subscription.start_date).toLocaleDateString('fr-FR')}</p>
+                  </div>
+                )}
+                {subscription.next_payment_date && (
+                  <div>
+                    <p className="text-gray-500">Prochaine échéance</p>
+                    <p>{new Date(subscription.next_payment_date).toLocaleDateString('fr-FR')}</p>
+                  </div>
+                )}
+                {subscription.end_date && (
+                  <div>
+                    <p className="text-gray-500">Fin d'abonnement</p>
+                    <p>{new Date(subscription.end_date).toLocaleDateString('fr-FR')}</p>
+                  </div>
+                )}
+              </div>
             </div>
+          ))
+        ) : (
+          <div className="flex justify-between items-center p-4 bg-white rounded-lg shadow-sm">
+            <span className="font-medium">Aucun abonnement actif</span>
+          </div>
         )}
       </div>
     </div>

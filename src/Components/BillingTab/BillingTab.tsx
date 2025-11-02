@@ -12,10 +12,13 @@ export function BillingTab({ data, onEdit, isUpdating = false }: BillingTabProps
   });
 
   const [formData, setFormData] = useState({
-    subscription_plan: data.subscription_plan || "",
-    next_payment_date: data.next_payment_date || undefined,
-    subscription_end_date: data.subscription_end_date || undefined,
-    subscription_status: data.subscription_status || "",
+    subscription: data.subscription || {
+      plan: "",
+      next_payment_date: undefined,
+      start_date: undefined,
+      end_date: undefined,
+      status: "active",
+    },    
     billing_address: data.billing_address || {
       street: "",
       city: "",
@@ -54,12 +57,16 @@ export function BillingTab({ data, onEdit, isUpdating = false }: BillingTabProps
     <div className="bg-white rounded-lg shadow-md p-6">
       <h2 className="text-xl font-semibold mb-6">Facturation</h2>
       <SubscriptionInfo
-        serviceName={formData.subscription_plan}
-        subscriptionStatus={formData.subscription_status}
-        subscriptionStartDate={formData.subscription_end_date}
-        nextPaymentDate={formData.next_payment_date}
-        subscriptionEndDate={formData.subscription_end_date}
-        subscriptionPlan={formData.subscription_plan}
+        serviceName={formData.subscription.plan}
+        subscriptions={[
+          {
+            plan: formData.subscription.plan,
+            status: formData.subscription.status || "active",
+            start_date: formData.subscription.start_date,
+            next_payment_date: formData.subscription.next_payment_date,
+            end_date: formData.subscription.end_date
+          },
+        ]}
       />
       <BillingAddressSection
         billingAddress={data.billing_address}

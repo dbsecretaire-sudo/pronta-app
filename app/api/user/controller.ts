@@ -29,7 +29,7 @@ export const getUsersBySubscriptionPlan = async (plan: string) => {
   return await userService.getUsersBySubscriptionPlan(plan);
 };
 
-export const updateUserSubscription = async (id: number, userData: any) => {
-  return await userService.updateUserSubscription(id, userData);
+export const updateUserSubscription = async (id: number, plan: string, userData: any) => {
+  return await userService.updateUserSubscription(id, plan, userData);
 }
 

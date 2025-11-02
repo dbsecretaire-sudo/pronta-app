@@ -7,5 +7,6 @@ export type {
     CreateUser, 
     UpdateUser, 
     UserFilter,
-    UpdateUserSubscription
+    // UpdateUserSubscription,
+    SubscriptionFields
 } from "./type";

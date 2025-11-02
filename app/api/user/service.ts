@@ -26,15 +26,30 @@ export class UserService {
 
     const password_hash = await hashPassword(user.password);
 
-    // Convertir les Date en timestamps pour la base de données
+    // Préparation des données pour la création de l'utilisateur
     const userData = {
       ...user,
       password_hash,
-      subscription_end_date: user.subscription_end_date,
-      next_payment_date: user.next_payment_date
+      // Construction du champ subscription avec conversion des dates
+      subscription: {
+        plan: user.subscription?.plan,
+        start_date: user.subscription?.start_date instanceof Date ?
+                    user.subscription.start_date.toISOString() :
+                    user.subscription?.start_date,
+        end_date: user.subscription?.end_date instanceof Date ?
+                  user.subscription.end_date.toISOString() :
+                  user.subscription?.end_date,
+        next_payment_date: user.subscription?.next_payment_date instanceof Date ?
+                          user.subscription.next_payment_date.toISOString() :
+                          user.subscription?.next_payment_date,
+        status: user.subscription?.status || 'active'
+      }
     };
 
-    return this.userModel.createUser(userData);
+    // Suppression du mot de passe en clair avant l'envoi au modèle
+    const { password, ...cleanUserData } = userData;
+
+    return this.userModel.createUser(cleanUserData);
   }
 
   async updateUser(id: number, user: UpdateUser): Promise<User> {
@@ -60,7 +75,7 @@ export class UserService {
     return this.userModel.getUsersWithActiveSubscription();
   }
 
-  async updateUserSubscription(id: number, updatedData: any): Promise<User> {
-    return this.userModel.updateUserSubscription(id, updatedData);
+  async updateUserSubscription(id: number, plan: string, updatedData: any): Promise<User> {
+    return this.userModel.updateUserSubscription(id, plan, updatedData);
   }
 }

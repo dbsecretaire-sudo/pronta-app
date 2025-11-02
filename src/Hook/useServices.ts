@@ -86,7 +86,7 @@ export const useServices = (userId: string | undefined, status: string) => {
     try {
       
       await subscribeToService(service.id);
-      await updateUserSubscription(Number(userId), {
+      await updateUserSubscription(Number(userId), service.name, {
         subscription_plan: undefined,
         subscription_end_date: undefined,
         next_payment_date: undefined,
@@ -119,7 +119,7 @@ export const useServices = (userId: string | undefined, status: string) => {
       }
 
       await deactivateUserService(Number(userId), service.id);
-      await updateUserSubscription(Number(userId), {
+      await updateUserSubscription(Number(userId), service.name, {
         subscription_plan: undefined,
         subscription_end_date: undefined,
         next_payment_date: undefined,
@@ -137,7 +137,7 @@ export const useServices = (userId: string | undefined, status: string) => {
     console.log("service: ", service);
     try {
       await reactivateUserService(Number(userId), service.id);
-      await updateUserSubscription(Number(userId), {
+      await updateUserSubscription(Number(userId), service.name, {
         subscription_plan: service.name,
         subscription_end_date: endDate,
         next_payment_date: new Date(endDate),

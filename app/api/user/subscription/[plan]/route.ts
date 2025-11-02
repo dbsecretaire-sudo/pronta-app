@@ -1,6 +1,6 @@
 // app/api/user/subscription/[plan]/route.ts
 import { NextResponse } from 'next/server';
-import { getUsersBySubscriptionPlan } from '../../controller';
+import { getUsersBySubscriptionPlan, updateUserSubscription } from '../../controller';
 
 // GET /api/user/subscription/[plan]
 export async function GET(
@@ -19,4 +19,21 @@ export async function GET(
   }
 }
 
+export async function PUT(
+  request: Request,
+  { params }: { params: Promise<{ id: string, plan: string }> }
+) {
+  try {
+    const { id, plan } = await params;
+    const userData = await request.json();
+    const updatedUser = await updateUserSubscription(Number(id), plan,  userData);
+;
+    return NextResponse.json(updatedUser);
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to update user" },
+      { status: 500 }
+    );
+  }
+}
 

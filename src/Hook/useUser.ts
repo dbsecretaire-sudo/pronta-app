@@ -16,6 +16,7 @@ export function useUser() {
     try {
       const response = await fetch(`/api/user/${session.user.id}`);
       if (!response.ok) throw new Error("Failed to fetch user data");
+
       const data = await response.json();
 
       // Transformation des données avec gestion des valeurs optionnelles
@@ -41,12 +42,15 @@ export function useUser() {
           },
           is_default: data.payment_method.is_default || false
         } : undefined,
-        subscription_plan: data.subscription_plan || '',
-        subscription_end_date: data.subscription_end_date ? new Date(data.subscription_end_date) : undefined,
+        subscription: {
+          plan: data.subscription?.plan || '',
+          start_date: data.subscription?.start_date ? new Date(data.subscription.start_date) : undefined,
+          end_date: data.subscription?.end_date ? new Date(data.subscription.end_date) : undefined,
+          next_payment_date: data.subscription?.next_payment_date ? new Date(data.subscription.next_payment_date) : undefined,
+          status: data.subscription?.status || 'active'
+        },
         phone: data.phone || '',
         company: data.company || '',
-        next_payment_date: data.next_payment_date ? new Date(data.next_payment_date) : undefined,
-        subscription_status: data.subscription_status || '',
         role: data.role || 'user',
       };
 

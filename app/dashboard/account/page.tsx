@@ -11,12 +11,19 @@ export default function AccountPage() {
     setActiveTab,
     isUpdating,
     handleProfileUpdate,
-    handleBillingUpdate
+    handleBillingUpdate,
+    handleSubscriptionUpdate  // Ajout de la nouvelle fonction
   } = useAccount();
 
   if (loading) return <div className="text-center py-8">Chargement...</div>;
   if (error) return <div className="text-center py-8 text-red-500">Erreur: {error}</div>;
   if (!userData) return <div className="text-center py-8">Utilisateur non trouvé</div>;
+
+  // Fonction utilitaire pour convertir les dates en objets Date
+  const ensureDate = (date: string | Date | undefined): Date | undefined => {
+    if (!date) return undefined;
+    return typeof date === 'string' ? new Date(date) : date;
+  };
 
   const tabs = [
     {
@@ -41,14 +48,47 @@ export default function AccountPage() {
       content: (
         <BillingTab
           data={{
-            subscription_plan: userData.subscription_plan,
-            subscription_end_date: userData.subscription_end_date,
-            next_payment_date: userData.next_payment_date,
-            subscription_status: userData.subscription_status,
+            // Nouvelle structure avec le champ subscription
+            subscription: userData.subscription,
+            service_name: userData.subscription.plan,
             billing_address: userData.billing_address,
             payment_method: userData.payment_method,
           }}
-          onEdit={handleBillingUpdate}
+          onEdit={async (data) => {
+            // Préparation des données pour l'API
+            const subscriptionData: {
+              plan?: string;
+              status?: string;
+              end_date?: Date;
+              next_payment_date?: Date;
+              start_date?: Date;
+            } = {};
+
+            // Copie des données d'abonnement si elles existent
+            if (data.subscription) {
+              if (data.subscription.plan) {
+                subscriptionData.plan = data.subscription.plan;
+              }
+              if (data.subscription.status) {
+                subscriptionData.status = data.subscription.status;
+              }
+              if (data.subscription.start_date) {
+                subscriptionData.start_date = ensureDate(data.subscription.start_date);
+              }
+              if (data.subscription.end_date) {
+                subscriptionData.end_date = ensureDate(data.subscription.end_date);
+              }
+              if (data.subscription.next_payment_date) {
+                subscriptionData.next_payment_date = ensureDate(data.subscription.next_payment_date);
+              }
+
+              return handleSubscriptionUpdate(subscriptionData);
+            }
+
+            // Pour les autres champs (billing_address, payment_method)
+            const { subscription, ...otherData } = data;
+            return handleBillingUpdate(otherData);
+          }}
           isUpdating={isUpdating}
         />
       ),

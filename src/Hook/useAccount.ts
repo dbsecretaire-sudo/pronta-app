@@ -15,9 +15,9 @@ export function useAccount() {
     name: string;
     role: Role;
   }) => {
-    if(!userData?.id){
+    if(!userData?.id) {
       console.error('User data is not available');
-      return { success: false, message: "Utilisateur non trouvé"};
+      return { success: false, message: "Utilisateur non trouvé" };
     }
 
     setIsUpdating(true);
@@ -34,7 +34,6 @@ export function useAccount() {
   };
 
   const handleBillingUpdate = async (updatedData: {
-    subscription_plan?: string;
     billing_address?: {
       street?: string;
       city?: string;
@@ -51,15 +50,43 @@ export function useAccount() {
       };
       is_default?: boolean;
     };
+    subscription?: {  // Nouveau type pour le champ subscription
+      plan?: string;
+      start_date?: Date;
+      end_date?: Date;
+      next_payment_date?: Date;
+      status?: string;
+    };
   }) => {
+    if (!userData?.id) {
+      console.error('User data is not available');
+      return { success: false, message: "Utilisateur non trouvé" };
+    }
+
     setIsUpdating(true);
     try {
-      const response = await fetch(`/api/users/${userData?.id}`, {
+      // Transformation des données pour correspondre à l'API
+      const apiData = {
+        ...updatedData,
+        // Si on veut mettre à jour uniquement le plan d'abonnement
+        ...(updatedData.subscription?.plan && {
+          subscription: {
+            ...userData.subscription,
+            ...updatedData.subscription,
+            // Conversion des dates en ISOString pour l'API
+            ...(updatedData.subscription?.start_date && { start_date: updatedData.subscription.start_date.toISOString() }),
+            ...(updatedData.subscription?.end_date && { end_date: updatedData.subscription.end_date.toISOString() }),
+            ...(updatedData.subscription?.next_payment_date && { next_payment_date: updatedData.subscription.next_payment_date.toISOString() })
+          }
+        })
+      };
+
+      const response = await fetch(`/api/users/${userData.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(updatedData),
+        body: JSON.stringify(apiData),
       });
 
       if (!response.ok) {
@@ -76,6 +103,54 @@ export function useAccount() {
     }
   };
 
+  // Nouvelle fonction pour mettre à jour spécifiquement l'abonnement
+  const handleSubscriptionUpdate = async (updatedSubscription: {
+    plan?: string;
+    status?: string;
+    end_date?: Date;
+    next_payment_date?: Date;
+    start_date?: Date;
+  }) => {
+    if (!userData?.id) {
+      console.error('User data is not available');
+      return { success: false, message: "Utilisateur non trouvé" };
+    }
+
+    setIsUpdating(true);
+    try {
+      // Préparation des données avec conversion des dates
+      const subscriptionData = {
+        ...userData.subscription,
+        ...updatedSubscription,
+        ...(updatedSubscription.start_date && { start_date: updatedSubscription.start_date.toISOString() }),
+        ...(updatedSubscription.end_date && { end_date: updatedSubscription.end_date.toISOString() }),
+        ...(updatedSubscription.next_payment_date && { next_payment_date: updatedSubscription.next_payment_date.toISOString() })
+      };
+
+      const response = await fetch(`/api/users/${userData.id}/subscription`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          subscription: subscriptionData
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Échec de la mise à jour de l'abonnement");
+      }
+
+      await mutate();
+      return { success: true, message: "Abonnement mis à jour avec succès !" };
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour de l'abonnement:", error);
+      return { success: false, message: "Erreur lors de la mise à jour de l'abonnement" };
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   return {
     userData,
     loading,
@@ -85,5 +160,6 @@ export function useAccount() {
     isUpdating,
     handleProfileUpdate,
     handleBillingUpdate,
+    handleSubscriptionUpdate,  // Nouvelle fonction exportée
   };
 }

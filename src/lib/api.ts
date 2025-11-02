@@ -1,6 +1,6 @@
 import { CalendarEvent } from "@/src/Types/Calendar/index";
 import { CallFilter } from "@/src/Types/Calls/index"; 
-import { Role, UpdateUserSubscription } from "../Types/Users";
+import { Role } from "../Types/Users";
 import { User } from "@/src/Types/Users";
 import { UserService } from '@/src/Types/UserServices';
 import { AvailableService } from "@/src/Types/Services";
@@ -151,6 +151,7 @@ export async function updateBilling(userId: number, data: {
 
 export const updateUserSubscription = async (
   userId: number,
+  plan: string,
   data: {
     subscription_plan?: string;
     subscription_end_date?: Date;
@@ -173,7 +174,7 @@ export const updateUserSubscription = async (
 
 
   try {
-    const res = await fetch(`/api/user/${userId}/subscription`, {
+    const res = await fetch(`/api/user/${userId}/subscription/${plan}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
