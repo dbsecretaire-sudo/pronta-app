@@ -78,8 +78,7 @@ export const reactivateUserService = async (userId: number, serviceId: number): 
     method: 'POST',
     credentials: 'include', // Pour les cookies d'authentification
   });
-const text = await response.text();
-  console.log("Réponse brute:", text);
+
   if (!response.ok) {
     const error = await response.json();
     console.error(error.error);
