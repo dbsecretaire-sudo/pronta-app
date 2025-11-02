@@ -12,61 +12,57 @@ export const useServices = (userId: string | undefined, status: string) => {
   const [userServices, setUserServices] = useState<UserServiceWithDetails[]>([]);
 
   const fetchData = async () => {
-  if (!userId) {
-    setLoading(false);
-    return;
-  }
+    if (!userId) {
+      setLoading(false);
+      return;
+    }
 
-  try {
-    setLoading(true);
-    setError(null);
+    try {
+      setLoading(true);
+      setError(null);
 
-    const [fetchedUserServices, allServices] = await Promise.all([
-      fetchUserServices(Number(userId)),
-      fetchAllServices(),
-    ]);
+      const [fetchedUserServices, allServices] = await Promise.all([
+        fetchUserServices(Number(userId)),
+        fetchAllServices(),
+      ]);
 
-    setUserServices(fetchedUserServices);
+      setUserServices(fetchedUserServices);
 
-    // Services abonnés et actifs (pour la section "Mes services")
-    const subscribedServices = Array.isArray(fetchedUserServices)
-      ? fetchedUserServices
-          .filter((us: UserServiceWithDetails) => us.is_active)
-          .map((us: UserServiceWithDetails) => us.service)
-      : [];
+      // Services abonnés et actifs (pour la section "Mes services")
+      const subscribedServices = Array.isArray(fetchedUserServices)
+        ? fetchedUserServices
+            .filter((us: UserServiceWithDetails) => us.is_active)
+            .map((us: UserServiceWithDetails) => us.service)
+        : [];
 
-    // Services avec statut (pour la section "Services disponibles")
-    const servicesWithStatus = allServices.map((service: Service) => {
-      const userService = fetchedUserServices.find(
-        (us: UserServiceWithDetails) => us.service_id === service.id
+      // Services avec statut (pour la section "Services disponibles")
+      const servicesWithStatus = allServices.map((service: Service) => {
+        const userService = fetchedUserServices.find(
+          (us: UserServiceWithDetails) => us.service_id === service.id
+        );
+
+        return {
+          ...service,
+          isSubscribed: !!userService,
+          isActive: userService?.is_active ?? false,
+          userService,  // ✅ Peut être undefined pour les services non abonnés
+        };
+      });
+
+      // Filtre les services disponibles
+      const availableServices = servicesWithStatus.filter(
+        (s: UserService) => !s.subscription_date || (s.subscription_date && !s.is_active)
       );
 
-      console.log(`Service ${service.id}: userService =`, userService);  // ✅ Log pour debugging
-
-      return {
-        ...service,
-        isSubscribed: !!userService,
-        isActive: userService?.is_active ?? false,
-        userService,  // ✅ Peut être undefined pour les services non abonnés
-      };
-    });
-
-    // Filtre les services disponibles
-    const availableServices = servicesWithStatus.filter(
-      (s: UserService) => !s.subscription_date || (s.subscription_date && !s.is_active)
-    );
-
-    console.log("availableServices:", availableServices);  // ✅ Log pour debugging
-
-    setServices(subscribedServices);
-    setAvailableServices(availableServices);
-  } catch (error) {
-    console.error("Erreur:", error);
-    setError("Impossible de charger les services.");
-  } finally {
-    setLoading(false);
-  }
-};
+      setServices(subscribedServices);
+      setAvailableServices(availableServices);
+    } catch (error) {
+      console.error("Erreur:", error);
+      setError("Impossible de charger les services.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
   useEffect(() => {
@@ -122,12 +118,13 @@ export const useServices = (userId: string | undefined, status: string) => {
 
   const handleReactivate = async (serviceId: number) => {
   if (!userId) return;
-
+console.log("Hello"); 
   try {
+    console.log("Hello1"); 
     const userService = userServices.find(
       (us: UserServiceWithDetails) => us.service_id === serviceId
     );
-    console.log("Hello");
+    console.log("Hello2"); 
 
     if (!userService) {
       setError("Vous n'êtes pas abonné à ce service.");
