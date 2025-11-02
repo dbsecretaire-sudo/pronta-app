@@ -55,10 +55,10 @@ console.log("BillingTab.tsx: ", formData);
       <h2 className="text-xl font-semibold mb-6">Facturation</h2>
       <SubscriptionInfo
         serviceName={formData.subscription_plan}
-        subscriptionStatus={data.subscription_status}
-        subscriptionStartDate={data.subscription_start_date}
-        nextPaymentDate={data.next_payment_date}
-        subscriptionEndDate={data.subscription_end_date}
+        subscriptionStatus={formData.subscription_status}
+        subscriptionStartDate={formData.subscription_end_date}
+        nextPaymentDate={formData.next_payment_date}
+        subscriptionEndDate={formData.subscription_end_date}
         subscriptionPlan={formData.subscription_plan}
       />
       <BillingAddressSection
