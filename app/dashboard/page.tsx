@@ -11,9 +11,8 @@ export default function DashboardHome() {
   if (loading) return <div className="p-8">Chargement...</div>;
 
   const userServicesMap = new Map<number, any>();
-  console.log(availableServices);
   availableServices.forEach((s) => {
-    if (s.userService) userServicesMap.set(s.id, s.userService);
+    if (s.userService && !s.userService?.is_active) userServicesMap.set(s.id, s.userService);
   });
 
   return (
