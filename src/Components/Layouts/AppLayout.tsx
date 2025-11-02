@@ -1,4 +1,4 @@
-// src/components/layouts/AppLayout.tsx (version optimisée)
+// src/components/layouts/AppLayout.tsx
 "use client";
 import { ReactNode } from "react";
 import { NavBar } from "@/src/Components";
@@ -36,8 +36,9 @@ export function AppLayout({
   }
 
   return (
-    <>
-      {showNavbar && (
+    <div className="flex flex-col min-h-screen">
+      {/* Barre de navigation */}
+      {showNavbar && !isInService && (
         <NavBar
           showLogo={true}
           logoText="Pronta"
@@ -45,9 +46,11 @@ export function AppLayout({
           userServices={userServices}
         />
       )}
-      <main className="flex-1">
+
+      {/* Contenu principal avec marge si navbar est affichée */}
+      <main className={`flex-1 ${showNavbar && !isInService ? 'md:ml-64' : ''}`}>
         {children}
       </main>
-    </>
+    </div>
   );
 }
