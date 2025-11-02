@@ -146,7 +146,7 @@ export function BillingTab({ data, onEdit, isUpdating = false }: BillingTabProps
           {!editMode.billing ? (
             <Button
               onClick={() => setEditMode({ ...editMode, billing: true })}
-              className="text-blue-600 text-sm bg-transparent hover:bg-blue-50"
+              variant="primary"
             >
               Modifier
             </Button>
@@ -284,7 +284,7 @@ export function BillingTab({ data, onEdit, isUpdating = false }: BillingTabProps
           {!editMode.payment ? (
             <Button
               onClick={() => setEditMode({ ...editMode, payment: true })}
-              className="text-blue-600 text-sm bg-transparent hover:bg-blue-50"
+              variant="primary"
             >
               Modifier
             </Button>
