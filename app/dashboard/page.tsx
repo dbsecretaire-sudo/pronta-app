@@ -11,7 +11,7 @@ export default function DashboardHome() {
 
   // Séparation des services
   const subscribedServices = availableServices.filter(s => s.userService?.is_active);
-  const servicesToReactivate = availableServices.filter(s => s.userService && !s.userService.is_active);
+  const servicesToReactivate = availableServices.filter(s => !s.userService?.is_active);
   const servicesToSubscribe = availableServices.filter(s => !s.userService);
 
   return (
