@@ -155,6 +155,7 @@ export const updateUserSubscription =  async (userId: number, data: {
   next_payment_date?: Date,
   subscription_status?: string;
 }) => {
+  console.log("updateUserSubscription");
   const res = await fetch(`/api/user/${userId}/subscription`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
