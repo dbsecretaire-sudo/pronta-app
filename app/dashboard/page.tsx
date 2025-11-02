@@ -2,18 +2,25 @@
 import { useSession } from "next-auth/react";
 import { useServices } from '@/src/Hook/useServices';
 import { ServiceCard, MessageList, AccountSummary } from '@/src/Modules/index';
+import { useState, useEffect } from 'react';
+import { AvailableService } from "@/src/Types/Services";
 
 export default function DashboardHome() {
   const { data: session, status } = useSession();
   const { services, availableServices, loading, handleSubscribe, handleDeactivate, handleReactivate } = useServices(session?.user?.id, status);
+  const [subscribedServices, setSubscribedServices ] = useState<AvailableService[]>([]);
+  const [servicesToReactivate, setServicesToReactivate ] = useState<AvailableService[]>([]);
+  const [servicesToSubscribe, setServicesToSubscribe ] = useState<AvailableService[]>([]);
 
   if (loading) return <div className="p-8">Chargement...</div>;
 
   // Séparation des services
-  const subscribedServices = availableServices.filter(s => s.userService?.is_active);
-  const servicesToReactivate = availableServices.filter(s => !s.userService?.is_active);
-  const servicesToSubscribe = availableServices.filter(s => !s.userService);
-
+  setSubscribedServices(availableServices.filter(s => s.userService?.is_active));
+  setServicesToReactivate(availableServices.filter(s => !s.userService?.is_active));
+  setServicesToSubscribe(availableServices.filter(s => !s.userService));
+  console.log("subscribedServices: ", subscribedServices);
+  console.log("servicesToReactivate", servicesToReactivate);
+  console.log("servicesToSubscribe", servicesToSubscribe);
   return (
     <div className="p-8 max-w-7xl mx-auto">
       <h1 className="text-2xl font-bold mb-8">Tableau de bord</h1>
