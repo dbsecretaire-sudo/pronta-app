@@ -30,10 +30,10 @@ export function ProfileTab({ data, onEdit, isUpdating = false }: ProfileTabProps
 
   // Options pour le rôle
   const roleOptions = [
-    { value: "admin", label: "Administrateur" },
-    { value: "user", label: "Utilisateur" },
-    { value: "editor", label: "Éditeur" },
-    { value: "viewer", label: "Lecteur" },
+    { value: "ADMIN", label: "Administrateur" },
+    { value: "CLIENT", label: "Client" },
+    { value: "SECRETARY", label: "Secrétaire" },
+    { value: "SUPERVISOR", label: "Superviseur" },
   ];
 
   return (
