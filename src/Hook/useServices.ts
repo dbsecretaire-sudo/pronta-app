@@ -26,8 +26,7 @@ export const useServices = (userId: string | undefined, status: string) => {
       fetchAllServices(),
     ]);
 
-    console.log("userServices bruts:", fetchedUserServices);  // ✅ Log pour debugging
-    console.log("allServices:", allServices);  // ✅ Log pour debugging
+    setUserServices(fetchedUserServices);
 
     // Services abonnés et actifs (pour la section "Mes services")
     const subscribedServices = Array.isArray(fetchedUserServices)
@@ -35,15 +34,7 @@ export const useServices = (userId: string | undefined, status: string) => {
           .filter((us: UserServiceWithDetails) => us.is_active)
           .map((us: UserServiceWithDetails) => us.service)
       : [];
-console.log("Mappage des services:");
-allServices.forEach((service:Service) => {
-  const userService = fetchedUserServices.find((us:UserService) => us.service_id === service.id);
-  console.log(`Service ${service.id} (${service.name}):`, {
-    userServiceExists: !!userService,
-    userService: userService,
-    isActive: userService?.is_active
-  });
-});
+
     // Services avec statut (pour la section "Services disponibles")
     const servicesWithStatus = allServices.map((service: Service) => {
       const userService = fetchedUserServices.find(
@@ -130,13 +121,13 @@ allServices.forEach((service:Service) => {
   };
 
   const handleReactivate = async (serviceId: number) => {
-    console.log("handleReactivate appelée pour:", serviceId, userId);
   if (!userId) return;
 
   try {
     const userService = userServices.find(
       (us: UserServiceWithDetails) => us.service_id === serviceId
     );
+    console.log("Hello");
 
     if (!userService) {
       setError("Vous n'êtes pas abonné à ce service.");
