@@ -1,4 +1,3 @@
-// app/dashboard/page.tsx
 "use client";
 import { useSession } from "next-auth/react";
 import { useServices } from '@/src/Hook/useServices';
@@ -10,27 +9,27 @@ export default function DashboardHome() {
 
   if (loading) return <div className="p-8">Chargement...</div>;
 
-  const userServicesMap = new Map<number, any>();
-  availableServices.forEach((s) => {
-    if (s.userService && !s.userService?.is_active) userServicesMap.set(s.id, s.userService);
-  });
-   console.log(userServicesMap);
+  // Séparation des services
+  const subscribedServices = availableServices.filter(s => s.userService?.is_active);
+  const servicesToReactivate = availableServices.filter(s => s.userService && !s.userService.is_active);
+  const servicesToSubscribe = availableServices.filter(s => !s.userService);
 
   return (
     <div className="p-8 max-w-7xl mx-auto">
       <h1 className="text-2xl font-bold mb-8">Tableau de bord</h1>
-      {/* Services souscrits */}
+
+      {/* Services souscrits (actifs) */}
       <section className="mb-10">
         <h2 className="text-xl font-semibold mb-4">Mes services</h2>
-        {services.length > 0 ? (
+        {subscribedServices.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {services.map((service) => (
+            {subscribedServices.map((service) => (
               <ServiceCard
                 key={service.id}
                 service={service}
-                isSubscribed
+                isSubscribed={true}
                 onDeactivate={handleDeactivate}
-                userService={userServicesMap.get(service.id)}
+                userService={service.userService}
               />
             ))}
           </div>
@@ -40,27 +39,36 @@ export default function DashboardHome() {
           </div>
         )}
       </section>
-      {/* Services disponibles */}
-      {userServicesMap.size > 0 && (
+
+      {/* Services disponibles (à réactiver ou à souscrire) */}
+      {(servicesToReactivate.length > 0 || servicesToSubscribe.length > 0) && (
         <section className="mb-10">
           <h2 className="text-xl font-semibold mb-4">Services disponibles</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Array.from(userServicesMap.values()).map((service) => {
-              const shouldShowReactivate = service.userService && !service.userService.is_active;
-              return (
-                <ServiceCard
-                  key={service.id}
-                  service={service}
-                  isSubscribed={!!service.userService}
-                  onSubscribe={!service.userService ? handleSubscribe : undefined}
-                  onReactivate = {!service.userService ? handleReactivate : undefined}
-                  userService={service.userService}
-                />
-              );
-            })}
+            {/* Services à réactiver */}
+            {servicesToReactivate.map((service) => (
+              <ServiceCard
+                key={service.id}
+                service={service}
+                isSubscribed={false}
+                onReactivate={handleReactivate}
+                userService={service.userService}
+              />
+            ))}
+            {/* Services à souscrire */}
+            {servicesToSubscribe.map((service) => (
+              <ServiceCard
+                key={service.id}
+                service={service}
+                isSubscribed={false}
+                onSubscribe={handleSubscribe}
+                userService={service.userService}
+              />
+            ))}
           </div>
         </section>
       )}
+
       {/* Section Messagerie intégrée */}
       <section className="mb-10 bg-white rounded-lg shadow-md p-6">
         <div className="flex justify-between items-center mb-5">
@@ -68,6 +76,7 @@ export default function DashboardHome() {
         </div>
         <p className="text-gray-500 italic">Aucun message pour le moment.</p>
       </section>
+
       {/* Section Mon Compte */}
       <AccountSummary />
     </div>
