@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { deactivateUserService } from '../../../controller';
 
-export async function PATCH(
+export async function POST(
   request: Request,
   { params }: { params: Promise<{ userId: string; serviceId: string }> }
 ) {

@@ -118,13 +118,10 @@ export const useServices = (userId: string | undefined, status: string) => {
 
   const handleReactivate = async (serviceId: number) => {
   if (!userId) return;
-console.log("Hello"); 
   try {
-    console.log("Hello1"); 
     const userService = userServices.find(
       (us: UserServiceWithDetails) => us.service_id === serviceId
     );
-    console.log("Hello2"); 
 
     if (!userService) {
       setError("Vous n'êtes pas abonné à ce service.");
