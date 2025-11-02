@@ -9,6 +9,7 @@ export const useServices = (userId: string | undefined, status: string) => {
   const [availableServices, setAvailableServices] = useState<AvailableService[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [userServices, setUserServices] = useState<UserServiceWithDetails[]>([]);
 
   const fetchData = async () => {
     if (!userId) {
@@ -20,10 +21,12 @@ export const useServices = (userId: string | undefined, status: string) => {
       setLoading(true);
       setError(null);
 
-      const [userServices, allServices] = await Promise.all([
+      const [fetchedUserServices, allServices] = await Promise.all([
         fetchUserServices(userId),
         fetchAllServices(),
       ]);
+
+      setUserServices(fetchedUserServices);
 
       // Services abonnés et actifs
       const subscribedServices = Array.isArray(userServices)
@@ -116,35 +119,30 @@ export const useServices = (userId: string | undefined, status: string) => {
   };
 
   const handleReactivate = async (serviceId: number) => {
-    if (!userId) return;
+  if (!userId) return;
 
-    try {
-      const userServices = await Promise.all([
-        fetchUserServices(userId),
-      ]);
+  try {
+    const userService = userServices.find(
+      (us: UserServiceWithDetails) => us.service_id === serviceId
+    );
 
-      const userService = userServices.find(
-        (us: UserServiceWithDetails) => us.service_id === serviceId
-      );
-
-      if (!userService) {
-        setError("Vous n'êtes pas abonné à ce service.");
-        return;
-      }
-
-      if (userService.is_active) {
-        setError("Cet abonnement est déjà actif.");
-        return;
-      }
-
-      // Appelle une fonction API pour réactiver le service
-      await reactivateUserService(Number(userId), serviceId);
-      await refreshServices();
-    } catch (error) {
-      console.error("Erreur lors de la réactivation:", error);
-      setError(error instanceof Error ? error.message : "Échec de la réactivation.");
+    if (!userService) {
+      setError("Vous n'êtes pas abonné à ce service.");
+      return;
     }
-  };
+
+    if (userService.is_active) { 
+      setError("Cet abonnement est déjà actif.");
+      return;
+    }
+
+    await reactivateUserService(Number(userId), serviceId);
+    await refreshServices();
+  } catch (error) {
+    console.error("Erreur lors de la réactivation:", error);
+    setError(error instanceof Error ? error.message : "Échec de la réactivation.");
+  }
+};
 
   return { services, availableServices, loading, error, handleSubscribe, handleDeactivate, handleReactivate};
 };
