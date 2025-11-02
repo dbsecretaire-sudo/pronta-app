@@ -24,7 +24,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   // Mapper les services disponibles et actifs pour la navbar
   const dynamicServices = subscribedAndActiveServices.map(service => ({
     name: service.name,
-    path: `/dashboard/Services/${service.id}`, // ou service.slug si disponible
+    path: service.route, // ou service.slug si disponible
     icon: service.icon || "🔧" // icône par défaut si non fournie
   }));
 
