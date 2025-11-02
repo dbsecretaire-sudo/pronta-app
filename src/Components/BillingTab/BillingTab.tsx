@@ -29,6 +29,7 @@ export function BillingTab({ data, onEdit, isUpdating = false }: BillingTabProps
     },
   });
 console.log("BillingTab.tsx: ", data);
+console.log("BillingTab.tsx: ", formData);
   const handleSubmit = async (e: React.FormEvent, type: "billing" | "payment") => {
     e.preventDefault();
     const payload = type === "billing" ? { billing_address: formData.billing_address } : { payment_method: formData.payment_method };
