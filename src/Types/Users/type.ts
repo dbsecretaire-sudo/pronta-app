@@ -23,12 +23,16 @@ export interface User {
   email: string;
   password_hash: string;
   name?: string;
-  role: Role;
-  created_at: Date;
+  created_at?: Date;
   billing_address?: BillingAddress;
   payment_method?: PaymentMethod;
   subscription_plan?: string;
   subscription_end_date?: Date;
+  phone?: string,
+  company?: string,
+  next_payment_date?: Date,
+  subscription_status?: string;
+  role: Role;
 }
 
 export type CreateUser = Omit<User, "id" | "created_at" | "password_hash"> & {

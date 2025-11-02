@@ -28,3 +28,6 @@ export const deleteUser = async (id: number) => {
 export const getUsersBySubscriptionPlan = async (plan: string) => {
   return await userService.getUsersBySubscriptionPlan(plan);
 };
+
+
+

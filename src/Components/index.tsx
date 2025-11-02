@@ -24,5 +24,5 @@ export type { Call, CallFilterProps, CallStatsProps } from "./Calls/types";
 export { formatDuration, formatDate } from "./Calls/utils";
 export { default as Calendar } from "./Calendar";
 export { AccountTabs } from "./AccountTabs";
-// export { default as ProfileTab } from './ProfileTab';
-// export { default as Tabs } from './Tabs'
+export { ProfileTab } from './ProfileTab';
+export { Tabs } from './Tabs'

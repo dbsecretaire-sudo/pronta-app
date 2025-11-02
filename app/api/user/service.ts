@@ -23,15 +23,22 @@ export class UserService {
     if (!isValidRole(user.role)) {
       throw new Error("Invalid role");
     }
+
     const password_hash = await hashPassword(user.password);
-    return this.userModel.createUser({ ...user, password_hash });
+
+    // Convertir les Date en timestamps pour la base de données
+    const userData = {
+      ...user,
+      password_hash,
+      subscription_end_date: user.subscription_end_date,
+      next_payment_date: user.next_payment_date
+    };
+
+    return this.userModel.createUser(userData);
   }
 
   async updateUser(id: number, user: UpdateUser): Promise<User> {
-    // if (user.password) {
-    //   user.password_hash = await hashPassword(user.password);
-    //   delete user.password;
-    // }
+
     return this.userModel.updateUser(id, user);
   }
 
