@@ -29,4 +29,3 @@ export { Tabs } from './Tabs';
 export { BillingTab } from "./BillingTab";
 export { MessagesTab } from "./MessagesTab";
 export { Button } from "./Button";
-export { AppLayout } from "./Layouts/AppLayout";

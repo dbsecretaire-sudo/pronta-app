@@ -22,7 +22,6 @@ export default function ProntaInvoicesLayout({
         </div>
       </nav>
 
-      {/* Le contenu sera enveloppé par la navbar globale via AppLayout */}
       <div className="pt-4">
         {children}
       </div>

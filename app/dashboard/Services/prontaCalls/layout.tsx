@@ -24,7 +24,6 @@ export default function ProntaCallsLayout({ children }: { children: React.ReactN
         </div>
       </nav>
 
-      {/* Le contenu sera enveloppé par AppLayout qui gère la navbar globale */}
       <div className="flex-1">
         {children}
       </div>

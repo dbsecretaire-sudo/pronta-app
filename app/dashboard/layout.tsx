@@ -18,7 +18,6 @@ export default function DashboardLayout({
     status
   );
 
-  // Filtrer et mapper les services actifs
   const userServices = availableServices
     .filter(service => service.userService?.is_active)
     .map(service => ({
@@ -27,7 +26,6 @@ export default function DashboardLayout({
       icon: service.icon || "🔧"
     }));
 
-  // États de chargement
   if (status === "loading" || servicesLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -44,15 +42,13 @@ export default function DashboardLayout({
   }
 
   return (
-
-        <NavBar
-          showLogo={true}
-          logoText="Pronta"
-          isInService={isInService}
-          userServices={userServices}
-        >
-          {children}
-        </NavBar>
-        
+    <NavBar
+      showLogo={true}
+      logoText="Pronta"
+      isInService={isInService}
+      userServices={userServices}
+    >
+      {children}
+    </NavBar>    
   );
 }

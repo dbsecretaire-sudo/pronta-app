@@ -1,13 +1,8 @@
 "use client";
-import { useAppLayout } from "@/src/Hook/useAppLayout";
 import { ProfileTab, BillingTab, MessagesTab } from "@/src/Components";
 import { useAccount } from "@/src/Hook/useAccount";
 
 export default function AccountPage() {
-  // Utilisation de notre hook global
-  const { userServices } = useAppLayout();
-
-  // Utilisation du hook spécifique au compte
   const {
     userData,
     loading,
@@ -64,7 +59,6 @@ export default function AccountPage() {
 
   return (
     <div className="flex flex-col h-screen">
-      {/* Le contenu sera enveloppé par AppLayout qui gère la navbar globale */}
       <div className="p-8 max-w-4xl mx-auto w-full">
         <h1 className="text-2xl font-bold mb-8">Mon compte</h1>
 
