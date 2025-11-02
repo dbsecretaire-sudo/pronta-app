@@ -1,6 +1,6 @@
 // src/Hook/useServices.ts
 import { useState, useEffect } from 'react';
-import { Service, AvailableService } from '@/src/Types/Services/index';
+import { Service, AvailableService } from '@/src/Types/Services';
 import { UserService, UserServiceWithDetails } from '@/src/Types/UserServices';
 import { fetchUserServices, fetchAllServices, subscribeToService, deactivateUserService, reactivateUserService, updateUserSubscription } from '@/src/lib/api';
 
@@ -10,6 +10,9 @@ export const useServices = (userId: string | undefined, status: string) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [userServices, setUserServices] = useState<UserServiceWithDetails[]>([]);
+  const now = new Date();
+  const endDate = new Date(now);
+  endDate.setMonth(now.getMonth() + 1);
 
   const fetchData = async () => {
     if (!userId) {
@@ -79,15 +82,12 @@ export const useServices = (userId: string | undefined, status: string) => {
     await fetchData();
   };
 
-  const handleSubscribe = async (serviceId: number) => {
+  const handleSubscribe = async (service: Service) => {
     try {
-      const now = new Date();
-      const defaultEndDate = new Date(now);
-      defaultEndDate.setMonth(now.getMonth() + 1);
-
-      await subscribeToService(serviceId);
+      
+      await subscribeToService(service.id);
       await updateUserSubscription(Number(userId), {
-        subscription_plan: "",
+        subscription_plan: service.name,
         subscription_end_date: undefined,
         next_payment_date: undefined,
         subscription_status: "inactif",
@@ -99,13 +99,13 @@ export const useServices = (userId: string | undefined, status: string) => {
     }
   };
 
-  const handleDeactivate = async (serviceId: number) => {
+  const handleDeactivate = async (service: Service) => {
     if (!userId) return;
 
     try {
       // Vérifie si l'utilisateur a un abonnement ACTIF à ce service
       const userService = availableServices.find(
-        (s) => s.id === serviceId
+        (s) => s.id === service.id
       )?.userService;
 
       if (!userService) {
@@ -118,9 +118,9 @@ export const useServices = (userId: string | undefined, status: string) => {
         return;
       }
 
-      await deactivateUserService(Number(userId), serviceId);
+      await deactivateUserService(Number(userId), service.id);
       await updateUserSubscription(Number(userId), {
-        subscription_plan: "",
+        subscription_plan: service.name,
         subscription_end_date: undefined,
         next_payment_date: undefined,
         subscription_status: "inactif",
@@ -132,11 +132,11 @@ export const useServices = (userId: string | undefined, status: string) => {
     }
   };
 
-  const handleReactivate = async (serviceId: number) => {
+  const handleReactivate = async (service: Service) => {
     if (!userId) return;
     try {
       const userService = userServices.find(
-        (us: UserServiceWithDetails) => us.service_id === serviceId
+        (us: UserServiceWithDetails) => us.service_id === service.id
       );
 
       const now = new Date();
@@ -153,9 +153,9 @@ export const useServices = (userId: string | undefined, status: string) => {
         return;
       }
 
-      await reactivateUserService(Number(userId), serviceId);
+      await reactivateUserService(Number(userId), service.id);
       await updateUserSubscription(Number(userId), {
-        subscription_plan: userService.service.name,
+        subscription_plan: service.name,
         subscription_end_date: new Date(now),
         next_payment_date: new Date(defaultEndDate),
         subscription_status: "actif",

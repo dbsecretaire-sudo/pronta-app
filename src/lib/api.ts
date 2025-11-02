@@ -1,6 +1,6 @@
 import { CalendarEvent } from "@/src/Types/Calendar/index";
 import { CallFilter } from "@/src/Types/Calls/index"; 
-import { Role } from "../Types/Users";
+import { Role, UpdateUserSubscription } from "../Types/Users";
 import { User } from "@/src/Types/Users";
 import { UserService } from '@/src/Types/UserServices';
 import { AvailableService } from "@/src/Types/Services";
@@ -149,18 +149,56 @@ export async function updateBilling(userId: number, data: {
 }
 
 
-export const updateUserSubscription =  async (userId: number, data: {
-  subscription_plan?: string;
-  subscription_end_date?: Date;
-  next_payment_date?: Date,
-  subscription_status?: string;
-}) => {
-  console.log("updateUserSubscription", data);
-  const res = await fetch(`/api/user/${userId}/subscription`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ data }),
-  });
-  if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
-  return res.json();
+export const updateUserSubscription = async (
+  userId: number,
+  data: {
+    subscription_plan?: string;
+    subscription_end_date?: Date;
+    next_payment_date?: Date;
+    subscription_status?: string;
+  }
+) => {
+  console.log("updateUserSubscription - Début", { userId, data });
+
+  // Préparation des données pour l'API
+  const requestData = {
+    ...data,
+    // Conversion des dates en strings ISO si elles existent
+    ...(data.subscription_end_date && {
+      subscription_end_date: data.subscription_end_date.toISOString()
+    }),
+    ...(data.next_payment_date && {
+      next_payment_date: data.next_payment_date.toISOString()
+    })
+  };
+
+  console.log("Données envoyées à l'API:", requestData);
+
+  try {
+    const res = await fetch(`/api/user/${userId}/subscription`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestData), // Pas besoin de { data: ... }
+    });
+
+    console.log("Réponse brute:", res);
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      console.error("Erreur de l'API:", {
+        status: res.status,
+        error: errorData
+      });
+      throw new Error(`HTTP error: ${res.status} - ${JSON.stringify(errorData)}`);
+    }
+
+    const result = await res.json();
+    console.log("Réponse réussie:", result);
+    return result;
+  } catch (error) {
+    console.error("Erreur dans updateUserSubscription:", error);
+    throw error;
+  }
 };
