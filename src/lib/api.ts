@@ -1,5 +1,6 @@
 import { CalendarEvent } from "@/src/Types/Calendar/index";
 import { CallFilter } from "@/src/Types/Calls/index"; 
+import { Role } from "../Types/Users";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL; // Remplacez par l’URL de votre backend
 
@@ -92,7 +93,8 @@ export const reactivateUserService = async (userId: number, serviceId: number): 
 export async function updateProfile(userId: number, data: {
   email: string;
   phone: string;
-  company: string;
+  name: string;
+  role: Role;
 }) {
   const response = await fetch(`/api/user/${userId}`, {
     method: "PUT",

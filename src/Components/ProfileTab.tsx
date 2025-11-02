@@ -2,15 +2,16 @@
 "use client";
 import { useState } from "react";
 import { Button } from "@/src/Components";
+import { Role } from "../Types/Users";
 
 interface ProfileTabProps {
   data: {
     email: string;
     phone: string;
     name: string;
-    role: string;
+    role: Role;
   };
-  onEdit: (data: { email: string; phone: string; name: string; role: string }) => Promise<{ success: boolean; message: string }>;
+  onEdit: (data: { email: string; phone: string; name: string; role: Role }) => Promise<{ success: boolean; message: string }>;
   isUpdating?: boolean;
 }
 
@@ -77,7 +78,7 @@ export function ProfileTab({ data, onEdit, isUpdating = false }: ProfileTabProps
             <label className="block text-sm font-medium text-gray-700">Rôle d'accès</label>
             <select
               value={formData.role}
-              onChange={(e) => setFormData({...formData, role: e.target.value})}
+              onChange={(e) => setFormData({...formData, role: e.target.value as Role})}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               required
             >

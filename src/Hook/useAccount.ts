@@ -2,7 +2,7 @@
 import { useUser } from "@/src/Hook/useUser";
 import { useState } from "react";
 import { updateProfile, updateBilling } from "@/src/lib/api";
-import { User } from "@/src/Types/Users";
+import { Role, User } from "@/src/Types/Users";
 
 export function useAccount() {
   const { userData, loading, error, mutate } = useUser();
@@ -12,7 +12,8 @@ export function useAccount() {
   const handleProfileUpdate = async (updatedData: {
     email: string;
     phone: string;
-    company: string;
+    name: string;
+    role: Role;
   }) => {
     if(!userData?.id){
       console.error('User data is not available');

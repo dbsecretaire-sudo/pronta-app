@@ -27,7 +27,8 @@ export default function AccountPage() {
           data={{
             email: userData.email,
             phone: userData.phone || "",
-            company: userData.company || "",
+            name: userData.name || "",
+            role: userData.role || ""
           }}
           onEdit={handleProfileUpdate}
           isUpdating={isUpdating}
