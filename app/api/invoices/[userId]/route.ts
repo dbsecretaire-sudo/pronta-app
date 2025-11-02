@@ -1,17 +1,24 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { Pool } from "pg";
+// app/api/invoices/route.ts
+import { NextResponse } from 'next/server';
+import pool from "@/src/lib/db";
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
-
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
+export async function GET(
+  request: Request,
+  { params }: { params: { userId: string } }
 ) {
-  const { userId } = req.query;
-
   try {
+    // Dans App Router, les paramètres dynamiques sont dans l'URL
+    // Ex: /api/invoices/123 -> userId = "123"
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get('userId') || params.userId;
+
+    if (!userId || isNaN(Number(userId))) {
+      return NextResponse.json(
+        { error: "Invalid user ID" },
+        { status: 400 }
+      );
+    }
+
     const client = await pool.connect();
     const result = await client.query(
       `
@@ -22,10 +29,14 @@ export default async function handler(
       `,
       [userId]
     );
+    client.release();
 
-    res.status(200).json(result.rows);
+    return NextResponse.json(result.rows);
   } catch (error) {
     console.error("Database error:", error);
-    res.status(500).json({ error: "Internal server error" });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
