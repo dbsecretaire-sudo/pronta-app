@@ -46,12 +46,6 @@ export default function DashboardHome() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {availableServices.map((service) => {
               const shouldShowReactivate = service.isSubscribed && !service.userService?.is_active;
-              console.log("Service:", service.id, {
-                isSubscribed: service.isSubscribed,
-                isActive: service.userService?.is_active,
-                userService: service.userService,
-                onReactivateCondition: service.isSubscribed && !service.userService?.is_active
-              }); // ✅ Log correctement placé
 
               return (
                 <ServiceCard
