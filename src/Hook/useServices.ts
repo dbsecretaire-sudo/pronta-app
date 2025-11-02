@@ -90,7 +90,7 @@ export const useServices = (userId: string | undefined, status: string) => {
         subscription_plan: undefined,
         subscription_end_date: undefined,
         next_payment_date: undefined,
-        subscription_status: "inactif",
+        subscription_status: "cancelled",
       })
       await refreshServices();
     } catch (error) {
@@ -123,7 +123,7 @@ export const useServices = (userId: string | undefined, status: string) => {
         subscription_plan: undefined,
         subscription_end_date: undefined,
         next_payment_date: undefined,
-        subscription_status: "inactif",
+        subscription_status: "cancelled",
       })
       await refreshServices();
     } catch (error) {
@@ -141,7 +141,7 @@ export const useServices = (userId: string | undefined, status: string) => {
         subscription_plan: service.name,
         subscription_end_date: endDate,
         next_payment_date: new Date(endDate),
-        subscription_status: "actif",
+        subscription_status: "active",
       });
       await refreshServices();
     } catch (error) {
