@@ -87,7 +87,7 @@ export const useServices = (userId: string | undefined, status: string) => {
       
       await subscribeToService(service.id);
       await updateUserSubscription(Number(userId), {
-        subscription_plan: service.name,
+        subscription_plan: undefined,
         subscription_end_date: undefined,
         next_payment_date: undefined,
         subscription_status: "inactif",
@@ -120,7 +120,7 @@ export const useServices = (userId: string | undefined, status: string) => {
 
       await deactivateUserService(Number(userId), service.id);
       await updateUserSubscription(Number(userId), {
-        subscription_plan: service.name,
+        subscription_plan: undefined,
         subscription_end_date: undefined,
         next_payment_date: undefined,
         subscription_status: "inactif",
