@@ -10,7 +10,7 @@ export type BillingTabProps = {
       status?: string;
       start_date?: Date;
       end_date?: Date;
-      next_payment_date?: Date;
+      next_payment_date?: Date | string | null;
       created_at?: Date;
     }>;
     service_name?: string;
@@ -31,7 +31,7 @@ export interface BillingTabData {
     status: string;
     start_date: string | Date;
     end_date?: string | Date;
-    next_payment_date?: string | Date;
+    next_payment_date?: string | Date | null;
     created_at?: string | Date;
   }>;
   billing_address?: any;

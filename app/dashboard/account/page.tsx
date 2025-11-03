@@ -124,7 +124,7 @@ export default function AccountPage() {
             // Nouvelle structure avec les abonnements multiples
             id: userData.id,
             email: userData.email,
-            subscriptions: userSubscriptions ,
+            subscriptions: userSubscriptions,
             billing_address: userData.billing_address,
             payment_method: userData.payment_method,
           }}
