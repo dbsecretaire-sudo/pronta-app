@@ -1,4 +1,4 @@
-import { updateUserSubscription, createUserSubscription, deleteUserSubscription } from '../controller';
+import { updateUserSubscription, createUserSubscription, deleteUserSubscription, getSubscriptionByUserId } from '../controller';
 import { NextResponse } from 'next/server';
 
 import { z } from 'zod';
@@ -80,3 +80,21 @@ export async function DELETE(
     );
   }
 }
+
+export async function GET(
+    request: Request,
+    { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+
+    const users = await getSubscriptionByUserId(Number(id));
+    return NextResponse.json(users);
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to fetch users" },
+      { status: 500 }
+    );
+  }
+}
+

@@ -124,6 +124,17 @@ import { User } from "../Users";
     return this.mapDbSubscriptionToSubscription(rows[0]);
   }
 
+    async getSubscriptionByUserId(userId: number): Promise<Subscription> {
+    const query = 'SELECT * FROM user_subscriptions WHERE user_id = $1';
+    const { rows } = await pool.query(query, [userId]);
+
+    if (rows.length === 0) {
+      throw new Error('Subscription not found');
+    }
+
+    return this.mapDbSubscriptionToSubscription(rows[0]);
+  }
+
   // Mappers
   private mapDbUserToUser(dbUser: any): User {
     return {
@@ -216,4 +227,6 @@ async deleteUserSubscription(subscriptionId: number): Promise<void> {
 
   await pool.query(query, [subscriptionId]);
 }
+
+
 }

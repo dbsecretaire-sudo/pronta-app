@@ -13,3 +13,7 @@ export async function createUserSubscription(userId: number, subscriptionData: a
 export async function deleteUserSubscription(subscriptionId: number) {
   return await subscriptionService.deleteUserSubscription(subscriptionId);
 }
+
+export async function getSubscriptionByUserId(userId: number) {
+  return await subscriptionService.getSubscriptionByUserId(userId);
+}
