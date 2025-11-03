@@ -226,16 +226,21 @@ export async function deleteSubscription(subscriptionId: number): Promise<void> 
   }
 }
 
-export async function getSubscriptionByPlan(userId: number, plan: string): Promise<{id: number} | null> {
+export async function getSubscriptionsByPlan(
+  userId: number,
+  plan: string
+): Promise<Subscription[] | null> {  // Retourne un tableau ou null
   try {
-    const response = await fetch(`/api/subscription/user/${userId}?plan=${encodeURIComponent(plan)}`);
+    const response = await fetch(
+      `/api/subscription/user/${userId}?plan=${encodeURIComponent(plan)}`
+    );
     if (!response.ok) {
       throw new Error("Failed to fetch subscriptions");
     }
-    const subscriptions = await response.json();
-    return subscriptions.length > 0 ? subscriptions[0] : null;
+    const subscriptions: Subscription[] = await response.json();
+    return subscriptions;  // Retourne TOUS les abonnements (tableau)
   } catch (error) {
-    console.error("Erreur lors de la vérification de l'abonnement:", error);
+    console.error("Erreur lors de la récupération des abonnements:", error);
     return null;
   }
 }
