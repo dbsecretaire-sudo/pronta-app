@@ -153,7 +153,7 @@ export const useServices = (userId: string | undefined, status: string) => {
       const existingSubscription = await getSubscriptionByPlan(Number(userId), service.name);
       if (existingSubscription && existingSubscription.length > 0) {
       const firstSubscription = existingSubscription[0];
-      console.log("existingSubscription", existingSubscription, " firstSubscription: ", firstSubscription, " existingSubscription[0] ", existingSubscription[0])
+      console.log("firstSubscription: ", firstSubscription.id)
       await updateUserSubscription({
         user_id: Number(userId),
         subscription_id: firstSubscription.id,
