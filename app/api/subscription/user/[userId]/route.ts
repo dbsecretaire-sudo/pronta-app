@@ -3,13 +3,14 @@ import { NextResponse } from 'next/server';
 
 export async function GET(
   request: Request,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> } // Typage correct pour Next.js
 ) {
+  const resolvedParams = await params; // Résoudre la Promise
   const { searchParams } = new URL(request.url);
-  const plan = searchParams.get('plan'); // Récupère le paramètre `plan` (ou `null` s'il n'existe pas)
+  const plan = searchParams.get('plan');
 
   try {
-    const userId = Number(params.userId);
+    const userId = Number(resolvedParams.userId); // Utiliser resolvedParams
     if (isNaN(userId)) {
       return NextResponse.json(
         { error: "L'ID de l'utilisateur est invalide" },
@@ -17,13 +18,11 @@ export async function GET(
       );
     }
 
-    // Cas 1 : Si un `plan` est spécifié, filtre par plan
-    // Cas 2 : Sinon, retourne tous les abonnements de l'utilisateur
     const subscriptions = plan
       ? await getSubscriptionByUserIdAndPlan(userId, plan)
       : await getSubscriptionByUserId(userId);
 
-    return NextResponse.json(subscriptions); // Toujours un tableau (même vide)
+    return NextResponse.json(subscriptions);
   } catch (error) {
     console.error("Erreur dans GET /api/subscription/[userId]:", error);
     return NextResponse.json(
