@@ -27,7 +27,7 @@ export default function AccountPage() {
       if (!userData?.id) return;
 
       try {
-        const response = await fetch(`/api/subscription`);
+        const response = await fetch(`/api/subscription/${userData.id}`);
         if (!response.ok) {
           throw new Error("Échec du chargement des abonnements");
         }
