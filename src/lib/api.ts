@@ -228,7 +228,7 @@ export async function deleteSubscription(subscriptionId: number): Promise<void> 
 
 export async function getSubscriptionByPlan(userId: number, plan: string): Promise<{id: number} | null> {
   try {
-    const response = await fetch(`/api/subscription?plan=${encodeURIComponent(plan)}`);
+    const response = await fetch(`/api/subscription/${userId}?plan=${encodeURIComponent(plan)}`);
     if (!response.ok) {
       throw new Error("Failed to fetch subscriptions");
     }
