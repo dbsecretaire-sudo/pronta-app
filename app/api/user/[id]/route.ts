@@ -1,10 +1,6 @@
 // app/api/user/[id]/route.ts
 import { NextResponse } from 'next/server';
-import {
-  getUserById,
-  updateUser,
-  deleteUser
-} from '../controller';
+import { getUserById, updateUser, deleteUser } from '@/app/api/user/controller';
 
 // GET /api/user/[id]
 export async function GET(

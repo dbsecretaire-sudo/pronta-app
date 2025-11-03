@@ -1,5 +1,5 @@
 import { User, CreateUser, UpdateUser, UserFilter, UserModel } from "./types";
-import { validateUser, hashPassword, isValidRole, isSubscriptionActive } from "./utils";
+import { validateUser, hashPassword, isValidRole } from "./utils";
 
 export class UserService {
   private userModel = new UserModel({} as User);

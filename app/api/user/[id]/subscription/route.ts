@@ -1,7 +1,6 @@
 // app/api/user/[id]/subscription/route.ts
 import { NextResponse } from 'next/server';
-import { updateUserSubscription } from '../../controller';
-
+import { updateUserSubscription } from '@/app/api/user/controller';
 import { z } from 'zod'; // Pour la validation (à installer: npm install zod)
 
 // Schéma de validation pour les données d'abonnement
@@ -16,11 +15,11 @@ const subscriptionUpdateSchema = z.object({
 // PUT /api/user/[id]/subscription/
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string;} } // Plus besoin de Promise ici
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
-    const userId = parseInt(id);
+    const { id } = await params;
+    const userId = Number(id);
 
     if (isNaN(userId)) {
       return NextResponse.json(

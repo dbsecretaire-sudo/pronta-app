@@ -246,11 +246,11 @@ async createUser(user: Omit<CreateUser, "password"> & { password_hash: string })
   }
 
 async updateUserSubscription(id: number, plan_d: string, updates: {
-  plan?: string;
+  plan: string;
   status?: string;
-  end_date?: Date;
-  next_payment_date?: Date;
-  start_date?: Date;
+  end_date: Date;
+  next_payment_date: Date;
+  start_date: Date;
 }): Promise<User> {
   // Vérification que le plan à mettre à jour correspond au plan_d
   const checkQuery = `

@@ -32,4 +32,3 @@ export const getUsersBySubscriptionPlan = async (plan: string) => {
 export const updateUserSubscription = async (id: number, plan: string, userData: any) => {
   return await userService.updateUserSubscription(id, plan, userData);
 }
-
