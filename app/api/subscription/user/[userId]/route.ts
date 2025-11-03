@@ -1,7 +1,6 @@
-import { getSubscriptionByUserId } from '../controller';
+import { getSubscriptionByUserId } from '@/app/api/subscription/controller';
 import { NextResponse } from 'next/server';
 
-import { z } from 'zod';
 export async function GET(
     request: Request,
     { params }: { params: Promise<{ userId: string }> }
