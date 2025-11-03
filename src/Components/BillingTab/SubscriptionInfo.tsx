@@ -100,19 +100,6 @@ export const SubscriptionInfo = ({
                   </div>
                 )}
               </div>
-
-              <div className="pt-3 border-t border-gray-100">
-                <div className="flex flex-wrap gap-4 text-sm">
-                  <div className="flex items-center text-gray-600">
-                    <span className="mr-1">ID:</span>
-                    <span className="font-mono">{subscription.id}</span>
-                  </div>
-                  <div className="flex items-center text-gray-600">
-                    <span className="mr-1">Créé le:</span>
-                    <span>{formatDate(subscription.created_at)}</span>
-                  </div>
-                </div>
-              </div>
             </div>
           ))}
         </>
