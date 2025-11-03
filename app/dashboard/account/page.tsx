@@ -26,16 +26,23 @@ export default function AccountPage() {
   const [userSubscriptions, setUserSubscriptions] = useState<Subscription[]>([]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (status !== 'authenticated' || !session?.user?.id) {
-        console.warn("Utilisateur non connecté ou ID manquant");
-        return;
-      }
-      const subscriptions = await fetchUserSubscriptions(Number(session.user.id));
+  const fetchData = async () => {
+    if (status !== 'authenticated' || !session?.user?.id) {
+      console.warn("Utilisateur non connecté ou ID manquant");
+      return;
+    }
+    try {
+      const result = await fetchUserSubscriptions(Number(session.user.id));
+      // S'assurer que result est un tableau, sinon utiliser un tableau vide
+      const subscriptions = Array.isArray(result) ? result : [];
       setUserSubscriptions(subscriptions);
-    };
-    fetchData();
-  }, [userData?.id]);
+    } catch (error) {
+      console.error("Erreur lors du chargement des abonnements:", error);
+      setUserSubscriptions([]); // Réinitialiser en cas d'erreur
+    }
+  };
+  fetchData();
+}, [session?.user?.id, status]); // Dépendance sur session.user.id et status
 
 
   if (loading) return <div className="text-center py-8">Chargement...</div>;
