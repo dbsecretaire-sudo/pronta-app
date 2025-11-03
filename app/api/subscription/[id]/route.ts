@@ -14,7 +14,7 @@ const subscriptionUpdateSchema = z.object({
   next_payment_date: z.union([z.string().datetime(), z.date()]).optional(),
 });
 
-// PUT /api/user/[id]/subscription/[subscriptionId]
+// PUT /api/subscription/[subscriptionId]
 export async function PUT(
   request: Request,
 { params }: { params: Promise<{ id: string }> }

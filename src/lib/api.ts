@@ -150,9 +150,9 @@ export async function updateBilling(userId: number, data: {
 }
 
 export const updateUserSubscription = async (
+  subscription_id: number, 
   data: {
     user_id: number;
-    subscription_id: number;  // Ajout de l'ID de l'abonnement
     plan: string;
     start_date?: string | Date;
     end_date?: string | Date;  // Rendu optionnel pour correspondre à votre modèle
@@ -182,7 +182,7 @@ export const updateUserSubscription = async (
 console.log("resquestData: ", requestData);
   try {
     // Correction de l'URL pour inclure l'ID de l'utilisateur et de l'abonnement
-    const res = await fetch(`/api/subscription/${data.subscription_id}`, {
+    const res = await fetch(`/api/subscription/${subscription_id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

@@ -110,9 +110,8 @@ export const useServices = (userId: string | undefined, status: string) => {
       // Cas 2 : Abonnement(s) existant(s) → Mettre à jour le premier abonnement trouvé
       // (Tu peux aussi choisir de tous les mettre à jour ou de gérer différemment)
       const firstSubscription = existingSubscription[0];
-      await updateUserSubscription({
+      await updateUserSubscription(firstSubscription.id, {
         user_id: Number(userId),
-        subscription_id: firstSubscription.id,
         plan: service.name,
         start_date: now,
         end_date: endDate,
@@ -153,10 +152,9 @@ export const useServices = (userId: string | undefined, status: string) => {
       const existingSubscription = await getSubscriptionByPlan(Number(userId), service.name);
       if (existingSubscription && existingSubscription.length > 0) {
       const firstSubscription = existingSubscription[0];
-      console.log("Number(userId): ", Number(userId), " type: ", typeof(Number(userId)));
-      await updateUserSubscription({
+      
+      await updateUserSubscription(firstSubscription.id, {
         user_id: Number(userId),
-        subscription_id: firstSubscription.id,
         plan: service.name,
         end_date: now, // Date de fin = maintenant
         next_payment_date: undefined,
@@ -180,9 +178,8 @@ export const useServices = (userId: string | undefined, status: string) => {
       const existingSubscription = await getSubscriptionByPlan(Number(userId), service.name);
       if (existingSubscription && existingSubscription.length > 0) {
       const firstSubscription = existingSubscription[0];
-      await updateUserSubscription({
+      await updateUserSubscription(firstSubscription.id, {
         user_id: Number(userId),
-        subscription_id: firstSubscription.id,
         plan: service.name,
         start_date: now,
         end_date: endDate,
