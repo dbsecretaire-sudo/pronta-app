@@ -91,9 +91,9 @@ export const useServices = (userId: string | undefined, status: string) => {
 
       const existingSubscription = await getSubscriptionByPlan(Number(userId), service.name);
 
-    if (existingSubscription) {
-      await deleteSubscription(existingSubscription.id);
-    }
+    // if (existingSubscription) {
+    //   await deleteSubscription(existingSubscription.id);
+    // }
       await refreshServices();
     } catch (error) {
       console.error("Erreur lors de l'abonnement:", error);
@@ -123,9 +123,9 @@ export const useServices = (userId: string | undefined, status: string) => {
       await deactivateUserService(Number(userId), service.id);
       const existingSubscription = await getSubscriptionByPlan(Number(userId), service.name);
 
-    if (existingSubscription) {
-      await deleteSubscription(existingSubscription.id);
-    }
+    // if (existingSubscription) {
+    //   await deleteSubscription(existingSubscription.id);
+    // }
       await refreshServices();
     } catch (error) {
       console.error("Erreur lors de la désactivation:", error);

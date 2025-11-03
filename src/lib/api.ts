@@ -226,7 +226,7 @@ export async function deleteSubscription(subscriptionId: number): Promise<void> 
   }
 }
 
-export async function getSubscriptionsByPlan(
+export async function getSubscriptionByPlan(
   userId: number,
   plan: string
 ): Promise<Subscription[] | null> {  // Retourne un tableau ou null
