@@ -287,7 +287,7 @@ export class UserModel {
       status?: string;
       start_date?: string | Date;
       end_date?: string | Date;
-      next_payment_date?: string | Date;
+      next_payment_date?: string | Date | null;
     }
   ): Promise<void> {
     const fields: string[] = [];
