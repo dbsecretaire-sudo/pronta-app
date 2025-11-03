@@ -5,7 +5,7 @@ export interface Subscription {
   status: string;
   start_date: Date;
   end_date?: Date;
-  next_payment_date?: Date;
+  next_payment_date?: Date | string | null;
   created_at?: Date;
   updated_at?: Date;
 }
@@ -17,7 +17,7 @@ export interface ApiSubscription {
   status?: string;  // Peut être undefined depuis l'API
   start_date?: Date;
   end_date?: Date;
-  next_payment_date?: Date;
+  next_payment_date?: Date | string | null;
   created_at?: Date;
   updated_at?: Date;
 }
@@ -36,5 +36,5 @@ export interface CreateSubscription {
   status?: string;
   start_date: Date | string;
   end_date?: Date | string;
-  next_payment_date?: Date | string;
+  next_payment_date?: Date | string | null;
 }
