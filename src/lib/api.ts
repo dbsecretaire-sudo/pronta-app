@@ -272,3 +272,9 @@ export async function createSubscription(subscriptionData: {
     throw error;
   }
 }
+
+export async function fetchUserSubscriptions(userId:number) {
+  const res = await fetch(`/api/subscription/${userId}`, { credentials: 'include' });
+  if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+  return res.json();
+};

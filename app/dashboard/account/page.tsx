@@ -4,6 +4,8 @@ import { useAccount } from "@/src/Hook/useAccount";
 import { Subscription, ApiSubscription } from "@/src/Types/Subscription";
 import { useEffect, useState } from "react";
 import { BillingTabData } from "@/src/Components/BillingTab/types";
+import { fetchUserSubscriptions } from "@/src/lib/api";
+import { useSession } from "next-auth/react";
 
 export default function AccountPage() {
   const {
@@ -19,41 +21,20 @@ export default function AccountPage() {
     // handleUpdateSubscription,
     // handleDeleteSubscription
   } = useAccount();
+  const { data: session, status} = useSession();
 
   const [userSubscriptions, setUserSubscriptions] = useState<Subscription[]>([]);
 
   useEffect(() => {
-    const fetchUserSubscriptions = async () => {
-      if (!userData?.id) return;
-
-      try {
-        const response = await fetch(`/api/subscription/${userData.id}`);
-        if (!response.ok) {
-          throw new Error("Échec du chargement des abonnements");
-        }
-
-        const apiSubscriptions: ApiSubscription[] = await response.json();
-
-        // Mapper les données avec des valeurs par défaut pour les champs requis
-        const mappedSubscriptions: Subscription[] = apiSubscriptions.map(sub => ({
-          id: sub.id,
-          plan: sub.plan,
-          status: sub.status || 'active',  // Valeur par défaut
-          start_date: sub.start_date || new Date(),  // Valeur par défaut
-          end_date: sub.end_date,
-          next_payment_date: sub.next_payment_date,
-          created_at: sub.created_at,
-          updated_at: sub.updated_at,
-          user_id: sub.user_id  // Optionnel
-        }));
-
-        setUserSubscriptions(mappedSubscriptions);
-      } catch (error) {
-        console.error("Erreur lors du chargement des abonnements:", error);
+    const fetchData = async () => {
+      if (status !== 'authenticated' || !session?.user?.id) {
+        console.warn("Utilisateur non connecté ou ID manquant");
+        return;
       }
+      const subscriptions = await fetchUserSubscriptions(Number(session.user.id));
+      setUserSubscriptions(subscriptions);
     };
-
-    fetchUserSubscriptions();
+    fetchData();
   }, [userData?.id]);
 
 
