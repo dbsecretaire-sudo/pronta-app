@@ -61,11 +61,15 @@ import { User } from "../Users";
         subscriptionData.end_date);
       paramIndex++;
     }
-    if (subscriptionData.next_payment_date !== undefined) {
+    if (subscriptionData.next_payment_date !== undefined) { // Inclut null
       fields.push(`next_payment_date = $${paramIndex}`);
-      values.push(subscriptionData.next_payment_date instanceof Date ?
-        subscriptionData.next_payment_date.toISOString() :
-        subscriptionData.next_payment_date);
+      values.push(
+        subscriptionData.next_payment_date === null
+          ? null // ⬅️ Envoie NULL à PostgreSQL
+          : subscriptionData.next_payment_date instanceof Date
+            ? subscriptionData.next_payment_date.toISOString()
+            : subscriptionData.next_payment_date // string déjà au format ISO
+      );
       paramIndex++;
     }
 

@@ -9,7 +9,7 @@ const subscriptionUpdateSchema = z.object({
   plan: z.string().optional(),
   status: z.string().optional(),
   start_date: z.union([z.string().datetime(), z.date()]).optional(),
-  end_date: z.union([z.string().datetime(), z.date()]).optional(),
+  end_date: z.union([z.string().datetime(), z.date(), z.null()]).optional(),
   next_payment_date: z.union([z.string().datetime(), z.date()]).optional(),
 });
 
