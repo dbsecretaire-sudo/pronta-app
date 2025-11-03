@@ -85,15 +85,42 @@ export const useServices = (userId: string | undefined, status: string) => {
   };
 
   const handleSubscribe = async (service: Service) => {
+     //je souscris à un abonnement// 
     try {
       
       await subscribeToService(service.id);
-
+   
       const existingSubscription = await getSubscriptionByPlan(Number(userId), service.name);
 
-    // if (existingSubscription) {
-    //   await deleteSubscription(existingSubscription.id);
-    // }
+      if (existingSubscription === null) {
+      throw new Error("Impossible de vérifier les abonnements existants.");
+    }
+
+    if (existingSubscription.length === 0) {
+      // Cas 1 : Aucun abonnement existant → Créer un nouvel abonnement
+      await createSubscription({
+        user_id: Number(userId),
+        plan: service.name,
+        start_date: now,
+        end_date: endDate,
+        next_payment_date: nextDate,
+        status: "active",
+      });
+    } else {
+      // Cas 2 : Abonnement(s) existant(s) → Mettre à jour le premier abonnement trouvé
+      // (Tu peux aussi choisir de tous les mettre à jour ou de gérer différemment)
+      const firstSubscription = existingSubscription[0];
+      await updateUserSubscription({
+        user_id: Number(userId),
+        subscription_id: firstSubscription.id,
+        plan: service.name,
+        start_date: now,
+        end_date: endDate,
+        next_payment_date: nextDate,
+        status: "active",
+      });
+    }
+    
       await refreshServices();
     } catch (error) {
       console.error("Erreur lors de l'abonnement:", error);
@@ -102,6 +129,7 @@ export const useServices = (userId: string | undefined, status: string) => {
   };
 
   const handleDeactivate = async (service: Service) => {
+    //je désactive un abonnement// 
     if (!userId) return;
 
     try {
@@ -121,11 +149,19 @@ export const useServices = (userId: string | undefined, status: string) => {
       }
 
       await deactivateUserService(Number(userId), service.id);
+      
       const existingSubscription = await getSubscriptionByPlan(Number(userId), service.name);
-
-    // if (existingSubscription) {
-    //   await deleteSubscription(existingSubscription.id);
-    // }
+      if (existingSubscription && existingSubscription.length > 0) {
+      const firstSubscription = existingSubscription[0];
+      await updateUserSubscription({
+        user_id: Number(userId),
+        subscription_id: firstSubscription.id,
+        plan: service.name,
+        end_date: now, // Date de fin = maintenant
+        next_payment_date: undefined,
+        status: "inactive",
+      });
+    }
       await refreshServices();
     } catch (error) {
       console.error("Erreur lors de la désactivation:", error);
@@ -134,35 +170,37 @@ export const useServices = (userId: string | undefined, status: string) => {
   };
 
   const handleReactivate = async (service: Service) => {
+    //je réactive un abonnement// 
     if (!userId) return;
 
     try {
       await reactivateUserService(Number(userId), service.id);
 
       const existingSubscription = await getSubscriptionByPlan(Number(userId), service.name);
-console.log('existingSubscription ', existingSubscription);
-      // if (existingSubscription) {
-      // Mettre à jour l'abonnement existant
-      // await updateUserSubscription({
-      //   user_id: Number(userId),
-      //   subscription_id: existingSubscription.id,
-      //   plan: service.name,
-      //   start_date: now,
-      //   end_date: endDate,
-      //   next_payment_date: nextDate,
-      //   status: "active",
-      // });
-    // } else {
-      // Créer un nouvel abonnement
-      // await createSubscription({
-      //   user_id: Number(userId),
-      //   plan: service.name,
-      //   start_date: now,
-      //   end_date: endDate,
-      //   next_payment_date: nextDate,
-      //   status: "active",
-      // });
-    // }
+      if (existingSubscription && existingSubscription.length > 0) {
+      const firstSubscription = existingSubscription[0];
+      await updateUserSubscription({
+        user_id: Number(userId),
+        subscription_id: firstSubscription.id,
+        plan: service.name,
+        start_date: now,
+        end_date: endDate,
+        next_payment_date: nextDate,
+        status: "active",
+      });
+    } else {
+      // Cas rare : Le service est marqué comme abonné mais aucun abonnement n'est trouvé
+      // → Créer un nouvel abonnement
+      await createSubscription({
+        user_id: Number(userId),
+        plan: service.name,
+        start_date: now,
+        end_date: endDate,
+        next_payment_date: nextDate,
+        status: "active",
+      });
+    }
+   
       await refreshServices();
     } catch (error) {
       console.error("Erreur lors de la réactivation:", error);
