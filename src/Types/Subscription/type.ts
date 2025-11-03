@@ -27,7 +27,7 @@ export interface UpdateSubscription {
   status?: string;
   start_date?: Date | string;
   end_date?: Date | string;
-  next_payment_date?: Date | string;
+  next_payment_date?: Date | string | null;
 }
 
 export interface CreateSubscription {
