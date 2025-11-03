@@ -87,7 +87,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-
+console.log("GET SUBSCRIPTIONS OK");
     const users = await getSubscriptionByUserId(Number(id));
     return NextResponse.json(users);
   } catch (error) {
