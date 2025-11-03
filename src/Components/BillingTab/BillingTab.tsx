@@ -204,9 +204,9 @@ export function BillingTab({ data, onEdit, isUpdating = false }: BillingTabProps
       {/* Section Abonnements */}
       <div className="mb-8">
         {/* Liste des abonnements */}
-        <div className="space-y-4">
+        <div className="">
           {data.subscriptions.map((subscription) => (
-            <div key={subscription.id || Math.random()} className="border rounded-lg p-4">
+            <div key={subscription.id || Math.random()} className="rounded-lg ">
               <SubscriptionInfo
                 serviceName={subscription.plan}
                 subscriptions={[{
