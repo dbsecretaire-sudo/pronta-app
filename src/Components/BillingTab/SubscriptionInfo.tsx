@@ -48,20 +48,11 @@ export const SubscriptionInfo = ({
   };
 
   return (
-    <div className="bg-blue-50 p-4 rounded-lg mb-6">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="font-medium text-lg">{serviceName || "Abonnements"}</h3>
-        {subscriptions.length > 0 && (
-          <div className="text-sm text-gray-600">
-            Total: {calculateTotalCost()} €/mois
-          </div>
-        )}
-      </div>
-
+    <div className="bg-blue-50 p-4 rounded-lg">
       {subscriptions.length > 0 ? (
         <>
           <div className="text-sm text-gray-600 mb-3">
-            {subscriptions.length} abonnement{subscriptions.length > 1 ? 's' : ''} actif{subscriptions.length > 1 ? 's' : ''}
+            Total: {calculateTotalCost()} €/mois
           </div>
           {subscriptions.map((subscription) => (
             <div key={subscription.id} className="space-y-3 p-4 bg-white rounded-lg shadow-sm mb-4">
