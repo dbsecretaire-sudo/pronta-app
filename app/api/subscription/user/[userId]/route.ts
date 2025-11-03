@@ -6,8 +6,9 @@ export async function GET(
     { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
+    console.log("GET SUBSCRIPTIONS OK");
     const { userId } = await params;
-console.log("GET SUBSCRIPTIONS OK");
+
     const users = await getSubscriptionByUserId(Number(userId));
     return NextResponse.json(users);
   } catch (error) {
