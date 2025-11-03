@@ -179,7 +179,7 @@ export const updateUserSubscription = async (
         data.next_payment_date
     })
   };
-
+console.log("resquestData: ", requestData);
   try {
     // Correction de l'URL pour inclure l'ID de l'utilisateur et de l'abonnement
     const res = await fetch(`/api/subscription/${data.subscription_id}`, {
