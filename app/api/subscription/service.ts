@@ -16,7 +16,7 @@ export class SubscriptionService {
     this.subscriptionModel.deleteUserSubscription(subscription_id);
   }
 
-  async getSubscriptionByUserId(user_id: number): Promise<Subscription> {
+  async getSubscriptionByUserId(user_id: number): Promise<Subscription[]> {
     return this.subscriptionModel.getSubscriptionByUserId(user_id);
   }
 }
