@@ -140,29 +140,29 @@ export const useServices = (userId: string | undefined, status: string) => {
       await reactivateUserService(Number(userId), service.id);
 
       const existingSubscription = await getSubscriptionByPlan(Number(userId), service.name);
-
-      if (existingSubscription) {
+console.log('existingSubscription ', existingSubscription);
+      // if (existingSubscription) {
       // Mettre à jour l'abonnement existant
-      await updateUserSubscription({
-        user_id: Number(userId),
-        subscription_id: existingSubscription.id,
-        plan: service.name,
-        start_date: now,
-        end_date: endDate,
-        next_payment_date: nextDate,
-        status: "active",
-      });
-    } else {
+      // await updateUserSubscription({
+      //   user_id: Number(userId),
+      //   subscription_id: existingSubscription.id,
+      //   plan: service.name,
+      //   start_date: now,
+      //   end_date: endDate,
+      //   next_payment_date: nextDate,
+      //   status: "active",
+      // });
+    // } else {
       // Créer un nouvel abonnement
-      await createSubscription({
-        user_id: Number(userId),
-        plan: service.name,
-        start_date: now,
-        end_date: endDate,
-        next_payment_date: nextDate,
-        status: "active",
-      });
-    }
+      // await createSubscription({
+      //   user_id: Number(userId),
+      //   plan: service.name,
+      //   start_date: now,
+      //   end_date: endDate,
+      //   next_payment_date: nextDate,
+      //   status: "active",
+      // });
+    // }
       await refreshServices();
     } catch (error) {
       console.error("Erreur lors de la réactivation:", error);
