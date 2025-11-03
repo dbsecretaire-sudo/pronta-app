@@ -44,9 +44,9 @@ export function useUser() {
         } : undefined,
         subscription: {
           plan: data.subscription?.plan || '',
-          start_date: data.subscription?.start_date ? new Date(data.subscription.start_date) : undefined,
-          end_date: data.subscription?.end_date ? new Date(data.subscription.end_date) : undefined,
-          next_payment_date: data.subscription?.next_payment_date ? new Date(data.subscription.next_payment_date) : undefined,
+          start_date: data.subscription?.start_date ? new Date(data.subscription.start_date) : "",
+          end_date: data.subscription?.end_date ? new Date(data.subscription.end_date) : "",
+          next_payment_date: data.subscription?.next_payment_date ? new Date(data.subscription.next_payment_date) : "",
           status: data.subscription?.status || 'active'
         },
         phone: data.phone || '',

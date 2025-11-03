@@ -151,12 +151,12 @@ export async function updateBilling(userId: number, data: {
 
 export const updateUserSubscription = async (
   userId: number,
-  plan: string,
   data: {
-    subscription_plan?: string;
-    subscription_end_date?: Date;
-    next_payment_date?: Date;
-    subscription_status?: string;
+    plan: string;
+    start_date?: string | Date;
+    end_date: string | Date;
+    next_payment_date: string | Date;
+    status: string;
   }
 ) => {
 
@@ -164,17 +164,20 @@ export const updateUserSubscription = async (
   const requestData = {
     ...data,
     // Conversion des dates en strings ISO si elles existent
-    ...(data.subscription_end_date && {
-      subscription_end_date: data.subscription_end_date.toISOString()
+        ...(data.end_date && {
+      start_date: data.start_date?.toString()
+    }),
+    ...(data.end_date && {
+      end_date: data.end_date.toString()
     }),
     ...(data.next_payment_date && {
-      next_payment_date: data.next_payment_date.toISOString()
+      next_payment_date: data.next_payment_date.toString()
     })
   };
 
 
   try {
-    const res = await fetch(`/api/user/${userId}/subscription/${plan}`, {
+    const res = await fetch(`/api/user/${userId}/subscription`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

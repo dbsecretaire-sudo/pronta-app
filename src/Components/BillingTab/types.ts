@@ -3,11 +3,11 @@ import { BillingAddress, PaymentMethod } from "@/src/Types/Users";
 export type BillingTabProps = {
   data: {
     subscription: {  // Nouveau champ structuré
-      plan?: string;
+      plan: string;
       start_date?: string | Date;
-      end_date?: string | Date;
-      next_payment_date?: string | Date;
-      status?: string;
+      end_date: string | Date;
+      next_payment_date: string | Date;
+      status: string;
     };
     service_name?: string;
     billing_address?: BillingAddress;

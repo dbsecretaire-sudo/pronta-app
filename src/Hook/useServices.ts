@@ -11,8 +11,10 @@ export const useServices = (userId: string | undefined, status: string) => {
   const [error, setError] = useState<string | null>(null);
   const [userServices, setUserServices] = useState<UserServiceWithDetails[]>([]);
   const now = new Date();
+  const nextDate = new Date(now);
+  nextDate.setMonth(now.getMonth() + 1);
   const endDate = new Date(now);
-  endDate.setMonth(now.getMonth() + 1);
+  endDate.setMonth(now.getFullYear() + 1);
 
   const fetchData = async () => {
     if (!userId) {
@@ -86,11 +88,11 @@ export const useServices = (userId: string | undefined, status: string) => {
     try {
       
       await subscribeToService(service.id);
-      await updateUserSubscription(Number(userId), service.name, {
-        subscription_plan: undefined,
-        subscription_end_date: undefined,
-        next_payment_date: undefined,
-        subscription_status: "cancelled",
+      await updateUserSubscription(Number(userId), {
+        plan: service.name,
+        end_date: now,
+        next_payment_date: "",
+        status: "cancelled",
       })
       await refreshServices();
     } catch (error) {
@@ -119,11 +121,11 @@ export const useServices = (userId: string | undefined, status: string) => {
       }
 
       await deactivateUserService(Number(userId), service.id);
-      await updateUserSubscription(Number(userId), service.name, {
-        subscription_plan: undefined,
-        subscription_end_date: undefined,
-        next_payment_date: undefined,
-        subscription_status: "cancelled",
+      await updateUserSubscription(Number(userId), {
+        plan: service.name,
+        end_date: now,
+        next_payment_date: "",
+        status: "cancelled",
       })
       await refreshServices();
     } catch (error) {
@@ -134,14 +136,15 @@ export const useServices = (userId: string | undefined, status: string) => {
 
   const handleReactivate = async (service: Service) => {
     if (!userId) return;
-    console.log("service: ", service);
+
     try {
       await reactivateUserService(Number(userId), service.id);
-      await updateUserSubscription(Number(userId), service.name, {
-        subscription_plan: service.name,
-        subscription_end_date: endDate,
-        next_payment_date: new Date(endDate),
-        subscription_status: "active",
+      await updateUserSubscription(Number(userId), {
+        plan: service.name,
+        start_date: now,
+        end_date: endDate,
+        next_payment_date: nextDate,
+        status: "active",
       });
       await refreshServices();
     } catch (error) {

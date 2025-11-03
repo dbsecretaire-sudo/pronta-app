@@ -21,10 +21,10 @@ export interface PaymentMethod {
 }
 
 export interface SubscriptionFields {
-    plan?: string;
+    plan: string;
     start_date?: Date | string;
-    end_date?: Date | string;
-    next_payment_date?: Date | string;
+    end_date: Date | string;
+    next_payment_date: Date | string;
     status: string;
 }
 

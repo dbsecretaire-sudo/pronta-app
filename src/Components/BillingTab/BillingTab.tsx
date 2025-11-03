@@ -14,9 +14,9 @@ export function BillingTab({ data, onEdit, isUpdating = false }: BillingTabProps
   const [formData, setFormData] = useState({
     subscription: data.subscription || {
       plan: "",
-      next_payment_date: undefined,
-      start_date: undefined,
-      end_date: undefined,
+      next_payment_date: "",
+      start_date: "",
+      end_date: "",
       status: "active",
     },    
     billing_address: data.billing_address || {

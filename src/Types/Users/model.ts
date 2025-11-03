@@ -18,16 +18,16 @@ export class UserModel {
       payment_method: dbUser.payment_method ? JSON.parse(dbUser.payment_method) : undefined,
       subscription: dbUser.subscription ? {
         plan: dbUser.subscription.plan,
-        start_date: dbUser.subscription.start_date ? new Date(dbUser.subscription.start_date) : undefined,
-        end_date: dbUser.subscription.end_date ? new Date(dbUser.subscription.end_date) : undefined,
-        next_payment_date: dbUser.subscription.next_payment_date ? new Date(dbUser.subscription.next_payment_date) : undefined,
+        start_date: dbUser.subscription.start_date ? new Date(dbUser.subscription.start_date) : "",
+        end_date: dbUser.subscription.end_date ? new Date(dbUser.subscription.end_date) : "",
+        next_payment_date: dbUser.subscription.next_payment_date ? new Date(dbUser.subscription.next_payment_date) : "",
         status: dbUser.subscription.status || 'active',
       } : {
         plan: '',
         status: 'active',
-        start_date: undefined,
-        end_date: undefined,
-        next_payment_date: undefined
+        start_date: "",
+        end_date: "",
+        next_payment_date: ""
       },
         role: dbUser.role
     };
