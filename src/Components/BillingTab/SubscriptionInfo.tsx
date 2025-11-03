@@ -40,25 +40,31 @@ export const SubscriptionInfo = ({
   const calculateTotalCost = () => {
     return subscriptions.reduce((total, sub) => {
       let price = 0;
-      if (sub.plan === "Basic") price = 9.99;
-      else if (sub.plan === "Premium") price = 19.99;
+      if (sub.plan === "Pronta Calls") price = 3.00;
+      else if (sub.plan === "Pronta Invoices") price = 300.00;
       else if (sub.plan === "Enterprise") price = 49.99;
       return total + price;
     }, 0).toFixed(2);
+  };
+
+  const getBillingUnit = (plan?: string): string => {
+    const planToUnit: Record<string, string> = {
+      "Pronta Calls": "appel",
+      "Pronta Invoices": "mois",
+    };
+
+    return plan ? planToUnit[plan] || "mois" : "mois"; 
   };
 
   return (
     <div className="bg-blue-50 p-4 rounded-lg">
       {subscriptions.length > 0 ? (
         <>
-          <div className="text-sm text-gray-600 mb-3">
-            Total: {calculateTotalCost()} €/mois
-          </div>
           {subscriptions.map((subscription) => (
             <div key={subscription.id} className="space-y-3 p-4 bg-white rounded-lg shadow-sm mb-4">
               <div className="flex justify-between items-start">
                 <div>
-                  <h4 className="font-medium text-gray-700">Abonnement #{subscription.id}</h4>
+                  <h4 className="font-medium text-gray-700">Total: {calculateTotalCost()} €/{getBillingUnit(subscription.plan)}</h4>
                   <p className="font-semibold text-lg">{subscription.plan}</p>
                 </div>
                 <span className={`px-3 py-1 rounded-full text-sm ${getStatusStyle(subscription.status)}`}>
