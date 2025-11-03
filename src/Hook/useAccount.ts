@@ -1,7 +1,6 @@
 // src/hooks/useAccount.ts
 import { useUser } from "@/src/Hook/useUser";
 import { useState } from "react";
-import { updateProfile, updateBilling } from "@/src/lib/api";
 import { Role, User } from "@/src/Types/Users";
 
 export function useAccount() {
@@ -9,6 +8,7 @@ export function useAccount() {
   const [activeTab, setActiveTab] = useState("profile");
   const [isUpdating, setIsUpdating] = useState(false);
 
+  // Mise à jour du profil utilisateur (sans toucher aux abonnements)
   const handleProfileUpdate = async (updatedData: {
     email: string;
     phone: string;
@@ -22,7 +22,18 @@ export function useAccount() {
 
     setIsUpdating(true);
     try {
-      await updateProfile(userData.id, updatedData);
+      const response = await fetch(`/api/users/${userData.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Échec de la mise à jour du profil");
+      }
+
       await mutate();
       return { success: true, message: "Profil mis à jour avec succès !" };
     } catch (error) {
@@ -33,6 +44,7 @@ export function useAccount() {
     }
   };
 
+  // Mise à jour des informations de facturation (sans toucher aux abonnements)
   const handleBillingUpdate = async (updatedData: {
     billing_address?: {
       street?: string;
@@ -50,13 +62,6 @@ export function useAccount() {
       };
       is_default?: boolean;
     };
-    subscription?: {  // Nouveau type pour le champ subscription
-      plan?: string;
-      start_date?: Date;
-      end_date?: Date;
-      next_payment_date?: Date;
-      status?: string;
-    };
   }) => {
     if (!userData?.id) {
       console.error('User data is not available');
@@ -65,28 +70,12 @@ export function useAccount() {
 
     setIsUpdating(true);
     try {
-      // Transformation des données pour correspondre à l'API
-      const apiData = {
-        ...updatedData,
-        // Si on veut mettre à jour uniquement le plan d'abonnement
-        ...(updatedData.subscription?.plan && {
-          subscription: {
-            ...userData.subscription,
-            ...updatedData.subscription,
-            // Conversion des dates en ISOString pour l'API
-            ...(updatedData.subscription?.start_date && { start_date: updatedData.subscription.start_date.toISOString() }),
-            ...(updatedData.subscription?.end_date && { end_date: updatedData.subscription.end_date.toISOString() }),
-            ...(updatedData.subscription?.next_payment_date && { next_payment_date: updatedData.subscription.next_payment_date.toISOString() })
-          }
-        })
-      };
-
       const response = await fetch(`/api/users/${userData.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(apiData),
+        body: JSON.stringify(updatedData),
       });
 
       if (!response.ok) {
@@ -103,13 +92,13 @@ export function useAccount() {
     }
   };
 
-  // Nouvelle fonction pour mettre à jour spécifiquement l'abonnement
-  const handleSubscriptionUpdate = async (updatedSubscription: {
-    plan?: string;
+  // Création d'un nouvel abonnement
+  const handleCreateSubscription = async (subscriptionData: {
+    plan: string;
     status?: string;
+    start_date?: Date;
     end_date?: Date;
     next_payment_date?: Date;
-    start_date?: Date;
   }) => {
     if (!userData?.id) {
       console.error('User data is not available');
@@ -119,22 +108,65 @@ export function useAccount() {
     setIsUpdating(true);
     try {
       // Préparation des données avec conversion des dates
-      const subscriptionData = {
-        ...userData.subscription,
+      const apiData = {
+        ...subscriptionData,
+        ...(subscriptionData.start_date && { start_date: subscriptionData.start_date.toISOString() }),
+        ...(subscriptionData.end_date && { end_date: subscriptionData.end_date.toISOString() }),
+        ...(subscriptionData.next_payment_date && { next_payment_date: subscriptionData.next_payment_date.toISOString() }),
+        user_id: userData.id
+      };
+
+      const response = await fetch(`/api/users/${userData.id}/subscriptions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(apiData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Échec de la création de l'abonnement");
+      }
+
+      await mutate();
+      return { success: true, message: "Abonnement créé avec succès !" };
+    } catch (error) {
+      console.error("Erreur lors de la création de l'abonnement:", error);
+      return { success: false, message: "Erreur lors de la création de l'abonnement" };
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  // Mise à jour d'un abonnement spécifique
+  const handleUpdateSubscription = async (subscriptionId: number, updatedSubscription: {
+    plan?: string;
+    status?: string;
+    start_date?: Date;
+    end_date?: Date;
+    next_payment_date?: Date;
+  }) => {
+    if (!userData?.id) {
+      console.error('User data is not available');
+      return { success: false, message: "Utilisateur non trouvé" };
+    }
+
+    setIsUpdating(true);
+    try {
+      // Préparation des données avec conversion des dates
+      const apiData = {
         ...updatedSubscription,
         ...(updatedSubscription.start_date && { start_date: updatedSubscription.start_date.toISOString() }),
         ...(updatedSubscription.end_date && { end_date: updatedSubscription.end_date.toISOString() }),
         ...(updatedSubscription.next_payment_date && { next_payment_date: updatedSubscription.next_payment_date.toISOString() })
       };
 
-      const response = await fetch(`/api/users/${userData.id}/subscription`, {
+      const response = await fetch(`/api/users/subscriptions/${subscriptionId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          subscription: subscriptionData
-        }),
+        body: JSON.stringify(apiData),
       });
 
       if (!response.ok) {
@@ -151,6 +183,36 @@ export function useAccount() {
     }
   };
 
+  // Suppression d'un abonnement
+  const handleDeleteSubscription = async (subscriptionId: number) => {
+    if (!userData?.id) {
+      console.error('User data is not available');
+      return { success: false, message: "Utilisateur non trouvé" };
+    }
+
+    setIsUpdating(true);
+    try {
+      const response = await fetch(`/api/users/subscriptions/${subscriptionId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Échec de la suppression de l'abonnement");
+      }
+
+      await mutate();
+      return { success: true, message: "Abonnement supprimé avec succès !" };
+    } catch (error) {
+      console.error("Erreur lors de la suppression de l'abonnement:", error);
+      return { success: false, message: "Erreur lors de la suppression de l'abonnement" };
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   return {
     userData,
     loading,
@@ -160,6 +222,8 @@ export function useAccount() {
     isUpdating,
     handleProfileUpdate,
     handleBillingUpdate,
-    handleSubscriptionUpdate,  // Nouvelle fonction exportée
+    // handleCreateSubscription,    // Nouvelle fonction pour créer un abonnement
+    // handleUpdateSubscription,    // Nouvelle fonction pour mettre à jour un abonnement
+    // handleDeleteSubscription,    // Nouvelle fonction pour supprimer un abonnement
   };
 }

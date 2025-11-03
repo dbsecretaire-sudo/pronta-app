@@ -4,6 +4,7 @@ import { Role } from "../Types/Users";
 import { User } from "@/src/Types/Users";
 import { UserService } from '@/src/Types/UserServices';
 import { AvailableService } from "@/src/Types/Services";
+import { Subscription } from "../Types/Subscription";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL; // Remplacez par l’URL de votre backend
 
@@ -148,41 +149,45 @@ export async function updateBilling(userId: number, data: {
   return response.json();
 }
 
-
 export const updateUserSubscription = async (
-  userId: number,
   data: {
+    user_id: number;
+    subscription_id: number;  // Ajout de l'ID de l'abonnement
     plan: string;
     start_date?: string | Date;
-    end_date: string | Date;
-    next_payment_date: string | Date;
-    status: string;
+    end_date?: string | Date;  // Rendu optionnel pour correspondre à votre modèle
+    next_payment_date?: string | Date;  // Rendu optionnel
+    status?: string;  // Rendu optionnel
   }
-) => {
-
-  // Préparation des données pour l'API
+): Promise<Subscription> => {  // Typage du retour
+  // Conversion des dates en ISOString si ce sont des objets Date
   const requestData = {
     ...data,
-    // Conversion des dates en strings ISO si elles existent
-        ...(data.end_date && {
-      start_date: data.start_date?.toString()
+    ...(data.start_date && {
+      start_date: data.start_date instanceof Date ?
+        data.start_date.toISOString() :
+        data.start_date
     }),
     ...(data.end_date && {
-      end_date: data.end_date.toString()
+      end_date: data.end_date instanceof Date ?
+        data.end_date.toISOString() :
+        data.end_date
     }),
     ...(data.next_payment_date && {
-      next_payment_date: data.next_payment_date.toString()
+      next_payment_date: data.next_payment_date instanceof Date ?
+        data.next_payment_date.toISOString() :
+        data.next_payment_date
     })
   };
 
-
   try {
-    const res = await fetch(`/api/user/${userId}/subscription`, {
+    // Correction de l'URL pour inclure l'ID de l'utilisateur et de l'abonnement
+    const res = await fetch(`/api/subscription/${data.subscription_id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(requestData), // Pas besoin de { data: ... }
+      body: JSON.stringify(requestData),
     });
 
     if (!res.ok) {
@@ -201,3 +206,69 @@ export const updateUserSubscription = async (
     throw error;
   }
 };
+
+export async function deleteSubscription(subscriptionId: number): Promise<void> {
+  try {
+    const response = await fetch(`/api/subscription/${subscriptionId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(`Failed to delete subscription: ${response.status} - ${JSON.stringify(errorData)}`);
+    }
+  } catch (error) {
+    console.error("Erreur lors de la suppression de l'abonnement:", error);
+    throw error;
+  }
+}
+
+export async function getSubscriptionByPlan(userId: number, plan: string): Promise<{id: number} | null> {
+  try {
+    const response = await fetch(`/api/user/subscription?plan=${encodeURIComponent(plan)}`);
+    if (!response.ok) {
+      throw new Error("Failed to fetch subscriptions");
+    }
+    const subscriptions = await response.json();
+    return subscriptions.length > 0 ? subscriptions[0] : null;
+  } catch (error) {
+    console.error("Erreur lors de la vérification de l'abonnement:", error);
+    return null;
+  }
+}
+
+export async function createSubscription(subscriptionData: {
+  user_id: number;
+  plan: string;
+  start_date: Date;
+  end_date: Date;
+  next_payment_date: Date;
+  status: string;
+}): Promise<void> {
+  try {
+    const response = await fetch(`/api/subscription`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        user_id: subscriptionData.user_id,
+        plan: subscriptionData.plan,
+        status: subscriptionData.status,
+        start_date: subscriptionData.start_date.toISOString(),
+        end_date: subscriptionData.end_date.toISOString(),
+        next_payment_date: subscriptionData.next_payment_date.toISOString()
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to create subscription");
+    }
+  } catch (error) {
+    console.error("Erreur lors de la création de l'abonnement:", error);
+    throw error;
+  }
+}

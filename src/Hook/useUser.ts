@@ -42,13 +42,6 @@ export function useUser() {
           },
           is_default: data.payment_method.is_default || false
         } : undefined,
-        subscription: {
-          plan: data.subscription?.plan || '',
-          start_date: data.subscription?.start_date ? new Date(data.subscription.start_date) : "",
-          end_date: data.subscription?.end_date ? new Date(data.subscription.end_date) : "",
-          next_payment_date: data.subscription?.next_payment_date ? new Date(data.subscription.next_payment_date) : "",
-          status: data.subscription?.status || 'active'
-        },
         phone: data.phone || '',
         company: data.company || '',
         role: data.role || 'user',

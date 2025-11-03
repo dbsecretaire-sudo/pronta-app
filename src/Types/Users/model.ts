@@ -1,35 +1,24 @@
 import pool from "@/src/lib/db";
 import { User, CreateUser, UpdateUser, UserFilter, Role, BillingAddress, PaymentMethod } from "./type";
+import { Subscription } from "../Subscription";
 
 export class UserModel {
   constructor(public data: User) {}
 
   // Helper pour mapper les résultats de la base de données vers un objet User
-  private mapDbUserToUser(dbUser: any): User {
+  mapDbUserToUser(dbUser: any): User {
     return {
       id: dbUser.id,
       email: dbUser.email,
       password_hash: dbUser.password_hash,
-      name: dbUser.name,
+      name: dbUser.name || undefined,
       created_at: dbUser.created_at ? new Date(dbUser.created_at) : undefined,
-      phone: dbUser.phone,
-      company: dbUser.company,
       billing_address: dbUser.billing_address ? JSON.parse(dbUser.billing_address) : undefined,
-      payment_method: dbUser.payment_method ? JSON.parse(dbUser.payment_method) : undefined,
-      subscription: dbUser.subscription ? {
-        plan: dbUser.subscription.plan,
-        start_date: dbUser.subscription.start_date ? new Date(dbUser.subscription.start_date) : "",
-        end_date: dbUser.subscription.end_date ? new Date(dbUser.subscription.end_date) : "",
-        next_payment_date: dbUser.subscription.next_payment_date ? new Date(dbUser.subscription.next_payment_date) : "",
-        status: dbUser.subscription.status || 'active',
-      } : {
-        plan: '',
-        status: 'active',
-        start_date: "",
-        end_date: "",
-        next_payment_date: ""
-      },
-        role: dbUser.role
+      payment_method: dbUser.payment_method ? this.mapDbPaymentMethod(JSON.parse(dbUser.payment_method)) : undefined,
+      phone: dbUser.phone || undefined,
+      company: dbUser.company || undefined,
+      role: dbUser.role,
+      // Les abonnements seront ajoutés séparément
     };
   }
 
@@ -47,6 +36,21 @@ export class UserModel {
     return paymentMethod;
   }
 
+  // Helper pour mapper les abonnements de la base de données
+  private mapDbSubscriptionToSubscription(dbSubscription: any): Subscription {
+    return {
+      id: dbSubscription.id,
+      user_id: dbSubscription.user_id,
+      plan: dbSubscription.plan,
+      status: dbSubscription.status,
+      start_date: dbSubscription.start_date,
+      end_date: dbSubscription.end_date ? new Date(dbSubscription.end_date) : undefined,
+      next_payment_date: dbSubscription.next_payment_date ? new Date(dbSubscription.next_payment_date) : undefined,
+      created_at: dbSubscription.created_at ? new Date(dbSubscription.created_at) : undefined,
+      updated_at: dbSubscription.updated_at ? new Date(dbSubscription.updated_at) : undefined
+    };
+  }
+
   async getAllUsers(filters?: UserFilter): Promise<User[]> {
     let query = "SELECT * FROM users WHERE 1=1";
     const params: any[] = [];
@@ -57,28 +61,26 @@ export class UserModel {
       params.push(filters.role);
       paramIndex++;
     }
-
     if (filters?.searchTerm) {
       query += ` AND (email ILIKE $${paramIndex} OR name ILIKE $${paramIndex})`;
       params.push(`%${filters.searchTerm}%`);
       paramIndex++;
     }
 
-    if (filters?.subscriptionPlan) {
-      query += ` AND subscription_plan = $${paramIndex}`;
-      params.push(filters.subscriptionPlan);
-      paramIndex++;
-    }
-
-    if (filters?.subscriptionActive !== undefined) {
-      const operator = filters.subscriptionActive ? '>' : '<=';
-      query += ` AND subscription_end_date ${operator} NOW()`;
-    }
-
     query += " ORDER BY created_at DESC";
 
     const res = await pool.query(query, params);
-    return res.rows.map(this.mapDbUserToUser);
+
+    // Pour chaque utilisateur, récupérer ses abonnements
+    const usersWithSubscriptions = await Promise.all(
+      res.rows.map(async (row) => {
+        const user = this.mapDbUserToUser(row);
+        const subscriptions = await this.getUserSubscriptions(user.id);
+        return { ...user, subscriptions };
+      })
+    );
+
+    return usersWithSubscriptions;
   }
 
   async getUserById(id: number): Promise<User> {
@@ -86,7 +88,9 @@ export class UserModel {
     if (res.rows.length === 0) {
       throw new Error(`User with id ${id} not found`);
     }
-    return this.mapDbUserToUser(res.rows[0]);
+
+    const user = this.mapDbUserToUser(res.rows[0]);
+    return { ...user };
   }
 
   async getUserByEmail(email: string): Promise<User> {
@@ -94,232 +98,267 @@ export class UserModel {
     if (res.rows.length === 0) {
       throw new Error(`User with email ${email} not found`);
     }
-    return this.mapDbUserToUser(res.rows[0]);
+
+    const user = this.mapDbUserToUser(res.rows[0]);
+    return { ...user };
   }
 
-  async updateUser(id: number, user: UpdateUser): Promise<User> {
-  const fields: string[] = [];
-  const values: any[] = [];
-  let paramIndex = 1;
-
-  // Fonction utilitaire pour ajouter un champ à la requête
-  const addField = (sql: string, value: any) => {
-    fields.push(sql);
-    values.push(value);
-    paramIndex++;
-  };
-
-  // Champs simples
-  user.email !== undefined && addField(`email = $${paramIndex}`, user.email);
-  user.name !== undefined && addField(`name = $${paramIndex}`, user.name);
-  user.role !== undefined && addField(`role = $${paramIndex}`, user.role);
-  user.phone !== undefined && addField(`phone = $${paramIndex}`, user.phone);
-  user.company !== undefined && addField(`company = $${paramIndex}`, user.company);
-
-  // Champs JSONB complexes
-  if (user.billing_address !== undefined) {
-    addField(
-      `billing_address = $${paramIndex}`,
-      user.billing_address ? JSON.stringify(user.billing_address) : null
-    );
+  // Nouvelle méthode pour récupérer les abonnements d'un utilisateur
+  async getUserSubscriptions(userId: number): Promise<Subscription[]> {
+    const query = `
+      SELECT * FROM user_subscriptions
+      WHERE user_id = $1
+      ORDER BY created_at DESC
+    `;
+    const res = await pool.query(query, [userId]);
+    return res.rows.map(this.mapDbSubscriptionToSubscription);
   }
 
-  if (user.payment_method !== undefined) {
-    addField(
-      `payment_method = $${paramIndex}`,
-      user.payment_method ? JSON.stringify(user.payment_method) : null
-    );
-  }
+  async updateUser(id: number, userData: UpdateUser): Promise<User> {
+    const fields: string[] = [];
+    const values: any[] = [];
+    let paramIndex = 1;
 
-  // Gestion du champ subscription
-  if (user.subscription !== undefined) {
-    // Préparation de l'objet subscription pour la mise à jour complète
-    const subscriptionUpdate: Record<string, any> = {};
+    const addField = (sql: string, value: any) => {
+      fields.push(sql);
+      values.push(value);
+      paramIndex++;
+    };
 
-    // Ajout des champs modifiés
-    if (user.subscription.plan !== undefined) {
-      subscriptionUpdate.plan = user.subscription.plan;
-    }
-    if (user.subscription.status !== undefined) {
-      subscriptionUpdate.status = user.subscription.status;
-    }
-    if (user.subscription.start_date !== undefined) {
-      subscriptionUpdate.start_date = user.subscription.start_date instanceof Date ?
-        user.subscription.start_date.toISOString() :
-        user.subscription.start_date;
-    }
-    if (user.subscription.end_date !== undefined) {
-      subscriptionUpdate.end_date = user.subscription.end_date instanceof Date ?
-        user.subscription.end_date.toISOString() :
-        user.subscription.end_date;
-    }
-    if (user.subscription.next_payment_date !== undefined) {
-      subscriptionUpdate.next_payment_date = user.subscription.next_payment_date instanceof Date ?
-        user.subscription.next_payment_date.toISOString() :
-        user.subscription.next_payment_date;
-    }
+    // Champs simples
+    userData.email !== undefined && addField(`email = $${paramIndex}`, userData.email);
+    userData.name !== undefined && addField(`name = $${paramIndex}`, userData.name);
+    userData.role !== undefined && addField(`role = $${paramIndex}`, userData.role);
+    userData.phone !== undefined && addField(`phone = $${paramIndex}`, userData.phone);
+    userData.company !== undefined && addField(`company = $${paramIndex}`, userData.company);
 
-    // Si on a des champs à mettre à jour dans subscription
-    if (Object.keys(subscriptionUpdate).length > 0) {
+    // Champs JSONB complexes
+    if (userData.billing_address !== undefined) {
       addField(
-        `subscription = $${paramIndex}`,
-        JSON.stringify(subscriptionUpdate)
+        `billing_address = $${paramIndex}`,
+        userData.billing_address ? JSON.stringify(userData.billing_address) : null
       );
     }
+    if (userData.payment_method !== undefined) {
+      addField(
+        `payment_method = $${paramIndex}`,
+        userData.payment_method ? JSON.stringify(userData.payment_method) : null
+      );
+    }
+
+    if (fields.length === 0) {
+      throw new Error('No fields to update');
+    }
+
+    const query = `
+      UPDATE users
+      SET ${fields.join(', ')}
+      WHERE id = $${paramIndex}
+      RETURNING *
+    `;
+    values.push(id);
+
+    const res = await pool.query(query, values);
+    if (res.rows.length === 0) {
+      throw new Error('User not found');
+    }
+
+    const user = this.mapDbUserToUser(res.rows[0]);
+    return { ...user };
   }
 
-  if (fields.length === 0) {
-    throw new Error('No fields to update');
+  // Création d'un utilisateur (sans abonnement)
+  async createUser(user: Omit<CreateUser, "password"> & { password_hash: string }): Promise<User> {
+    const res = await pool.query(
+      `INSERT INTO users (
+        email, password_hash, name, role, phone, company,
+        billing_address, payment_method
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      RETURNING *`,
+      [
+        user.email,
+        user.password_hash,
+        user.name || '',
+        user.role || 'CLIENT',
+        user.phone || '',
+        user.company || '',
+        user.billing_address ? JSON.stringify(user.billing_address) : null,
+        user.payment_method ? JSON.stringify(user.payment_method) : null
+      ]
+    );
+
+    const createdUser = this.mapDbUserToUser(res.rows[0]);
+
+    // Retourner l'utilisateur avec ses abonnements
+    return this.getUserById(createdUser.id);
   }
 
-  // Construction et exécution de la requête
-  const query = `
-    UPDATE users
-    SET ${fields.join(', ')}
-    WHERE id = $${paramIndex}
-    RETURNING *
-  `;
-  values.push(id);
+  // Nouvelle méthode pour créer un abonnement
+  async createUserSubscription(userId: number, subscription: {
+    plan: string;
+    status?: string;
+    start_date?: string | Date;
+    end_date?: string | Date;
+    next_payment_date?: string | Date;
+  }): Promise<void> {
+    const query = `
+      INSERT INTO user_subscriptions
+      (user_id, plan, status, start_date, end_date, next_payment_date)
+      VALUES ($1, $2, $3, $4, $5, $6)
+    `;
 
-  const res = await pool.query(query, values);
-  if (res.rows.length === 0) {
-    throw new Error('User not found');
+    await pool.query(query, [
+      userId,
+      subscription.plan,
+      subscription.status || 'active',
+      subscription.start_date instanceof Date ?
+        subscription.start_date.toISOString() :
+        subscription.start_date || new Date().toISOString(),
+      subscription.end_date instanceof Date ?
+        subscription.end_date.toISOString() :
+        subscription.end_date,
+      subscription.next_payment_date instanceof Date ?
+        subscription.next_payment_date.toISOString() :
+        subscription.next_payment_date
+    ]);
   }
-
-  return this.mapDbUserToUser(res.rows[0]);
-}
-
-
-async createUser(user: Omit<CreateUser, "password"> & { password_hash: string }): Promise<User> {
-  // Valeurs par défaut pour subscription
-  const subscription = {
-    plan: user.subscription?.plan || '',
-    start_date: user.subscription?.start_date?.toString() || new Date().toISOString(),
-    end_date: user.subscription?.end_date?.toString(),
-    next_payment_date: user.subscription?.next_payment_date?.toString(),
-    status: user.subscription?.status || 'active'
-  };
-
-  const res = await pool.query(
-    `INSERT INTO users (
-      email, password_hash, name, role, phone, company,
-      billing_address, payment_method, subscription
-    )
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-    RETURNING *`,
-    [
-      user.email,
-      user.password_hash,
-      user.name || '',
-      user.role || 'CLIENT',
-      user.phone || '',
-      user.company || '',
-      user.billing_address ? JSON.stringify(user.billing_address) : null,
-      user.payment_method ? JSON.stringify(user.payment_method) : null,
-      JSON.stringify(subscription)
-    ]
-  );
-
-  return this.mapDbUserToUser(res.rows[0]);
-}
 
   async deleteUser(id: number): Promise<void> {
+    // La suppression en cascade est gérée par la base (ON DELETE CASCADE)
     const res = await pool.query("DELETE FROM users WHERE id = $1 RETURNING id", [id]);
     if (res.rows.length === 0) {
       throw new Error('User not found');
     }
   }
 
+  // Méthode mise à jour pour récupérer les utilisateurs par plan d'abonnement
   async getUsersBySubscriptionPlan(plan: string): Promise<User[]> {
-    const res = await pool.query(
-      "SELECT * FROM users WHERE subscription_plan = $1 ORDER BY created_at DESC",
-      [plan]
+    const query = `
+      SELECT DISTINCT u.* FROM users u
+      JOIN user_subscriptions us ON u.id = us.user_id
+      WHERE us.plan = $1
+      ORDER BY u.created_at DESC
+    `;
+
+    const res = await pool.query(query, [plan]);
+
+    // Pour chaque utilisateur, récupérer ses abonnements
+    const usersWithSubscriptions = await Promise.all(
+      res.rows.map(async (row) => {
+        const user = this.mapDbUserToUser(row);
+        const subscriptions = await this.getUserSubscriptions(user.id);
+        return { ...user, subscriptions };
+      })
     );
-    return res.rows.map(this.mapDbUserToUser);
+
+    return usersWithSubscriptions;
   }
 
+  // Méthode mise à jour pour récupérer les utilisateurs avec abonnement actif
   async getUsersWithActiveSubscription(): Promise<User[]> {
-    const res = await pool.query(
-      "SELECT * FROM users WHERE subscription_end_date > NOW() ORDER BY created_at DESC"
+    const query = `
+      SELECT DISTINCT u.* FROM users u
+      JOIN user_subscriptions us ON u.id = us.user_id
+      WHERE us.status = 'active'
+      ORDER BY u.created_at DESC
+    `;
+
+    const res = await pool.query(query);
+
+    // Pour chaque utilisateur, récupérer ses abonnements
+    const usersWithSubscriptions = await Promise.all(
+      res.rows.map(async (row) => {
+        const user = this.mapDbUserToUser(row);
+        const subscriptions = await this.getUserSubscriptions(user.id);
+        return { ...user, subscriptions };
+      })
     );
-    return res.rows.map(this.mapDbUserToUser);
+
+    return usersWithSubscriptions;
   }
 
-async updateUserSubscription(id: number, plan_d: string, updates: {
-  plan: string;
-  status?: string;
-  end_date: Date;
-  next_payment_date: Date;
-  start_date: Date;
-}): Promise<User> {
-  // Vérification que le plan à mettre à jour correspond au plan_d
-  const checkQuery = `
-    SELECT subscription->>'plan' as current_plan
-    FROM users
-    WHERE id = $1
-  `;
-  const checkRes = await pool.query(checkQuery, [id]);
+  // Nouvelle méthode pour mettre à jour un abonnement utilisateur
+  async updateUserSubscription(
+    userId: number,
+    subscriptionId: number,
+    updates: {
+      plan?: string;
+      status?: string;
+      start_date?: string | Date;
+      end_date?: string | Date;
+      next_payment_date?: string | Date;
+    }
+  ): Promise<void> {
+    const fields: string[] = [];
+    const values: any[] = [];
+    let paramIndex = 1;
 
-  if (checkRes.rows.length === 0) {
-    throw new Error('User not found');
+    if (updates.plan !== undefined) {
+      fields.push(`plan = $${paramIndex}`);
+      values.push(updates.plan);
+      paramIndex++;
+    }
+    if (updates.status !== undefined) {
+      fields.push(`status = $${paramIndex}`);
+      values.push(updates.status);
+      paramIndex++;
+    }
+    if (updates.start_date !== undefined) {
+      fields.push(`start_date = $${paramIndex}`);
+      values.push(updates.start_date instanceof Date ?
+                  updates.start_date.toISOString() :
+                  updates.start_date);
+      paramIndex++;
+    }
+    if (updates.end_date !== undefined) {
+      fields.push(`end_date = $${paramIndex}`);
+      values.push(updates.end_date instanceof Date ?
+                  updates.end_date.toISOString() :
+                  updates.end_date);
+      paramIndex++;
+    }
+    if (updates.next_payment_date !== undefined) {
+      fields.push(`next_payment_date = $${paramIndex}`);
+      values.push(updates.next_payment_date instanceof Date ?
+                  updates.next_payment_date.toISOString() :
+                  updates.next_payment_date);
+      paramIndex++;
+    }
+
+    if (fields.length > 0) {
+      const query = `
+        UPDATE user_subscriptions
+        SET ${fields.join(', ')}
+        WHERE id = $${paramIndex} AND user_id = $${paramIndex + 1}
+      `;
+      values.push(subscriptionId, userId);
+
+      await pool.query(query, values);
+    }
   }
 
-  const currentPlan = checkRes.rows[0].current_plan;
+  // Nouvelle méthode pour supprimer un abonnement
+  async deleteUserSubscription(userId: number, subscriptionId: number): Promise<void> {
+    const query = `
+      DELETE FROM user_subscriptions
+      WHERE id = $1 AND user_id = $2
+    `;
 
-  // Si le plan actuel ne correspond pas à plan_d, on ne fait rien
-  if (currentPlan !== plan_d) {
-    throw new Error(`Cannot update subscription: current plan (${currentPlan}) does not match target plan (${plan_d})`);
+    await pool.query(query, [subscriptionId, userId]);
   }
 
-  const { plan, status, end_date, next_payment_date, start_date } = updates;
-  const fields: string[] = [];
-  const values: any[] = [];
-  let paramIndex = 1;
-
-  if (plan !== undefined) {
-    fields.push(`subscription = jsonb_set(COALESCE(subscription, '{}'::jsonb), '{plan}', to_jsonb($${paramIndex}::text))`);
-    values.push(plan);
-    paramIndex++;
+  // Nouvelle méthode pour ajouter un abonnement à un utilisateur
+  async addSubscriptionToUser(
+    userId: number,
+    subscription: {
+      plan: string;
+      status?: string;
+      start_date?: string | Date;
+      end_date?: string | Date;
+      next_payment_date?: string | Date;
+    }
+  ): Promise<void> {
+    return this.createUserSubscription(userId, subscription);
   }
-  if (status !== undefined) {
-    fields.push(`subscription = jsonb_set(COALESCE(subscription, '{}'::jsonb), '{status}', to_jsonb($${paramIndex}::text))`);
-    values.push(status);
-    paramIndex++;
-  }
-  if (end_date !== undefined) {
-    fields.push(`subscription = jsonb_set(COALESCE(subscription, '{}'::jsonb), '{end_date}', to_jsonb($${paramIndex}::text))`);
-    values.push(end_date.toISOString());
-    paramIndex++;
-  }
-  if (next_payment_date !== undefined) {
-    fields.push(`subscription = jsonb_set(COALESCE(subscription, '{}'::jsonb), '{next_payment_date}', to_jsonb($${paramIndex}::text))`);
-    values.push(next_payment_date.toISOString());
-    paramIndex++;
-  }
-  if (start_date !== undefined) {
-    fields.push(`subscription = jsonb_set(COALESCE(subscription, '{}'::jsonb), '{start_date}', to_jsonb($${paramIndex}::text))`);
-    values.push(start_date.toISOString());
-    paramIndex++;
-  }
-
-  if (fields.length === 0) {
-    throw new Error('No subscription fields to update');
-  }
-
-  const query = `
-    UPDATE users
-    SET ${fields.join(', ')}
-    WHERE id = $${paramIndex} AND subscription->>'plan' = $${paramIndex + 1}
-    RETURNING *
-  `;
-  values.push(id, plan_d); // Ajout de plan_d comme dernier paramètre
-
-  const res = await pool.query(query, values);
-  if (res.rows.length === 0) {
-    throw new Error('User not found or plan does not match');
-  }
-
-  return this.mapDbUserToUser(res.rows[0]);
-}
-
 }

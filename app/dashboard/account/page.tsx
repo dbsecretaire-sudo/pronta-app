@@ -1,6 +1,9 @@
 "use client";
 import { ProfileTab, BillingTab, MessagesTab } from "@/src/Components";
 import { useAccount } from "@/src/Hook/useAccount";
+import { Subscription, ApiSubscription } from "@/src/Types/Subscription";
+import { useEffect, useState } from "react";
+import { BillingTabData } from "@/src/Components/BillingTab/types";
 
 export default function AccountPage() {
   const {
@@ -12,17 +15,98 @@ export default function AccountPage() {
     isUpdating,
     handleProfileUpdate,
     handleBillingUpdate,
-    handleSubscriptionUpdate  // Ajout de la nouvelle fonction
+    // handleCreateSubscription,
+    // handleUpdateSubscription,
+    // handleDeleteSubscription
   } = useAccount();
+
+  const [userSubscriptions, setUserSubscriptions] = useState<Subscription[]>([]);
+
+  useEffect(() => {
+    const fetchUserSubscriptions = async () => {
+      if (!userData?.id) return;
+
+      try {
+        const response = await fetch(`/api/users/${userData.id}/subscriptions`);
+        if (!response.ok) {
+          throw new Error("Échec du chargement des abonnements");
+        }
+
+        const apiSubscriptions: ApiSubscription[] = await response.json();
+
+        // Mapper les données avec des valeurs par défaut pour les champs requis
+        const mappedSubscriptions: Subscription[] = apiSubscriptions.map(sub => ({
+          id: sub.id,
+          plan: sub.plan,
+          status: sub.status || 'active',  // Valeur par défaut
+          start_date: sub.start_date || new Date(),  // Valeur par défaut
+          end_date: sub.end_date,
+          next_payment_date: sub.next_payment_date,
+          created_at: sub.created_at,
+          updated_at: sub.updated_at,
+          user_id: sub.user_id  // Optionnel
+        }));
+
+        setUserSubscriptions(mappedSubscriptions);
+      } catch (error) {
+        console.error("Erreur lors du chargement des abonnements:", error);
+      }
+    };
+
+    fetchUserSubscriptions();
+  }, [userData?.id]);
+
 
   if (loading) return <div className="text-center py-8">Chargement...</div>;
   if (error) return <div className="text-center py-8 text-red-500">Erreur: {error}</div>;
   if (!userData) return <div className="text-center py-8">Utilisateur non trouvé</div>;
 
+
   // Fonction utilitaire pour convertir les dates en objets Date
   const ensureDate = (date: string | Date | undefined): Date | undefined => {
     if (!date) return undefined;
     return typeof date === 'string' ? new Date(date) : date;
+  };
+
+  // Fonction pour gérer les mises à jour de facturation et abonnements
+  const handleBillingEdit = async (data: {
+    billing_address?: any;
+    payment_method?: any;
+    // subscription?: {
+    //   id?: number;
+    //   plan?: string;
+    //   status?: string;
+    //   start_date?: Date | string;
+    //   end_date?: Date | string;
+    //   next_payment_date?: Date | string;
+    // };
+  }) => {
+    // Si on a des données d'abonnement
+    // if (data.subscription) {
+    //   const subscriptionData = {
+    //     ...data.subscription,
+    //     start_date: data.subscription.start_date ? ensureDate(data.subscription.start_date) : undefined,
+    //     end_date: data.subscription.end_date ? ensureDate(data.subscription.end_date) : undefined,
+    //     next_payment_date: data.subscription.next_payment_date ? ensureDate(data.subscription.next_payment_date) : undefined
+    //   };
+
+    //   // Si c'est un nouvel abonnement (pas d'ID)
+    //   if (!subscriptionData.id) {
+    //     return handleCreateSubscription({
+    //       ...subscriptionData,
+    //       user_id: userData.id
+    //     } as Subscription);
+    //   }
+    //   // Sinon, c'est une mise à jour
+    //   else {
+    //     return handleUpdateSubscription(subscriptionData.id, subscriptionData);
+    //   }
+    // }
+    // // Sinon, c'est une mise à jour des informations de facturation
+    // else {
+      const { billing_address, payment_method } = data;
+      return handleBillingUpdate({ billing_address, payment_method });
+    // }
   };
 
   const tabs = [
@@ -48,48 +132,16 @@ export default function AccountPage() {
       content: (
         <BillingTab
           data={{
-            // Nouvelle structure avec le champ subscription
-            subscription: userData.subscription,
-            service_name: userData.subscription.plan,
+            // Nouvelle structure avec les abonnements multiples
+            id: userData.id,
+            email: userData.email,
+            subscriptions: userSubscriptions ,
             billing_address: userData.billing_address,
             payment_method: userData.payment_method,
           }}
-          onEdit={async (data) => {
-            // Préparation des données pour l'API
-            const subscriptionData: {
-              plan?: string;
-              status?: string;
-              end_date?: Date;
-              next_payment_date?: Date;
-              start_date?: Date;
-            } = {};
-
-            // Copie des données d'abonnement si elles existent
-            if (data.subscription) {
-              if (data.subscription.plan) {
-                subscriptionData.plan = data.subscription.plan;
-              }
-              if (data.subscription.status) {
-                subscriptionData.status = data.subscription.status;
-              }
-              if (data.subscription.start_date) {
-                subscriptionData.start_date = ensureDate(data.subscription.start_date);
-              }
-              if (data.subscription.end_date) {
-                subscriptionData.end_date = ensureDate(data.subscription.end_date);
-              }
-              if (data.subscription.next_payment_date) {
-                subscriptionData.next_payment_date = ensureDate(data.subscription.next_payment_date);
-              }
-
-              return handleSubscriptionUpdate(subscriptionData);
-            }
-
-            // Pour les autres champs (billing_address, payment_method)
-            const { subscription, ...otherData } = data;
-            return handleBillingUpdate(otherData);
-          }}
+          onEdit={handleBillingEdit}
           isUpdating={isUpdating}
+          // onDeleteSubscription={handleDeleteSubscription}
         />
       ),
     },
@@ -104,7 +156,6 @@ export default function AccountPage() {
     <div className="flex flex-col h-screen">
       <div className="p-8 max-w-4xl mx-auto w-full">
         <h1 className="text-2xl font-bold mb-8">Mon compte</h1>
-
         {/* Version mobile */}
         <div className="sm:hidden mb-6">
           <select
@@ -119,7 +170,6 @@ export default function AccountPage() {
             ))}
           </select>
         </div>
-
         {/* Version desktop */}
         <div className="hidden sm:block mb-6">
           <div className="border-b border-gray-200">
@@ -140,7 +190,6 @@ export default function AccountPage() {
             </nav>
           </div>
         </div>
-
         {/* Contenu de l'onglet actif */}
         {tabs.find(tab => tab.id === activeTab)?.content}
       </div>

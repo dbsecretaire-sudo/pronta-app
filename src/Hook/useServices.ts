@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Service, AvailableService } from '@/src/Types/Services';
 import { UserService, UserServiceWithDetails } from '@/src/Types/UserServices';
-import { fetchUserServices, fetchAllServices, subscribeToService, deactivateUserService, reactivateUserService, updateUserSubscription } from '@/src/lib/api';
+import { fetchUserServices, fetchAllServices, subscribeToService, deactivateUserService, reactivateUserService, updateUserSubscription, deleteSubscription, createSubscription, getSubscriptionByPlan } from '@/src/lib/api';
 
 export const useServices = (userId: string | undefined, status: string) => {
   const [services, setServices] = useState<Service[]>([]);
@@ -88,12 +88,12 @@ export const useServices = (userId: string | undefined, status: string) => {
     try {
       
       await subscribeToService(service.id);
-      await updateUserSubscription(Number(userId), {
-        plan: service.name,
-        end_date: now,
-        next_payment_date: "",
-        status: "cancelled",
-      })
+
+      const existingSubscription = await getSubscriptionByPlan(Number(userId), service.name);
+
+    if (existingSubscription) {
+      await deleteSubscription(existingSubscription.id);
+    }
       await refreshServices();
     } catch (error) {
       console.error("Erreur lors de l'abonnement:", error);
@@ -121,12 +121,11 @@ export const useServices = (userId: string | undefined, status: string) => {
       }
 
       await deactivateUserService(Number(userId), service.id);
-      await updateUserSubscription(Number(userId), {
-        plan: service.name,
-        end_date: now,
-        next_payment_date: "",
-        status: "cancelled",
-      })
+      const existingSubscription = await getSubscriptionByPlan(Number(userId), service.name);
+
+    if (existingSubscription) {
+      await deleteSubscription(existingSubscription.id);
+    }
       await refreshServices();
     } catch (error) {
       console.error("Erreur lors de la désactivation:", error);
@@ -139,13 +138,31 @@ export const useServices = (userId: string | undefined, status: string) => {
 
     try {
       await reactivateUserService(Number(userId), service.id);
-      await updateUserSubscription(Number(userId), {
+
+      const existingSubscription = await getSubscriptionByPlan(Number(userId), service.name);
+
+      if (existingSubscription) {
+      // Mettre à jour l'abonnement existant
+      await updateUserSubscription({
+        user_id: Number(userId),
+        subscription_id: existingSubscription.id,
         plan: service.name,
         start_date: now,
         end_date: endDate,
         next_payment_date: nextDate,
         status: "active",
       });
+    } else {
+      // Créer un nouvel abonnement
+      await createSubscription({
+        user_id: Number(userId),
+        plan: service.name,
+        start_date: now,
+        end_date: endDate,
+        next_payment_date: nextDate,
+        status: "active",
+      });
+    }
       await refreshServices();
     } catch (error) {
       console.error("Erreur lors de la réactivation:", error);

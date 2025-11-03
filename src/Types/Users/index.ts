@@ -8,5 +8,4 @@ export type {
     UpdateUser, 
     UserFilter,
     // UpdateUserSubscription,
-    SubscriptionFields
 } from "./type";

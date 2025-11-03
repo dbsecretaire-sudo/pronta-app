@@ -29,21 +29,7 @@ export class UserService {
     // Préparation des données pour la création de l'utilisateur
     const userData = {
       ...user,
-      password_hash,
-      // Construction du champ subscription avec conversion des dates
-      subscription: {
-        plan: user.subscription?.plan,
-        start_date: user.subscription?.start_date instanceof Date ?
-                    user.subscription.start_date.toISOString() :
-                    user.subscription?.start_date,
-        end_date: user.subscription?.end_date instanceof Date ?
-                  user.subscription.end_date.toISOString() :
-                  user.subscription?.end_date,
-        next_payment_date: user.subscription?.next_payment_date instanceof Date ?
-                          user.subscription.next_payment_date.toISOString() :
-                          user.subscription?.next_payment_date,
-        status: user.subscription?.status || 'active'
-      }
+      password_hash
     };
 
     // Suppression du mot de passe en clair avant l'envoi au modèle
@@ -75,7 +61,5 @@ export class UserService {
     return this.userModel.getUsersWithActiveSubscription();
   }
 
-  async updateUserSubscription(id: number, plan: string, updatedData: any): Promise<User> {
-    return this.userModel.updateUserSubscription(id, plan, updatedData);
-  }
+
 }

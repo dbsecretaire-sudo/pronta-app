@@ -20,14 +20,6 @@ export interface PaymentMethod {
   is_default?: boolean;
 }
 
-export interface SubscriptionFields {
-    plan: string;
-    start_date?: Date | string;
-    end_date: Date | string;
-    next_payment_date: Date | string;
-    status: string;
-}
-
 export interface User {
   id: number;
   email: string;
@@ -36,7 +28,6 @@ export interface User {
   created_at?: Date;
   billing_address?: BillingAddress;
   payment_method?: PaymentMethod;
-  subscription: SubscriptionFields;
   phone?: string,
   company?: string,
   role: Role;
@@ -50,13 +41,6 @@ export type CreateUser = Omit<User, "id" | "created_at" | "password_hash"> & {
 export type UpdateUser = Partial<Omit<User, "id" | "created_at" | "password_hash">> & {
   password?: string;
 };
-
-// export interface UpdateUserSubscription {
-//   subscription_plan?: string;
-//   subscription_end_date?: Date;
-//   next_payment_date?: Date;
-//   subscription_status?: 'active' | 'inactive' | 'pending' | 'cancelled' | 'overdue';
-// }
 
 export interface UserFilter {
   role?: Role;
