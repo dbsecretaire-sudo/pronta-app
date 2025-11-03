@@ -16,15 +16,6 @@ export function BillingTab({ data, onEdit, isUpdating = false }: BillingTabProps
 
   // État initial avec gestion des abonnements multiples
   const [formData, setFormData] = useState({
-    subscriptions: data.subscriptions || [{
-      id: null,
-      plan: "",
-      next_payment_date: undefined,
-      start_date: undefined,
-      end_date: undefined,
-      status: "active",
-      created_at: undefined,
-    }],
     billing_address: data.billing_address || {
       street: "",
       city: "",
@@ -39,6 +30,8 @@ export function BillingTab({ data, onEdit, isUpdating = false }: BillingTabProps
     },
   });
 
+
+
   // Gestion de la soumission des modifications
   const handleSubmit = async (e: React.FormEvent, type: "billing" | "payment" | "subscription") => {
     e.preventDefault();
@@ -50,32 +43,34 @@ export function BillingTab({ data, onEdit, isUpdating = false }: BillingTabProps
       payload = { billing_address: formData.billing_address };
     } else if (type === "payment") {
       payload = { payment_method: formData.payment_method };
-    } else if (type === "subscription" && editMode.selectedSubscriptionId) {
-      // Pour les abonnements, on appelle un endpoint spécifique
-      const subscriptionData = {
-        ...formData.subscriptions.find(sub => sub.id === editMode.selectedSubscriptionId),
-        start_date: new Date(formData.subscriptions.find(sub => sub.id === editMode.selectedSubscriptionId)?.start_date || "").toISOString(),
-        end_date: formData.subscriptions.find(sub => sub.id === editMode.selectedSubscriptionId)?.end_date ?
-          new Date(formData.subscriptions.find(sub => sub.id === editMode.selectedSubscriptionId)?.end_date || "").toISOString() : undefined,
-        next_payment_date: formData.subscriptions.find(sub => sub.id === editMode.selectedSubscriptionId)?.next_payment_date ?
-          new Date(formData.subscriptions.find(sub => sub.id === editMode.selectedSubscriptionId)?.next_payment_date || "").toISOString() : undefined
-      };
+    } 
+    // else if (type === "subscription" && editMode.selectedSubscriptionId) {
+    //   // Pour les abonnements, on appelle un endpoint spécifique
+    //   const subscriptionData = {
+    //     ...formData.subscriptions.find(sub => sub.id === editMode.selectedSubscriptionId),
+    //     start_date: new Date(formData.subscriptions.find(sub => sub.id === editMode.selectedSubscriptionId)?.start_date || "").toISOString(),
+    //     end_date: formData.subscriptions.find(sub => sub.id === editMode.selectedSubscriptionId)?.end_date ?
+    //       new Date(formData.subscriptions.find(sub => sub.id === editMode.selectedSubscriptionId)?.end_date || "").toISOString() : undefined,
+    //     next_payment_date: formData.subscriptions.find(sub => sub.id === editMode.selectedSubscriptionId)?.next_payment_date ?
+    //       new Date(formData.subscriptions.find(sub => sub.id === editMode.selectedSubscriptionId)?.next_payment_date || "").toISOString() : undefined
+    //   };
 
-      // Appel API spécifique pour mettre à jour un abonnement
-      const response = await fetch(`/api/users/subscriptions/${editMode.selectedSubscriptionId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(subscriptionData),
-      });
+    //   // Appel API spécifique pour mettre à jour un abonnement
+    //   const response = await fetch(`/api/users/subscriptions/${editMode.selectedSubscriptionId}`, {
+    //     method: "PUT",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify(subscriptionData),
+    //   });
 
-      if (!response.ok) {
-        throw new Error("Échec de la mise à jour de l'abonnement");
-      }
+    //   if (!response.ok) {
+    //     throw new Error("Échec de la mise à jour de l'abonnement");
+    //   }
 
-      result = { success: true, message: "Abonnement mis à jour avec succès !" };
-    } else {
+    //   result = { success: true, message: "Abonnement mis à jour avec succès !" };
+    // } 
+    else {
       // Pour les autres types, on utilise la fonction onEdit fournie
       result = await onEdit(payload);
     }
@@ -98,14 +93,14 @@ export function BillingTab({ data, onEdit, isUpdating = false }: BillingTabProps
     value: any,
     subscriptionId?: number
   ) => {
-    if (type === "subscription" && subscriptionId !== undefined) {
-      setFormData({
-        ...formData,
-        subscriptions: formData.subscriptions.map(sub =>
-          sub.id === subscriptionId ? { ...sub, [field]: value } : sub
-        )
-      });
-    } else {
+    // if (type === "subscription" && subscriptionId !== undefined) {
+    //   setFormData({
+    //     ...formData,
+    //     subscriptions: formData.subscriptions.map(sub =>
+    //       sub.id === subscriptionId ? { ...sub, [field]: value } : sub
+    //     )
+    //   });
+    // } else {
       setFormData({
         ...formData,
         [type]: {
@@ -113,38 +108,27 @@ export function BillingTab({ data, onEdit, isUpdating = false }: BillingTabProps
           [field]: value,
         },
       });
-    }
+    
   };
 
-  // Début de l'édition d'un abonnement spécifique
-  const handleEditSubscription = (subscriptionId: number) => {
-    setEditMode({
-      ...editMode,
-      subscription: true,
-      selectedSubscriptionId: subscriptionId
-    });
-  };
+  // // Début de l'édition d'un abonnement spécifique
+  // const handleEditSubscription = (subscriptionId: number) => {
+  //   setEditMode({
+  //     ...editMode,
+  //     subscription: true,
+  //     selectedSubscriptionId: subscriptionId
+  //   });
+  // };
 
   // Annulation de l'édition
   const handleCancel = (type: "billing" | "payment" | "subscription") => {
-    if (type === "subscription") {
-      setEditMode({
-        ...editMode,
-        subscription: false,
-        selectedSubscriptionId: null
-      });
-      // Réinitialiser les données de l'abonnement
-      setFormData({
-        ...formData,
-        subscriptions: data.subscriptions || []
-      });
-    } else {
+
       setEditMode({ ...editMode, [type]: false });
       setFormData({
         ...formData,
         [type]: data[type as "billing_address" | "payment_method"]
       });
-    }
+    
   };
 
   // Création d'un nouvel abonnement
@@ -214,24 +198,14 @@ export function BillingTab({ data, onEdit, isUpdating = false }: BillingTabProps
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-xl font-semibold mb-6">Facturation</h2>
+    <div className="bg-blue-50 p-4 rounded-lg mb-6">
+      <h2 className="flex justify-between items-center mb-4">Facturation</h2>
 
       {/* Section Abonnements */}
       <div className="mb-8">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-medium">Mes abonnements</h3>
-          <button
-            onClick={handleCreateSubscription}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          >
-            Ajouter un abonnement
-          </button>
-        </div>
-
         {/* Liste des abonnements */}
         <div className="space-y-4">
-          {formData.subscriptions.map((subscription) => (
+          {data.subscriptions.map((subscription) => (
             <div key={subscription.id || Math.random()} className="border rounded-lg p-4">
               <SubscriptionInfo
                 serviceName={subscription.plan}

@@ -16,7 +16,7 @@ export default function AccountPage() {
     setActiveTab,
     isUpdating,
     handleProfileUpdate,
-    handleBillingUpdate,
+    handleBillingUpdate
     // handleCreateSubscription,
     // handleUpdateSubscription,
     // handleDeleteSubscription
