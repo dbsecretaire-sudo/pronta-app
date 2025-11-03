@@ -14,7 +14,7 @@ export const useServices = (userId: string | undefined, status: string) => {
   const nextDate = new Date(now);
   nextDate.setMonth(now.getMonth() + 1);
   const endDate = new Date(now);
-  endDate.setMonth(now.getFullYear() + 1);
+  endDate.setFullYear(now.getFullYear() + 1);
 
   const fetchData = async () => {
     if (!userId) {
