@@ -5,7 +5,6 @@ import { z } from 'zod';
 
 // Schéma de validation pour les données d'abonnement
 const subscriptionUpdateSchema = z.object({
-  id : z.number(),
   user_id: z.number(),
   plan: z.string().optional(),
   status: z.string().optional(),
