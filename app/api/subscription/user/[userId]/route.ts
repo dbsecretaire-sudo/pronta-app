@@ -6,7 +6,6 @@ export async function GET(
     { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
-    console.log("GET SUBSCRIPTIONS OK");
     const { userId } = await params;
 
     const users = await getSubscriptionByUserId(Number(userId));

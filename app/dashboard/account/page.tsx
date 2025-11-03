@@ -33,6 +33,7 @@ export default function AccountPage() {
     }
     try {
       const result = await fetchUserSubscriptions(Number(session.user.id));
+      console.log("résultat: ", result);
       // S'assurer que result est un tableau, sinon utiliser un tableau vide
       const subscriptions = Array.isArray(result) ? result : [];
       setUserSubscriptions(subscriptions);
