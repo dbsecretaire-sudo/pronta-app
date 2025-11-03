@@ -132,7 +132,7 @@ import { User } from "../Users";
 
   async getSubscriptionByUserIdAndPlan(userId: number, plan: string): Promise<Subscription[]> {
     const query = 'SELECT * FROM user_subscriptions WHERE user_id = $1 AND plan = $2';
-    const { rows } = await pool.query(query, [userId]);
+    const { rows } = await pool.query(query, [userId, plan]);
     return rows.map(row => this.mapDbSubscriptionToSubscription(row));
   }
 
