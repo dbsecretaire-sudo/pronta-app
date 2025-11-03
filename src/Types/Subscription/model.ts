@@ -124,8 +124,14 @@ import { User } from "../Users";
     return this.mapDbSubscriptionToSubscription(rows[0]);
   }
 
-    async getSubscriptionByUserId(userId: number): Promise<Subscription[]> {
+  async getSubscriptionByUserId(userId: number): Promise<Subscription[]> {
     const query = 'SELECT * FROM user_subscriptions WHERE user_id = $1';
+    const { rows } = await pool.query(query, [userId]);
+    return rows.map(row => this.mapDbSubscriptionToSubscription(row));
+  }
+
+  async getSubscriptionByUserIdAndPlan(userId: number, plan: string): Promise<Subscription[]> {
+    const query = 'SELECT * FROM user_subscriptions WHERE user_id = $1 AND plan = $2';
     const { rows } = await pool.query(query, [userId]);
     return rows.map(row => this.mapDbSubscriptionToSubscription(row));
   }

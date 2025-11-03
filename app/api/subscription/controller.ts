@@ -17,3 +17,7 @@ export async function deleteUserSubscription(subscriptionId: number) {
 export async function getSubscriptionByUserId(userId: number) {
   return await subscriptionService.getSubscriptionByUserId(userId);
 }
+
+export async function getSubscriptionByUserIdAndPlan(userId: number, plan: string) {
+  return await subscriptionService.getSubscriptionByUserIdAndPlan(userId, plan);
+}
