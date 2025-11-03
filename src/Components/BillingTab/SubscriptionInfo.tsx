@@ -40,7 +40,7 @@ export const SubscriptionInfo = ({
   const calculateTotalCost = () => {
     return subscriptions.reduce((total, sub) => {
       let price = 0;
-      if (sub.plan === "Pronta Calls") price = 3.00;
+      if (sub.plan === "Pronta Calls") price = 3.50;
       else if (sub.plan === "Pronta Invoices") price = 300.00;
       else if (sub.plan === "Enterprise") price = 49.99;
       return total + price;
@@ -64,8 +64,8 @@ export const SubscriptionInfo = ({
             <div key={subscription.id} className="space-y-3 p-4 bg-white rounded-lg shadow-sm mb-4">
               <div className="flex justify-between items-start">
                 <div>
-                  <h4 className="font-medium text-gray-700">Total: {calculateTotalCost()} €/{getBillingUnit(subscription.plan)}</h4>
                   <p className="font-semibold text-lg">{subscription.plan}</p>
+                  <h4 className="font-medium text-gray-700">Total: {calculateTotalCost()} €/{getBillingUnit(subscription.plan)}</h4>
                 </div>
                 <span className={`px-3 py-1 rounded-full text-sm ${getStatusStyle(subscription.status)}`}>
                   {getStatusLabel(subscription.status)}
