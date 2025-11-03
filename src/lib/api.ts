@@ -156,7 +156,7 @@ export const updateUserSubscription = async (
     plan: string;
     start_date?: string | Date;
     end_date?: string | Date;  // Rendu optionnel pour correspondre à votre modèle
-    next_payment_date?: string | Date;  // Rendu optionnel
+    next_payment_date?: string | Date | null;  // Rendu optionnel
     status?: string;  // Rendu optionnel
   }
 ): Promise<Subscription> => {  // Typage du retour

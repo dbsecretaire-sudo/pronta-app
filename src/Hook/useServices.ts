@@ -157,8 +157,8 @@ export const useServices = (userId: string | undefined, status: string) => {
         user_id: Number(userId),
         plan: service.name,
         end_date: now, // Date de fin = maintenant
-        next_payment_date: undefined,
-        status: "inactive",
+        next_payment_date: null,
+        status: "cancelled",
       });
     }
       await refreshServices();
