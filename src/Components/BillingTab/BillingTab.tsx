@@ -80,7 +80,7 @@ export function BillingTab({ data, onEdit, isUpdating = false }: BillingTabProps
   };
 
   return (
-    <div className="bg-blue-50 p-4 rounded-lg mb-6">
+    <div className="bg-blue-50 rounded-lg shadow-md p-6">
       <h2 className="text-xl font-semibold mb-6">Facturation</h2>
 
       {/* Section Abonnements */}

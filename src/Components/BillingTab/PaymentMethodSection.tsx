@@ -56,7 +56,7 @@ export const PaymentMethodSection = ({
                 <label className="block text-sm font-medium text-gray-700">Numéro de Carte</label>
                 <input
                   type="text"
-                  value={formData.details?.card_last_four?.replace(/(\d{4})(?=\d)/g, '$1 ') || ''}
+                  value={formData.details?.card_last_four || ''}
                   onChange={(e) => {
                     // Supprime les espaces et les caractères non numériques
                     let rawValue = e.target.value.replace(/\D/g, '');
