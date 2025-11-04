@@ -38,7 +38,7 @@ export const SubscriptionInfo = ({ subscriptions }: { subscriptions: Subscriptio
                   {subscriptions.status === "active" ? 
                     (<div>
                       <p className="font-semibold text-lg">{subscriptions.service.name}</p>
-                      <h4 className="font-medium text-gray-700">Total: {subscriptions.service.price} €/{subscriptions.service.unit}</h4>
+                      <h4 className="font-medium text-gray-700">Tarif: {subscriptions.service.price} €/{subscriptions.service.unit}</h4>
                      </div> 
                     ) : (
                       <div>
