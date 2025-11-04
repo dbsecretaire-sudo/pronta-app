@@ -3,7 +3,7 @@
 import { SubscriptionWithService } from "@/src/Types/Subscription";
 import { getStatusLabel, getStatusStyle } from "./utils";
 
-export const SubscriptionInfo = ({ subscriptions = [] }: { subscriptions: SubscriptionWithService[] }) => {
+export const SubscriptionInfo = ({ subscriptions }: { subscriptions: SubscriptionWithService }) => {
   
   // Fonction pour formater une date
   const formatDate = (date: string | Date | undefined) => {
@@ -32,13 +32,12 @@ export const SubscriptionInfo = ({ subscriptions = [] }: { subscriptions: Subscr
   return (
     <div className="bg-blue-50 p-4 rounded-lg">
       <>
-      {subscriptions.map((subscription) => {
         <div>
-          <p>{subscription.id}</p>
-          <p>{subscription.service.name}</p>
-          <p>{subscription.status}</p>
+          <p>{subscriptions.id}</p>
+          <p>{subscriptions.service.name}</p>
+          <p>{subscriptions.status}</p>
         </div>
-      })}
+      
       
       </>
       {/* {subscriptions.length > 0 ? (
