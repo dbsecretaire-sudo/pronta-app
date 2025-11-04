@@ -40,8 +40,9 @@ console.log("subscriptions.length: ", subscriptions.length);
 subscriptions.map((sub) => {
   console.log("id", sub.id);
   console.log("status", sub.status);
+  console.log("price", sub.service.price);
 })
-console.log("subscriptions.length: ", subscriptions.length);
+
 
   return (
     <div className="bg-blue-50 p-4 rounded-lg">
