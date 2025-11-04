@@ -119,12 +119,46 @@ export const PaymentMethodSection = ({
                 />
               </div>
             )}
+            {formData.type === 'bank_transfer' && (
+              <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <h4 className="font-medium text-gray-900 mb-2">Nos coordonnées bancaires</h4>
+                <p className="text-sm text-gray-600 mb-1">
+                  <strong>Titulaire du compte:</strong> MADAME BAUWENS DELPHINE
+                </p>
+                <p className="text-sm text-gray-600 mb-1">
+                  <strong>Banque:</strong> CR CORSE - Agence de CORTE
+                </p>
+                <p className="text-sm text-gray-600 mb-1">
+                  <strong>IBAN:</strong> FR76 1200 6000 2082 1095 4120 262
+                </p>
+                <p className="text-sm text-gray-600 mb-1">
+                  <strong>BIC:</strong> AGRIFRPP820
+                </p>
+                <p className="text-sm text-gray-600 mb-1">
+                  <strong>Adresse:</strong> VILLAGE, 20272 PIANELLO
+                </p>
+                <p className="text-sm text-gray-600 mb-1">
+                  <strong>Téléphone:</strong> 04 95 45 04 80
+                </p>
+                <p className="text-sm text-gray-600 mb-3">
+                  <strong>Domiciliation:</strong> Code établissement 12006 | Code guichet 00020 | Numéro de compte 82109541202 | Clé RIB 62
+                </p>
+                <p className="text-xs text-gray-500 italic">
+                  Ne communiquez ces informations qu'à des organismes de confiance pour éviter tout risque de fraude.
+                </p>
+              </div>
+            )}
             <div className="flex items-center space-x-2">
               <input
                 type="checkbox"
                 id="default-payment"
                 checked={formData.is_default || false}
-                onChange={(e) => onChange("is_default", e.target.checked)}
+                onChange={(e) => {
+                  // Empêche la modification si aucun type n'est sélectionné
+                  if (formData.type === "") return;
+                  onChange("is_default", e.target.checked);
+                }}
+                disabled={formData.type === ""} // Désactive le checkbox si aucun type n'est sélectionné
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
               <label htmlFor="default-payment" className="text-sm text-gray-700">
@@ -162,6 +196,28 @@ export const PaymentMethodSection = ({
                   )}
                   {paymentMethod.type === 'paypal' && paymentMethod.details?.paypal_email && (
                     <p>{paymentMethod.details.paypal_email}</p>
+                  )}
+                  {paymentMethod.type === 'bank_transfer' && (
+                    <div className="bg-gray-50 p-3 rounded-lg border border-gray-200 mt-2">
+                      <h4 className="font-medium text-gray-900 mb-2">Nos coordonnées bancaires</h4>
+                      <div className="space-y-1 text-sm">
+                        <p className="text-gray-600">
+                          <strong>Titulaire:</strong> MADAME BAUWENS DELPHINE
+                        </p>
+                        <p className="text-gray-600">
+                          <strong>IBAN:</strong> FR76 1200 6000 2082 1095 4120 262
+                        </p>
+                        <p className="text-gray-600">
+                          <strong>BIC:</strong> AGRIFRPP820
+                        </p>
+                        <p className="text-gray-600">
+                          <strong>Banque:</strong> CR CORSE - Agence de CORTE
+                        </p>
+                        <p className="text-gray-600">
+                          <strong>Domiciliation:</strong> 12006 00020 82109541202 62
+                        </p>
+                      </div>
+                    </div>
                   )}
                 </>
               )}
