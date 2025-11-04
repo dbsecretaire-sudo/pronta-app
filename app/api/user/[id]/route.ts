@@ -35,6 +35,7 @@ export async function PUT(
   try {
     const { id } = await params;
     const userData = await request.json();
+    console.log(userData);
     const updatedUser = await updateUser(Number(id), userData);
     return NextResponse.json(updatedUser);
   } catch (error) {
