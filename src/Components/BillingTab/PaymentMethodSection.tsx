@@ -26,77 +26,92 @@ export const PaymentMethodSection = ({
 }: PaymentMethodSectionProps) => {
   return (
     <div className="bg-blue-50 p-4 rounded-lg">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="font-medium">Méthode de paiement</h3>
-        {!isEditing ? (
-          <Button onClick={onEdit} variant="primary">
-            Modifier
-          </Button>
-        ) : null}
-      </div>
-      {isEditing ? (
-        <form onSubmit={onSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Type de paiement</label>
-            <select
-              value={formData.type}
-              onChange={(e) => onChange("type", e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              required
-            >
-              <option value="">Sélectionnez un type</option>
-              <option value="credit_card">Carte de crédit</option>
-              <option value="paypal">PayPal</option>
-              <option value="bank_transfer">Virement bancaire</option>
-            </select>
-          </div>
-          {formData.type === 'credit_card' && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Derniers chiffres de la carte</label>
-              <input
-                type="text"
-                value={formData.details?.card_last_four || ''}
-                onChange={(e) => onChange("details", { ...formData.details, card_last_four: e.target.value })}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                placeholder="1234"
-                maxLength={4}
-              />
-            </div>
-          )}
-          {formData.type === 'paypal' && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Email PayPal</label>
-              <input
-                type="email"
-                value={formData.details?.paypal_email || ''}
-                onChange={(e) => onChange("details", { ...formData.details, paypal_email: e.target.value })}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                placeholder="votre@email.com"
-              />
-            </div>
-          )}
-          <div className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              id="default-payment"
-              checked={formData.is_default || false}
-              onChange={(e) => onChange("is_default", e.target.checked)}
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-            />
-            <label htmlFor="default-payment" className="text-sm text-gray-700">
-              Méthode de paiement par défaut
-            </label>
-          </div>
-          <div className="flex space-x-3">
-            <Button type="submit" disabled={isUpdating} variant="primary">
-              {isUpdating ? "Enregistrement..." : "Enregistrer"}
+      {!isEditing ? (
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="font-medium">Méthode de paiement</h3>
+          
+            <Button onClick={onEdit} variant="primary">
+              Modifier
             </Button>
-            <Button type="button" onClick={onCancel} variant="secondary">
-              Annuler
-            </Button>
-          </div>
-        </form>
+        </div>    
       ) : (
+        <div className="space-y-3 p-4 bg-white rounded-lg shadow-sm mb-4">
+          <form onSubmit={onSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Type de paiement</label>
+              <select
+                value={formData.type}
+                onChange={(e) => onChange("type", e.target.value)}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                required
+              >
+                <option value="">Sélectionnez un type</option>
+                <option value="credit_card">Carte de crédit</option>
+                <option value="paypal">PayPal</option>
+                <option value="bank_transfer">Virement bancaire</option>
+              </select>
+            </div>
+            {formData.type === 'credit_card' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Numéro de Carte</label>
+                <input
+                  type="text"
+                  value={formData.details?.card_last_four || ''}
+                  onChange={(e) => {
+                    let value = e.target.value.replace(/\s+/g, '');
+                    if (value.length > 16) {
+                      value = value.substring(0, 16);
+                    }
+                    const formattedValue = value.replace(/(\d{4})(?=\d)/g, '$1 ');
+                    onChange("details", {
+                      ...formData.details,
+                      card_last_four: value, 
+                    });
+                    e.target.value = formattedValue;
+                  }}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  placeholder="1234 5678 9012 3456"
+                  maxLength={16}
+                />
+              </div>
+            )}
+            {formData.type === 'paypal' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Email PayPal</label>
+                <input
+                  type="email"
+                  value={formData.details?.paypal_email || ''}
+                  onChange={(e) => onChange("details", { ...formData.details, paypal_email: e.target.value })}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  placeholder="votre@email.com"
+                />
+              </div>
+            )}
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="default-payment"
+                checked={formData.is_default || false}
+                onChange={(e) => onChange("is_default", e.target.checked)}
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              />
+              <label htmlFor="default-payment" className="text-sm text-gray-700">
+                Méthode de paiement par défaut
+              </label>
+            </div>
+            <div className="flex space-x-3">
+              <Button type="submit" disabled={isUpdating} variant="primary">
+                {isUpdating ? "Enregistrement..." : "Enregistrer"}
+              </Button>
+              <Button type="button" onClick={onCancel} variant="secondary">
+                Annuler
+              </Button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {!isEditing ? (
         <div>
           {paymentMethod ? (
             <div>
@@ -123,7 +138,7 @@ export const PaymentMethodSection = ({
             <p className="text-gray-500">Aucune méthode de paiement</p>
           )}
         </div>
-      )}
+      ) : null}
     </div>
   );
 };

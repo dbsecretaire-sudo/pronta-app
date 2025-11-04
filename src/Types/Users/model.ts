@@ -15,9 +15,9 @@ export class UserModel {
       name: dbUser.name || undefined,
       created_at: dbUser.created_at ? new Date(dbUser.created_at) : undefined,
       billing_address:
-      typeof dbUser.billing_address === 'string'
-        ? JSON.parse(dbUser.billing_address)
-        : dbUser.billing_address || undefined,
+        typeof dbUser.billing_address === 'string'
+          ? JSON.parse(dbUser.billing_address)
+          : dbUser.billing_address || undefined,
       payment_method:
         dbUser.payment_method
           ? typeof dbUser.payment_method === 'string'
