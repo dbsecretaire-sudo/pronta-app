@@ -7,18 +7,26 @@ export class UserModel {
 
   // Helper pour mapper les résultats de la base de données vers un objet User
   mapDbUserToUser(dbUser: any): User {
+    console.log("Type de billing_address:", typeof dbUser.billing_address, dbUser.billing_address);
     return {
       id: dbUser.id,
       email: dbUser.email,
       password_hash: dbUser.password_hash,
       name: dbUser.name || undefined,
       created_at: dbUser.created_at ? new Date(dbUser.created_at) : undefined,
-      billing_address: dbUser.billing_address ? JSON.parse(dbUser.billing_address) : undefined,
-      payment_method: dbUser.payment_method ? this.mapDbPaymentMethod(JSON.parse(dbUser.payment_method)) : undefined,
+      billing_address:
+      typeof dbUser.billing_address === 'string'
+        ? JSON.parse(dbUser.billing_address)
+        : dbUser.billing_address || undefined,
+      payment_method:
+        dbUser.payment_method
+          ? typeof dbUser.payment_method === 'string'
+            ? this.mapDbPaymentMethod(JSON.parse(dbUser.payment_method))
+            : this.mapDbPaymentMethod(dbUser.payment_method)
+          : undefined,
       phone: dbUser.phone || undefined,
       company: dbUser.company || undefined,
       role: dbUser.role,
-      // Les abonnements seront ajoutés séparément
     };
   }
 
