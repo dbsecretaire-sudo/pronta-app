@@ -255,22 +255,17 @@ export async function createSubscription(subscriptionData: {
   try {
     const response = await fetch(`/api/subscription`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         user_id: subscriptionData.user_id,
         service_id: subscriptionData.service_id,
         status: subscriptionData.status,
         start_date: subscriptionData.start_date.toISOString(),
         end_date: subscriptionData.end_date.toISOString(),
-        next_payment_date: subscriptionData.next_payment_date.toISOString()
+        next_payment_date: subscriptionData.next_payment_date.toISOString(),
       }),
     });
-
-    if (!response.ok) {
-      throw new Error("Failed to create subscription");
-    }
+    if (!response.ok) throw new Error("Failed to create subscription");
   } catch (error) {
     console.error("Erreur lors de la création de l'abonnement:", error);
     throw error;
