@@ -36,7 +36,7 @@ export const SubscriptionInfo = ({ subscriptions = [] }: { subscriptions: Subscr
     return diffDays > 0 ? diffDays : 0;
   };
 
-console.log("subscriptions: ", subscriptions);
+console.log("subscriptions.length: ", subscriptions.length);
 
   return (
     <div className="bg-blue-50 p-4 rounded-lg">
