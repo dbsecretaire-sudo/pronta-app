@@ -58,7 +58,7 @@ export const subscribeToService = async (userServiceData: UserService) => {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
-    body: JSON.stringify({ userServiceData }),
+    body: JSON.stringify(userServiceData),
   });
   if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
   return res.json();

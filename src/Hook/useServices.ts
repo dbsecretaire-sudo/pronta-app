@@ -95,27 +95,32 @@ export const useServices = (userId: string | undefined, status: string) => {
   };
 
   const handleSubscribe = async (service: Service) => {
-     //je souscris à un abonnement// 
-    try {
-      
-      // 
-   
-      const existingSubscription = await getSubscriptionByService(Number(userId), service.id);
+  try {
+    if (!userId) throw new Error("User ID is required");
 
-      if (existingSubscription === null) {
+    const existingSubscription = await getSubscriptionByService(Number(userId), service.id);
+    if (existingSubscription === null) {
       throw new Error("Impossible de vérifier les abonnements existants.");
     }
+
+    // Préparation des données pour l'API
+    const now = new Date();
+    const nextDate = new Date(now);
+    nextDate.setMonth(now.getMonth() + 1);
+    const endDate = new Date(now);
+    endDate.setFullYear(now.getFullYear() + 1);
 
     if (existingSubscription.length === 0) {
       // Cas 1 : Aucun abonnement existant → Créer un nouvel abonnement
       await subscribeToService({
         user_id: Number(userId),
         service_id: service.id,
-        subscription_date: now,
         is_active: true,
         can_write: false,
         can_delete: false,
+        subscription_date: now,
       });
+
       await createSubscription({
         user_id: Number(userId),
         service_id: service.id,
@@ -125,8 +130,7 @@ export const useServices = (userId: string | undefined, status: string) => {
         status: "active",
       });
     } else {
-      // Cas 2 : Abonnement(s) existant(s) → Mettre à jour le premier abonnement trouvé
-      // (Tu peux aussi choisir de tous les mettre à jour ou de gérer différemment)
+      // Cas 2 : Abonnement(s) existant(s) → Mettre à jour le premier abonnement
       const firstSubscription = existingSubscription[0];
       await updateUserSubscription(firstSubscription.id, {
         user_id: Number(userId),
@@ -137,13 +141,13 @@ export const useServices = (userId: string | undefined, status: string) => {
         status: "active",
       });
     }
-    
-      await refreshServices();
-    } catch (error) {
-      console.error("Erreur lors de l'abonnement:", error);
-      setError("Échec de l'abonnement au service.");
-    }
-  };
+
+    await refreshServices();
+  } catch (error) {
+    console.error("Erreur lors de l'abonnement:", error);
+    setError(error instanceof Error ? error.message : "Échec de l'abonnement au service.");
+  }
+};
 
   const handleDeactivate = async (service: Service) => {
     //je désactive un abonnement// 
