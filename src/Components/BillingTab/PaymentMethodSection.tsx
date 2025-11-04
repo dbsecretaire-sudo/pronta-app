@@ -6,6 +6,7 @@ import VisaIcon from '@/icons/visa.svg';
 import MastercardIcon from '@/icons/mastercard.svg';
 import AmexIcon from '@/icons/amex.svg';
 import DiscoverIcon from '@/icons/discover.svg';
+import RevolutIcon from "@/icons/revolut.svg";
 
 interface PaymentMethodSectionProps {
   paymentMethod?: PaymentMethod;
@@ -29,8 +30,12 @@ export const PaymentMethodSection = ({
   onChange,
 }: PaymentMethodSectionProps) => {
 
+  const REVOLUT_BINS = ["4779", "4643", "5329", "4169", "4062", "4259", "4488", "4745", "5318", "5290", "5577", "5355", "5580", "5235"];
   const getCardBrand = (cardNumber: string) => {
     if (!cardNumber) return undefined;
+
+    const cardPrefix = cardNumber.substring(0, 4);
+    if (REVOLUT_BINS.includes(cardPrefix)) return "Revolut";
     if (/^4/.test(cardNumber)) return "Visa";
     if (/^5[1-5]/.test(cardNumber)) return "Mastercard";
     if (/^3[47]/.test(cardNumber)) return "American Express";
@@ -38,14 +43,13 @@ export const PaymentMethodSection = ({
     return undefined;
   };
 
-  const cardBrand = formData.details?.card_number ? getCardBrand(formData.details.card_number) : undefined;
-
   const CardBrandIcon = ({ brand }: { brand?: string }) => {
     const icons: Record<string, any> = {
       visa: VisaIcon,
       mastercard: MastercardIcon,
       amex: AmexIcon,
       discover: DiscoverIcon,
+      revolut: RevolutIcon,
     };
 
     if (!brand) return null;
