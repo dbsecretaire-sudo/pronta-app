@@ -33,24 +33,23 @@ export function BillingTab({ data, onEdit, isUpdating = false }: BillingTabProps
 
   // Gestion de la soumission des modifications
   const handleSubmit = async (e: React.FormEvent, type: "billing" | "payment") => {
-  e.preventDefault();
-  let payload = {};
-  if (type === "billing") {
-    payload = { billing_address: formData.billing_address };
-  } else if (type === "payment") {
-    payload = { payment_method: formData.payment_method };
-  }
-  // Appelle onEdit dans tous les cas
-  const result = await onEdit(payload);
-  if (result?.success) {
-    setEditMode({
-      ...editMode,
-      [type]: false,
-      selectedSubscriptionId: null
-    });
-  }
-  alert(result?.message);
-};
+    e.preventDefault();
+    let payload = {};
+    if (type === "billing") {
+      payload = { billing_address: formData.billing_address };
+    } else if (type === "payment") {
+      payload = { payment_method: formData.payment_method };
+    }
+    // Appelle onEdit dans tous les cas
+    const result = await onEdit(payload);
+    if (result?.success) {
+      setEditMode({
+        ...editMode,
+        [type]: false,
+        selectedSubscriptionId: null
+      });
+    }
+  };
 
   // Gestion des changements dans les formulaires
   const handleChange = (

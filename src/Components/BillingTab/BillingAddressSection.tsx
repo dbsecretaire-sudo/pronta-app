@@ -32,20 +32,10 @@ export const BillingAddressSection  = ({
         <div className="flex justify-between items-center mb-4">
           <h3 className="font-medium">Adresse de facturation</h3>
           
-          <Button onClick={onEdit} variant="primary">
-            Modifier
+            <Button onClick={onEdit} variant="primary">
+              Modifier
             </Button>
-
-          {billingAddress ? (
-            <div className="space-y-1">
-              <p>{billingAddress.street}</p>
-              <p>{billingAddress.postal_code} {billingAddress.city}</p>
-              <p>{billingAddress.country}</p>
-            </div>
-          ) : (
-            <p className="text-gray-500">Aucune adresse de facturation</p>
-          )}
-        </div>
+        </div>    
       ) : (
       <div className="space-y-3 p-4 bg-white rounded-lg shadow-sm mb-4">
         <form onSubmit={onSubmit} className="space-y-4">
@@ -112,6 +102,17 @@ export const BillingAddressSection  = ({
         </form>
       </div>
       )}
+      <div>
+        {billingAddress ? (
+          <div className="space-y-1">
+            <p>{billingAddress.street}</p>
+            <p>{billingAddress.postal_code} {billingAddress.city}</p>
+            <p>{billingAddress.country}</p>
+          </div>
+        ) : (
+          <p className="text-gray-500">Aucune adresse de facturation</p>
+        )}
+      </div>
     </div>
   );
 };

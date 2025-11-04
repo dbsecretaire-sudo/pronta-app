@@ -70,7 +70,7 @@ export function useAccount() {
 
     setIsUpdating(true);
     try {
-      const response = await fetch(`/api/users/${userData.id}`, {
+      const response = await fetch(`/api/user/${userData.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
