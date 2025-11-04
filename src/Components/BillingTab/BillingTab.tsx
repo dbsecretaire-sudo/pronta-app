@@ -1,9 +1,11 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SubscriptionInfo } from "./SubscriptionInfo";
 import { BillingAddressSection } from "./BillingAddressSection";
 import { PaymentMethodSection } from "./PaymentMethodSection";
 import { BillingTabProps } from "./types";
+import { Service } from "@/src/Types/Services";
+import { getServiceInfo } from "@/src/lib/api";
 
 export function BillingTab({ data, onEdit, isUpdating = false }: BillingTabProps) {
   // État pour gérer les modes d'édition
@@ -29,8 +31,6 @@ export function BillingTab({ data, onEdit, isUpdating = false }: BillingTabProps
       is_default: false,
     },
   });
-
-
 
   // Gestion de la soumission des modifications
   const handleSubmit = async (e: React.FormEvent, type: "billing" | "payment" | "subscription") => {
@@ -108,7 +108,6 @@ export function BillingTab({ data, onEdit, isUpdating = false }: BillingTabProps
                     end_date: subscription.end_date,
                     next_payment_date: subscription.next_payment_date,
                     created_at: subscription.created_at
-                    // user_id n'est pas requis pour l'affichage
                   }]}
               />
             </div>

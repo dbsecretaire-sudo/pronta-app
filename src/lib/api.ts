@@ -5,6 +5,7 @@ import { User } from "@/src/Types/Users";
 import { UserService } from '@/src/Types/UserServices';
 import { AvailableService, Service } from "@/src/Types/Services";
 import { Subscription } from "../Types/Subscription";
+import { SubscriptionWithService } from "../Types/Subscription";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL; // Remplacez par l’URL de votre backend
 
@@ -289,4 +290,12 @@ export async function getServiceInfo(serviceId: number): Promise<Service> {
   }
   const service: Service = await response.json();
   return service;
+}
+
+export async function getSubscriptionWithService(subscription: Subscription): Promise<SubscriptionWithService> {
+  const service = await getServiceInfo(subscription.service_id);
+  return {
+    ...subscription,
+    service,
+  };
 }

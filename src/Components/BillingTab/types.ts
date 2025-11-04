@@ -1,3 +1,4 @@
+import { Service } from "@/src/Types/Services";
 import { BillingAddress, PaymentMethod } from "@/src/Types/Users";
 
 export type BillingTabProps = {
@@ -7,13 +8,12 @@ export type BillingTabProps = {
     subscriptions: Array<{
       id: number;
       service_id: number;
-      status?: string;
-      start_date?: Date;
+      status: string;
+      start_date: Date;
       end_date?: Date;
       next_payment_date?: Date | string | null;
       created_at?: Date;
     }>;
-    service_name?: string;
     billing_address?: BillingAddress;
     payment_method?: PaymentMethod;
   };

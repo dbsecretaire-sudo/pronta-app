@@ -60,41 +60,9 @@ export default function AccountPage() {
   const handleBillingEdit = async (data: {
     billing_address?: any;
     payment_method?: any;
-    // subscription?: {
-    //   id?: number;
-    //   plan?: string;
-    //   status?: string;
-    //   start_date?: Date | string;
-    //   end_date?: Date | string;
-    //   next_payment_date?: Date | string;
-    // };
   }) => {
-    // Si on a des données d'abonnement
-    // if (data.subscription) {
-    //   const subscriptionData = {
-    //     ...data.subscription,
-    //     start_date: data.subscription.start_date ? ensureDate(data.subscription.start_date) : undefined,
-    //     end_date: data.subscription.end_date ? ensureDate(data.subscription.end_date) : undefined,
-    //     next_payment_date: data.subscription.next_payment_date ? ensureDate(data.subscription.next_payment_date) : undefined
-    //   };
-
-    //   // Si c'est un nouvel abonnement (pas d'ID)
-    //   if (!subscriptionData.id) {
-    //     return handleCreateSubscription({
-    //       ...subscriptionData,
-    //       user_id: userData.id
-    //     } as Subscription);
-    //   }
-    //   // Sinon, c'est une mise à jour
-    //   else {
-    //     return handleUpdateSubscription(subscriptionData.id, subscriptionData);
-    //   }
-    // }
-    // // Sinon, c'est une mise à jour des informations de facturation
-    // else {
-      const { billing_address, payment_method } = data;
-      return handleBillingUpdate({ billing_address, payment_method });
-    // }
+    const { billing_address, payment_method } = data;
+    return handleBillingUpdate({ billing_address, payment_method });
   };
 
   const tabs = [

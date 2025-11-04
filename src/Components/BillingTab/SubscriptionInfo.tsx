@@ -1,37 +1,35 @@
 "use client";
 
-import { Subscription } from "@/src/Types/Subscription";
+import { Subscription, SubscriptionWithService } from "@/src/Types/Subscription";
 import { getStatusLabel, getStatusStyle } from "./utils";
 import { useEffect, useState } from "react";
-import { getServiceInfo } from "@/src/lib/api";
-import { Service } from "@/src/Types/Services";
+import { getSubscriptionWithService } from "@/src/lib/api";
 
-interface SubscriptionInfoProps {
-  subscriptions: Array<Partial<Subscription> & { id: number, service_id: number }>;
-}
 
-export const SubscriptionInfo = ({ subscriptions = [] }: SubscriptionInfoProps) => {
+// interface SubscriptionInfoProps {
+//   subscriptions: { subscriptions: Subscription[] };
+// }
 
-  const [serviceInfos, setServiceInfos] = useState<Record<number, Service>>({});
+export const SubscriptionInfo = ({ subscriptions = [] }: { subscriptions: Subscription[] }) => {
+  const [subscriptionsWithService, setSubscriptionsWithService] = useState<SubscriptionWithService[]>([]);
 
   useEffect(() => {
-    const fetchServiceInfos = async () => {
+    const fetchSubscriptionsWithService = async () => {
       try {
-        const infos: Record<number, Service> = {};
-        for (const subscription of subscriptions) {
-          if (subscription.service_id) {
-            const info = await getServiceInfo(subscription.service_id);
-            infos[subscription.service_id] = info;
-          }
-        }
-        setServiceInfos(infos);
+        const subsWithService = await Promise.all(
+          subscriptions.map(async (subscription) => {
+            return await getSubscriptionWithService(subscription);
+          })
+        );
+        setSubscriptionsWithService(subsWithService);
       } catch (error) {
         console.error("Erreur lors de la récupération des informations de service:", error);
       }
     };
 
-    fetchServiceInfos();
+    fetchSubscriptionsWithService();
   }, [subscriptions]);
+
 
   // Fonction pour formater une date
   const formatDate = (date: string | Date | undefined) => {
@@ -57,26 +55,21 @@ export const SubscriptionInfo = ({ subscriptions = [] }: SubscriptionInfoProps) 
     return diffDays > 0 ? diffDays : 0;
   };
 
-  console.log("subscriptions: ", subscriptions);
-  console.log("serviceInfos: ", serviceInfos);
-
   return (
     <div className="bg-blue-50 p-4 rounded-lg">
-      {subscriptions.length > 0 ? (
+      {subscriptionsWithService.length > 0 ? (
         <>
-          {subscriptions.map((subscription) => {
-            const serviceInfo = serviceInfos[subscription.service_id];
-            (
+          {subscriptionsWithService.map((subscription) => {
             <div key={subscription.id} className="space-y-3 p-4 bg-white rounded-lg shadow-sm mb-4">
               <div className="flex justify-between items-start">
                   {subscription.status === "active" ? 
                     (<div>
-                      <p className="font-semibold text-lg">{serviceInfo?.name || 'Inconnu'}</p>
-                      <h4 className="font-medium text-gray-700">Total: {serviceInfo?.price || '0.00'} €/{serviceInfo?.unit || 'mois'}</h4>
+                      <p className="font-semibold text-lg">{subscription.service.name}</p>
+                      <h4 className="font-medium text-gray-700">Total: {subscription.service.price} €/{subscription.service.unit}</h4>
                      </div> 
                     ) : (
                       <div>
-                        <p className="font-semibold text-lg">{serviceInfo?.name || 'Inconnu'}</p>
+                        <p className="font-semibold text-lg">{subscription.service.name || 'Inconnu'}</p>
                       </div>
                     )
                   }               
@@ -111,8 +104,7 @@ export const SubscriptionInfo = ({ subscriptions = [] }: SubscriptionInfoProps) 
                 )}
               </div>
             </div>
-          )}
-        )}
+          })}
         </>
       ) : (
         <div className="flex flex-col items-center p-6 bg-white rounded-lg shadow-sm text-center">

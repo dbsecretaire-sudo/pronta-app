@@ -1,1 +1,1 @@
-export type { Subscription, CreateSubscription, UpdateSubscription, ApiSubscription } from "./type";
+export type { Subscription, CreateSubscription, UpdateSubscription, ApiSubscription, SubscriptionWithService } from "./type";

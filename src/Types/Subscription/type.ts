@@ -1,3 +1,5 @@
+import { Service } from "../Services";
+
 export interface Subscription {
   id: number;
   user_id?: number;
@@ -37,4 +39,8 @@ export interface CreateSubscription {
   start_date: Date | string;
   end_date?: Date | string;
   next_payment_date?: Date | string | null;
+}
+
+export interface SubscriptionWithService extends Subscription {
+  service: Service; // ⬅️ Ajoute l'interface Service ici
 }
