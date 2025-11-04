@@ -12,7 +12,7 @@ export async function POST(
     // Schéma de validation pour la création d'abonnement
     const subscriptionCreateSchema = z.object({
       user_id: z.number(),
-      plan: z.string(),
+      service_id: z.number(),
       status: z.string().optional(),
       start_date: z.union([z.string().datetime(), z.date()]).optional(),
       end_date: z.union([z.string().datetime(), z.date()]).optional(),
