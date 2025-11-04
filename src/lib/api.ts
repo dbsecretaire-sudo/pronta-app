@@ -92,7 +92,6 @@ export const reactivateUserService = async (userId: number, serviceId: number): 
   }
 };
 
-
 export async function updateProfile(userId: number, data: {
   email: string;
   phone: string;
@@ -283,20 +282,3 @@ export async function fetchUserSubscriptions(userId:number) {
   if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
   return res.json();
 };
-
-// export async function getServiceInfo(serviceId: number): Promise<Service> {
-//   const response = await fetch(`/api/services/${serviceId}`);
-//   if (!response.ok) {
-//     throw new Error("Failed to fetch service");
-//   }
-//   const service: Service = await response.json();
-//   return service;
-// }
-
-// export async function getSubscriptionWithService(subscription: Subscription): Promise<SubscriptionWithService> {
-//   const service = await getServiceInfo(subscription.service_id);
-//   return {
-//     ...subscription,
-//     service,
-//   };
-// }
