@@ -9,6 +9,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
+    console.log(id);
     const user = await getUserById(Number(id));
 
     if (!user) {
