@@ -4,7 +4,8 @@ import {
   AssignServiceToUser,
   UpdateUserServicePermissions,
   UserServiceWithDetails,
-  UserService
+  UserService,
+  CreateUserService
 } from "./types";
 
 const userServiceService = new UserServiceService();
@@ -12,6 +13,10 @@ const userServiceService = new UserServiceService();
 export const getUserServices = async (userId: number): Promise<UserServiceWithDetails[]> => {
   return await userServiceService.getUserServices(userId);
 };
+
+export const createUserService = async (userServiceData: CreateUserService) => {
+  return await userServiceService.createUserService(userServiceData);
+}
 
 export const getUserService = async (
   userId: number,

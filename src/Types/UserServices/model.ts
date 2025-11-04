@@ -1,4 +1,4 @@
-import { UserService, AssignServiceToUser, UserServiceWithDetails, UpdateUserServicePermissions } from "./type";
+import { UserService, AssignServiceToUser, UserServiceWithDetails, UpdateUserServicePermissions, CreateUserService } from "./type";
 import pool from "@/src/lib/db";
 
 export class UserServiceModel {
@@ -133,6 +133,31 @@ export class UserServiceModel {
        WHERE user_id = $1 AND service_id = $2
        RETURNING *`,
       [userId, serviceId]
+    );
+    return res.rows[0];
+  }
+
+  async createUserService(data: CreateUserService): Promise<UserService> {
+    const res = await pool.query(
+      `INSERT INTO user_services (
+        user_id,
+        service_id,
+        is_active,
+        can_write,
+        can_delete,
+        subscription_date
+      )
+      VALUES (
+        $1, $2, COALESCE($3, TRUE), COALESCE($4, FALSE), COALESCE($5, FALSE), NOW()
+      )
+      RETURNING *`,
+      [
+        data.user_id,          // Ajoute user_id ici
+        data.service_id,
+        data.is_active,
+        data.can_write,
+        data.can_delete,
+      ]
     );
     return res.rows[0];
   }
