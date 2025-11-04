@@ -2,6 +2,10 @@
 import { useState } from "react";
 import { Button } from "@/src/Components";
 import { PaymentMethod } from "@/src/Types/Users";
+import VisaIcon from '@/icons/visa.svg';
+import MastercardIcon from '@/icons/mastercard.svg';
+import AmexIcon from '@/icons/amex.svg';
+import DiscoverIcon from '@/icons/discover.svg';
 
 interface PaymentMethodSectionProps {
   paymentMethod?: PaymentMethod;
@@ -24,6 +28,31 @@ export const PaymentMethodSection = ({
   onSubmit,
   onChange,
 }: PaymentMethodSectionProps) => {
+
+  const getCardBrand = (cardNumber: string) => {
+    if (!cardNumber) return undefined;
+    if (/^4/.test(cardNumber)) return "Visa";
+    if (/^5[1-5]/.test(cardNumber)) return "Mastercard";
+    if (/^3[47]/.test(cardNumber)) return "American Express";
+    if (/^6(?:011|5)/.test(cardNumber)) return "Discover";
+    return undefined;
+  };
+
+  const cardBrand = formData.details?.card_number ? getCardBrand(formData.details.card_number) : undefined;
+
+  const CardBrandIcon = ({ brand }: { brand?: string }) => {
+    const icons: Record<string, any> = {
+      visa: VisaIcon,
+      mastercard: MastercardIcon,
+      amex: AmexIcon,
+      discover: DiscoverIcon,
+    };
+
+    if (!brand) return null;
+    const Icon = icons[brand.toLowerCase()];
+    return Icon ? <img src={Icon.src} alt={brand} className="h-6 w-auto" /> : null;
+  };
+
   return (
     <div className="bg-blue-50 p-4 rounded-lg">
       {!isEditing ? (
@@ -54,26 +83,31 @@ export const PaymentMethodSection = ({
             {formData.type === 'credit_card' && (
               <div>
                 <label className="block text-sm font-medium text-gray-700">Numéro de Carte</label>
-                <input
-                  type="text"
-                  value={formData.details?.card_last_four || ''}
-                  onChange={(e) => {
-                    // Supprime les espaces et les caractères non numériques
-                    let rawValue = e.target.value.replace(/\D/g, '');
-                    // Limite à 16 chiffres
-                    if (rawValue.length > 16) {
-                      rawValue = rawValue.substring(0, 16);
-                    }
-                    // Met à jour formData
-                    onChange("details", {
-                      ...formData.details,
-                      card_number: rawValue,
-                    });
-                  }}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                  placeholder="1234 5678 9012 3456"
-                  maxLength={16}
-                />
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="text"
+                    value={formData.details?.card_number?.replace(/(\d{4})(?=\d)/g, '$1 ') || ''}
+                    onChange={(e) => {
+                      const rawValue = e.target.value.replace(/\D/g, '').substring(0, 16);
+                      onChange("details", {
+                        ...formData.details,
+                        card_number: rawValue,
+                        card_last_four: rawValue.slice(-4),
+                        card_brand: getCardBrand(rawValue),
+                      });
+                    }}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    placeholder="1234 5678 9012 3456"
+                  />
+                  {cardBrand && (
+                    <img
+                      src={`/icons/${cardBrand.toLowerCase()}.svg`}
+                      alt={cardBrand}
+                      className="h-6 w-auto"
+                    />
+                  )}
+                  <CardBrandIcon brand={formData.details?.card_brand} />
+                </div>
               </div>
             )}
             {formData.type === 'paypal' && (

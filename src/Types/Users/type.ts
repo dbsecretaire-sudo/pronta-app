@@ -9,6 +9,7 @@ export interface BillingAddress {
 }
 
 export interface PaymentMethodDetails {
+  card_number?: string;
   card_last_four?: string;
   card_brand?: string;
   paypal_email?: string;

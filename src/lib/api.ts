@@ -126,6 +126,7 @@ export async function updateBilling(userId: number, data: {
   payment_method?: {
     type: string;
     details: {
+      card_number?: string;
       card_last_four?: string;
       card_brand?: string;
       paypal_email?: string;

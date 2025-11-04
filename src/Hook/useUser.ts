@@ -36,6 +36,7 @@ export function useUser() {
         payment_method: data.payment_method ? {
           type: data.payment_method.type || '',
           details: {
+            card_number: data.payment_method.details?.card_number || '',
             card_last_four: data.payment_method.details?.card_last_four || '',
             card_brand: data.payment_method.details?.card_brand || '',
             paypal_email: data.payment_method.details?.paypal_email || '',
