@@ -98,7 +98,7 @@ export const useServices = (userId: string | undefined, status: string) => {
      //je souscris à un abonnement// 
     try {
       
-      await subscribeToService(service.id);
+      // await subscribeToService(service.id);
    
       const existingSubscription = await getSubscriptionByService(Number(userId), service.id);
 
