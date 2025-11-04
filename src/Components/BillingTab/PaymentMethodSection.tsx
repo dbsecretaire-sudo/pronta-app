@@ -56,18 +56,19 @@ export const PaymentMethodSection = ({
                 <label className="block text-sm font-medium text-gray-700">Numéro de Carte</label>
                 <input
                   type="text"
-                  value={formData.details?.card_last_four || ''}
+                  value={formData.details?.card_last_four?.replace(/(\d{4})(?=\d)/g, '$1 ') || ''}
                   onChange={(e) => {
-                    let value = e.target.value.replace(/\s+/g, '');
-                    if (value.length > 16) {
-                      value = value.substring(0, 16);
+                    // Supprime les espaces et les caractères non numériques
+                    let rawValue = e.target.value.replace(/\D/g, '');
+                    // Limite à 16 chiffres
+                    if (rawValue.length > 16) {
+                      rawValue = rawValue.substring(0, 16);
                     }
-                    const formattedValue = value.replace(/(\d{4})(?=\d)/g, '$1 ');
+                    // Met à jour formData
                     onChange("details", {
                       ...formData.details,
-                      card_last_four: value, 
+                      card_number: rawValue,
                     });
-                    e.target.value = formattedValue;
                   }}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                   placeholder="1234 5678 9012 3456"
