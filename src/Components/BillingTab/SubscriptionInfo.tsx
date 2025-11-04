@@ -10,27 +10,8 @@ import { getSubscriptionWithService } from "@/src/lib/api";
 //   subscriptions: { subscriptions: Subscription[] };
 // }
 
-export const SubscriptionInfo = ({ subscriptions = [] }: { subscriptions: Subscription[] }) => {
-  const [subscriptionsWithService, setSubscriptionsWithService] = useState<SubscriptionWithService[]>([]);
-
-  useEffect(() => {
-    const fetchSubscriptionsWithService = async () => {
-      try {
-        const subsWithService = await Promise.all(
-          subscriptions.map(async (subscription) => {
-            return await getSubscriptionWithService(subscription);
-          })
-        );
-        setSubscriptionsWithService(subsWithService);
-      } catch (error) {
-        console.error("Erreur lors de la récupération des informations de service:", error);
-      }
-    };
-
-    fetchSubscriptionsWithService();
-  }, [subscriptions]);
-
-
+export const SubscriptionInfo = ({ subscriptions = [] }: { subscriptions: SubscriptionWithService[] }) => {
+  
   // Fonction pour formater une date
   const formatDate = (date: string | Date | undefined) => {
     if (!date) return "Non défini";
@@ -61,7 +42,7 @@ console.log("subscriptions: ", subscriptions);
     <div className="bg-blue-50 p-4 rounded-lg">
       {subscriptions.length > 0 ? (
         <>
-          {subscriptionsWithService.map((subscription) => {
+          {subscriptions.map((subscription) => {
             <div key={subscription.id} className="space-y-3 p-4 bg-white rounded-lg shadow-sm mb-4">
               <div className="flex justify-between items-start">
                   {subscription.status === "active" ? 

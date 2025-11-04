@@ -1,7 +1,7 @@
 "use client";
 import { ProfileTab, BillingTab, MessagesTab } from "@/src/Components";
 import { useAccount } from "@/src/Hook/useAccount";
-import { Subscription, ApiSubscription } from "@/src/Types/Subscription";
+import { Subscription, ApiSubscription, SubscriptionWithService } from "@/src/Types/Subscription";
 import { useEffect, useState } from "react";
 import { BillingTabData } from "@/src/Components/BillingTab/types";
 import { fetchUserSubscriptions } from "@/src/lib/api";
@@ -17,13 +17,10 @@ export default function AccountPage() {
     isUpdating,
     handleProfileUpdate,
     handleBillingUpdate
-    // handleCreateSubscription,
-    // handleUpdateSubscription,
-    // handleDeleteSubscription
   } = useAccount();
   const { data: session, status} = useSession();
 
-  const [userSubscriptions, setUserSubscriptions] = useState<Subscription[]>([]);
+  const [userSubscriptions, setUserSubscriptions] = useState<SubscriptionWithService[]>([]);
 
   useEffect(() => {
   const fetchData = async () => {

@@ -5,7 +5,8 @@ import { BillingAddressSection } from "./BillingAddressSection";
 import { PaymentMethodSection } from "./PaymentMethodSection";
 import { BillingTabProps } from "./types";
 import { Service } from "@/src/Types/Services";
-import { getServiceInfo } from "@/src/lib/api";
+import { getServiceInfo, getSubscriptionWithService } from "@/src/lib/api";
+import { SubscriptionWithService } from "@/src/Types/Subscription";
 
 export function BillingTab({ data, onEdit, isUpdating = false }: BillingTabProps) {
   // État pour gérer les modes d'édition
@@ -107,7 +108,8 @@ export function BillingTab({ data, onEdit, isUpdating = false }: BillingTabProps
                     start_date: subscription.start_date,
                     end_date: subscription.end_date,
                     next_payment_date: subscription.next_payment_date,
-                    created_at: subscription.created_at
+                    created_at: subscription.created_at,
+                    service: subscription.service
                   }]}
               />
             </div>

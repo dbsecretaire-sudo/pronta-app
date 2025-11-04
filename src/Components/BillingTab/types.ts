@@ -13,6 +13,7 @@ export type BillingTabProps = {
       end_date?: Date;
       next_payment_date?: Date | string | null;
       created_at?: Date;
+      service: Service;
     }>;
     billing_address?: BillingAddress;
     payment_method?: PaymentMethod;
