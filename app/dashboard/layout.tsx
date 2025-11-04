@@ -6,8 +6,7 @@ import { useServices } from '@/src/Hook/useServices';
 import { NavBar, ServiceItem } from "@/src/Components";
 import { fetchUserServices } from "@/src/lib/api";
 import { useEffect, useState } from "react";
-import { UserServiceWithDetails } from "@/src/Types/UserServices";
-import { AvailableService, Service } from "@/src/Types/Services";
+import { AvailableService } from "@/src/Types/Services";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -35,7 +34,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       }
     }, [availableServices]);
 
-    console.log("userId", session?.user.id);
   const refreshServices = async () => {
     try {
       const services = await fetchUserServices(Number(session?.user.id));
@@ -52,8 +50,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   };
 
   useEffect(() => {
-    refreshServices();
-  }, []);
+    if (status === "authenticated" && session?.user?.id) {
+      refreshServices();
+    }
+  }, [status, session?.user?.id]);
 
   if (status === "loading" || servicesLoading) {
     return (
