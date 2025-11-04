@@ -41,6 +41,10 @@ subscriptions.map((sub) => {
   console.log("id", sub.id);
   console.log("status", sub.status);
   console.log("price", sub.service.price);
+  console.log("service name", sub.service.name);
+  console.log("unit", sub.service.unit);
+  console.log("status active?", sub.status === "active");
+
 })
 
 
