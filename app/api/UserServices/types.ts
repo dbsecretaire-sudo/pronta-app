@@ -3,7 +3,6 @@ export type {
   UserServiceWithDetails, 
   AssignServiceToUser, 
   UpdateUserServicePermissions ,
-  CreateUserService,
   UpdateUserService
 } from "@/src/Types/UserServices/index";
 
