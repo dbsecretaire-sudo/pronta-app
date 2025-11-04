@@ -53,7 +53,7 @@ export const fetchAllServices = async () => {
   return res.json();
 };
 
-export const subscribeToService = async (userServiceData: UserService) => {
+export const subscribeToService = async (userServiceData: UserService): Promise<void> => {
   const res = await fetch('/api/UserServices', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

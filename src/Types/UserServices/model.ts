@@ -148,7 +148,7 @@ export class UserServiceModel {
         subscription_date
       )
       VALUES (
-        $1, $2, COALESCE($3, TRUE), COALESCE($4, FALSE), COALESCE($5, FALSE), NOW()
+        $1, $2, $3, $4, $5, $6
       )
       RETURNING *`,
       [
