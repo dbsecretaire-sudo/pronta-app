@@ -35,9 +35,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       }
     }, [availableServices]);
 
+    console.log("userId", session?.user.id);
   const refreshServices = async () => {
     try {
-      const services = await fetchUserServices(Number(session?.user?.id));
+      const services = await fetchUserServices(Number(session?.user.id));
       const transformedServices = services.map((service: { id: any; name: any; route: any; icon: any; }) => ({
         id: service.id,
         name: service.name,
