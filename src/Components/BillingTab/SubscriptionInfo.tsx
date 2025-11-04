@@ -57,6 +57,7 @@ export const SubscriptionInfo = ({ subscriptions = [] }: SubscriptionInfoProps) 
     return diffDays > 0 ? diffDays : 0;
   };
 
+  console.log("subscriptions: ", subscriptions);
 
   return (
     <div className="bg-blue-50 p-4 rounded-lg">
@@ -67,10 +68,17 @@ export const SubscriptionInfo = ({ subscriptions = [] }: SubscriptionInfoProps) 
             (
             <div key={subscription.id} className="space-y-3 p-4 bg-white rounded-lg shadow-sm mb-4">
               <div className="flex justify-between items-start">
-                <div>
-                  <p className="font-semibold text-lg">{serviceInfo?.name || 'Inconnu'}</p>
-                  <h4 className="font-medium text-gray-700">Total: {serviceInfo?.price || '0.00'} €/{serviceInfo?.unit || 'mois'}</h4>
-                </div>
+                  {subscription.status === "active" ? 
+                    (<div>
+                      <p className="font-semibold text-lg">{serviceInfo?.name || 'Inconnu'}</p>
+                      <h4 className="font-medium text-gray-700">Total: {serviceInfo?.price || '0.00'} €/{serviceInfo?.unit || 'mois'}</h4>
+                     </div> 
+                    ) : (
+                      <div>
+                        <p className="font-semibold text-lg">{serviceInfo?.name || 'Inconnu'}</p>
+                      </div>
+                    )
+                  }               
                 <span className={`px-3 py-1 rounded-full text-sm ${getStatusStyle(subscription.status)}`}>
                   {getStatusLabel(subscription.status)}
                 </span>
