@@ -2,10 +2,12 @@
 import { useSession } from "next-auth/react";
 import { useServices } from '@/src/Hook/useServices';
 import { ServiceCard, MessageList, AccountSummary } from '@/src/Modules/index';
+import { useState } from "react";
 
 export default function DashboardHome() {
   const { data: session, status } = useSession();
-  const { services, availableServices, loading, handleSubscribe, handleDeactivate, handleReactivate } = useServices(session?.user?.id, status);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const { services, availableServices, loading, handleSubscribe, handleDeactivate, handleReactivate } = useServices(session?.user?.id, status, refreshKey);
 
   if (loading) return <div className="p-8">Chargement...</div>;
 
