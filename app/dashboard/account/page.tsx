@@ -35,11 +35,11 @@ export default function AccountPage() {
       setUserSubscriptions(subscriptions);
     } catch (error) {
       console.error("Erreur lors du chargement des abonnements:", error);
-      setUserSubscriptions([]); // Réinitialiser en cas d'erreur
+      setUserSubscriptions([]); 
     }
   };
   fetchData();
-}, [session?.user?.id, status]); // Dépendance sur session.user.id et status
+}, [session?.user?.id, status]);
 
 
   if (loading) return <div className="text-center py-8">Chargement...</div>;

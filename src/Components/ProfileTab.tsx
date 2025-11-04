@@ -22,10 +22,6 @@ export function ProfileTab({ data, onEdit, isUpdating = false }: ProfileTabProps
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const result = await onEdit(formData);
-    if (result.success) {
-      setEditMode(false);
-    }
-    alert(result.message);
   };
 
   // Options pour le rôle
