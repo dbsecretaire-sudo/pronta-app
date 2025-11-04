@@ -29,10 +29,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       }));
   }
 
+   useEffect(() => {
+      if (availableServices.length > 0) {
+        setUserServices(transformToServiceItem(availableServices));
+      }
+    }, [availableServices]);
+
   const refreshServices = async () => {
     try {
       const services = await fetchUserServices(Number(session?.user?.id));
-      // ✅ Transforme les services en ServiceItem[]
       const transformedServices = services.map((service: { id: any; name: any; route: any; icon: any; }) => ({
         id: service.id,
         name: service.name,
