@@ -24,9 +24,20 @@ export default function DashboardHome() {
   const [error, setError] = useState<string | null>(null);
 
   // Séparation des services
-  const subscribedServices = availableServices.filter(s => s.userService?.is_active);
-  const servicesToReactivate = availableServices.filter(s => !s.userService?.is_active);
-  const servicesToSubscribe = availableServices.filter(s => !s.userService);
+// Services abonnés et actifs (pour "Mes services")
+const subscribedServices = availableServices.filter(
+  (s) => s.userService !== undefined && s.userService?.is_active
+);
+
+// Services à réactiver (lien existe mais inactif)
+const servicesToReactivate = availableServices.filter(
+  (s) => s.userService !== undefined && !s.userService?.is_active
+);
+
+// Services à souscrire (aucun lien avec l'utilisateur)
+const servicesToSubscribe = availableServices.filter(
+  (s) => s.userService === undefined
+);
 
   // Gestion du changement des champs du formulaire
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -172,14 +183,13 @@ export default function DashboardHome() {
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">Route - ex: /dashboard/service/nouveauService</label>
+                <label className="block text-sm font-medium mb-1">Route</label>
                 <textarea
                   name="route"
                   value={formData.route}
                   onChange={handleInputChange}
                   className="w-full border rounded-lg px-3 py-2"
-                  placeholder="Décrivez le service..."
-                  rows={3}
+                  placeholder="Ex: /dashboard/service/nouveauService"
                 />
               </div>
               <div className="mb-4">
@@ -196,15 +206,13 @@ export default function DashboardHome() {
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">Unité - ex: heure, mois, ...</label>
+                <label className="block text-sm font-medium mb-1">Unité</label>
                 <input
-                  type="string"
                   name="unit"
                   value={formData.unit}
                   onChange={handleInputChange}
                   className="w-full border rounded-lg px-3 py-2"
-                  min="0"
-                  step="0.01"
+                  placeholder="Ex: heure, mois, ..."
                   required
                 />
               </div>
