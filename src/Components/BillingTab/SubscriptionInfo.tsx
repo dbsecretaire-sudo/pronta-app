@@ -7,7 +7,7 @@ import { getServiceInfo } from "@/src/lib/api";
 import { Service } from "@/src/Types/Services";
 
 interface SubscriptionInfoProps {
-  subscriptions: Array<Partial<Subscription> & { id: number }>;
+  subscriptions: Array<Partial<Subscription> & { id: number, service_id: number }>;
 }
 
 export const SubscriptionInfo = ({ subscriptions = [] }: SubscriptionInfoProps) => {
@@ -58,13 +58,14 @@ export const SubscriptionInfo = ({ subscriptions = [] }: SubscriptionInfoProps) 
   };
 
   console.log("subscriptions: ", subscriptions);
+  console.log("serviceInfos: ", serviceInfos);
 
   return (
     <div className="bg-blue-50 p-4 rounded-lg">
       {subscriptions.length > 0 ? (
         <>
           {subscriptions.map((subscription) => {
-            const serviceInfo = subscription.service_id ? serviceInfos[subscription.service_id] : undefined;
+            const serviceInfo = serviceInfos[subscription.service_id];
             (
             <div key={subscription.id} className="space-y-3 p-4 bg-white rounded-lg shadow-sm mb-4">
               <div className="flex justify-between items-start">

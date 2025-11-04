@@ -74,7 +74,6 @@ export const deactivateUserService = async (userId: number, serviceId: number): 
     console.error(error.error);
   } else {
     const result = await response.json();
-    console.log(`Service désactivé: userId: ${userId}, serviceId: ${serviceId}`, result);
   }
 };
 
@@ -89,7 +88,6 @@ export const reactivateUserService = async (userId: number, serviceId: number): 
     console.error(error.error);
   } else {
     const result = await response.json();
-    console.log(`Service réactivé: userId: ${userId}, serviceId: ${serviceId}`, result);
   }
 };
 
@@ -179,7 +177,7 @@ export const updateUserSubscription = async (
         data.next_payment_date
     })
   };
-console.log("resquestData: ", requestData);
+
   try {
     // Correction de l'URL pour inclure l'ID de l'utilisateur et de l'abonnement
     const res = await fetch(`/api/subscription/${subscription_id}`, {
