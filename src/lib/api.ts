@@ -54,7 +54,7 @@ export const fetchAllServices = async () => {
 };
 
 export const subscribeToService = async (userServiceData: UserService) => {
-  const res = await fetch('/api/userServices', {
+  const res = await fetch('/api/UserServices', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
