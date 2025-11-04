@@ -99,13 +99,6 @@ export const PaymentMethodSection = ({
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                     placeholder="1234 5678 9012 3456"
                   />
-                  {cardBrand && (
-                    <img
-                      src={`/icons/${cardBrand.toLowerCase()}.svg`}
-                      alt={cardBrand}
-                      className="h-6 w-auto"
-                    />
-                  )}
                   <CardBrandIcon brand={formData.details?.card_brand} />
                 </div>
               </div>
