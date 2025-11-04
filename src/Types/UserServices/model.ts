@@ -145,7 +145,7 @@ export class UserServiceModel {
         subscription_date,
         is_active,
         can_write,
-        can_delete,
+        can_delete
       )
       VALUES (
         $1, $2, $3, $4, $5, $6
