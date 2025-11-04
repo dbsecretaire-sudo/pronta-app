@@ -5,19 +5,17 @@ import { getUserById, updateUser, deleteUser } from '@/app/api/user/controller';
 // GET /api/user/[id]
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await params;
+    const { id } = params; // Pas besoin d'attendre, params est déjà résolu
     const user = await getUserById(Number(id));
-
     if (!user) {
       return NextResponse.json(
         { error: "User not found" },
         { status: 404 }
       );
     }
-
     return NextResponse.json(user);
   } catch (error) {
     return NextResponse.json(
