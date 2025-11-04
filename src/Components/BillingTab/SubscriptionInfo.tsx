@@ -1,14 +1,7 @@
 "use client";
 
-import { Subscription, SubscriptionWithService } from "@/src/Types/Subscription";
+import { SubscriptionWithService } from "@/src/Types/Subscription";
 import { getStatusLabel, getStatusStyle } from "./utils";
-import { useEffect, useState } from "react";
-import { getSubscriptionWithService } from "@/src/lib/api";
-
-
-// interface SubscriptionInfoProps {
-//   subscriptions: { subscriptions: Subscription[] };
-// }
 
 export const SubscriptionInfo = ({ subscriptions = [] }: { subscriptions: SubscriptionWithService[] }) => {
   
@@ -36,21 +29,19 @@ export const SubscriptionInfo = ({ subscriptions = [] }: { subscriptions: Subscr
     return diffDays > 0 ? diffDays : 0;
   };
 
-console.log("subscriptions.length: ", subscriptions.length);
-subscriptions.map((sub) => {
-  console.log("id", sub.id);
-  console.log("status", sub.status);
-  console.log("price", sub.service.price);
-  console.log("service name", sub.service.name);
-  console.log("unit", sub.service.unit);
-  console.log("status active?", sub.status === "active");
-
-})
-
-
   return (
     <div className="bg-blue-50 p-4 rounded-lg">
-      {subscriptions.length > 0 ? (
+      <>
+      {subscriptions.map((subscription) => {
+        <div>
+          <p>{subscription.id}</p>
+          <p>{subscription.service.name}</p>
+          <p>{subscription.status}</p>
+        </div>
+      })}
+      
+      </>
+      {/* {subscriptions.length > 0 ? (
         <>
           {subscriptions.map((subscription) => {
             <div key={subscription.id} className="space-y-3 p-4 bg-white rounded-lg shadow-sm mb-4">
@@ -109,7 +100,7 @@ subscriptions.map((sub) => {
             Vous n'avez actuellement aucun abonnement actif.
           </p>
         </div>
-      )}
+      )} */}
     </div>
   );
 };
