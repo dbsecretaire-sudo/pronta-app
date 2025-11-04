@@ -7,10 +7,9 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const resolvedParams = await params;
   try {
-    const user_id = Number(resolvedParams.id);
-    const user = await getUserById(user_id);
+    const { id } = await params;
+    const user = await getUserById(Number(id));
 
     if (!user) {
       return NextResponse.json(
@@ -22,7 +21,7 @@ export async function GET(
     return NextResponse.json(user);
   } catch (error) {
     return NextResponse.json(
-      { error: "Failed to fetch user" },
+      { error: `Failed to fetch user, ${error}` },
       { status: 500 }
     );
   }
