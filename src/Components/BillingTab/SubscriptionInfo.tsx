@@ -69,7 +69,7 @@ export const SubscriptionInfo = ({ subscriptions = [] }: SubscriptionInfoProps) 
               <div className="flex justify-between items-start">
                 <div>
                   <p className="font-semibold text-lg">{serviceInfo?.name || 'Inconnu'}</p>
-                  <h4 className="font-medium text-gray-700">Total: {serviceInfo?.price.toFixed(2) || '0.00'} €/{serviceInfo?.unit || 'mois'}</h4>
+                  <h4 className="font-medium text-gray-700">Total: {serviceInfo?.price || '0.00'} €/{serviceInfo?.unit || 'mois'}</h4>
                 </div>
                 <span className={`px-3 py-1 rounded-full text-sm ${getStatusStyle(subscription.status)}`}>
                   {getStatusLabel(subscription.status)}
