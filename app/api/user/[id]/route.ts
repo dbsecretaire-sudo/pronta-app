@@ -7,13 +7,10 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  
-  const { id } = await params;
-  console.log(id);
-
+  const resolvedParams = await params;
   try {
-    const { id } = await params;
-    const user = await getUserById(Number(id));
+    const user_id = Number(resolvedParams.id);
+    const user = await getUserById(user_id);
 
     if (!user) {
       return NextResponse.json(
