@@ -13,7 +13,7 @@ export const getUserServices = async (userId: number): Promise<UserServiceWithDe
   return await userServiceService.getUserServices(userId);
 };
 
-export const createUserService = async (userServiceData: UserService) => {
+export const createUserService = async (userServiceData: UserService):Promise<UserService> => {
   return await userServiceService.createUserService(userServiceData);
 }
 

@@ -14,8 +14,13 @@ export class UserServiceService {
     return this.userServiceModel.getUserServices(userId);
   }
 
-  async createUserService(userServiceData: UserService):Promise<UserService> {
-    return this.userServiceModel.createUserService(userServiceData);
+  async createUserService(data: UserService): Promise<UserService> {
+    try {
+      return await this.userServiceModel.createUserService(data);
+    } catch (error) {
+      console.error("Erreur dans le contrôleur:", error);
+      throw new Error(`Failed to create user service: ${error instanceof Error ? error.message : String(error)}`);
+    }
   }
 
   async getUserService(userId: number, serviceId: number): Promise<UserServiceWithDetails | null> {
