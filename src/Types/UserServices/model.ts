@@ -142,10 +142,10 @@ export class UserServiceModel {
       `INSERT INTO user_services (
         user_id,
         service_id,
+        subscription_date
         is_active,
         can_write,
         can_delete,
-        subscription_date
       )
       VALUES (
         $1, $2, $3, $4, $5, $6
