@@ -22,10 +22,10 @@ export class ServiceModel {
     // Créer un service
     async createService(service: Omit<Service, "id">): Promise<Service> {
         const res = await pool.query(
-            `INSERT INTO services (name, description, route, icon)
-            VALUES ($1, $2, $3, $4)
+            `INSERT INTO services (name, description, route, icon, price, unit)
+            VALUES ($1, $2, $3, $4, $5, $6)
             RETURNING *`,
-            [service.name, service.description, service.route, service.icon]
+            [service.name, service.description, service.route, service.icon, service.price, service.unit]
         );
         return res.rows[0];
     }

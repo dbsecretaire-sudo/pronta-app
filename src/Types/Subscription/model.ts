@@ -8,7 +8,7 @@ import { User } from "../Users";
  async createSubscription(subscription: CreateSubscription): Promise<Subscription> {
     const query = `
       INSERT INTO user_subscriptions (
-        user_id, plan, status, start_date, end_date, next_payment_date
+        user_id, service_id, status, start_date, end_date, next_payment_date
       )
       VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING *
@@ -16,7 +16,7 @@ import { User } from "../Users";
 
     const { rows } = await pool.query(query, [
       subscription.user_id,
-      subscription.plan,
+      subscription.service_id,
       subscription.status || 'active',
       subscription.start_date instanceof Date ?
         subscription.start_date.toISOString() :
@@ -37,9 +37,9 @@ import { User } from "../Users";
     const values: any[] = [];
     let paramIndex = 1;
 
-    if (subscriptionData.plan !== undefined) {
-      fields.push(`plan = $${paramIndex}`);
-      values.push(subscriptionData.plan);
+    if (subscriptionData.service_id !== undefined) {
+      fields.push(`service_id = $${paramIndex}`);
+      values.push(subscriptionData.service_id);
       paramIndex++;
     }
     if (subscriptionData.status !== undefined) {
@@ -134,9 +134,9 @@ import { User } from "../Users";
     return rows.map(row => this.mapDbSubscriptionToSubscription(row));
   }
 
-  async getSubscriptionByUserIdAndPlan(userId: number, plan: string): Promise<Subscription[]> {
-    const query = 'SELECT * FROM user_subscriptions WHERE user_id = $1 AND plan = $2';
-    const { rows } = await pool.query(query, [userId, plan]);
+  async getSubscriptionByUserIdAndService(userId: number, service_id: number): Promise<Subscription[]> {
+    const query = 'SELECT * FROM user_subscriptions WHERE user_id = $1 AND service_id = $2';
+    const { rows } = await pool.query(query, [userId, service_id]);
     return rows.map(row => this.mapDbSubscriptionToSubscription(row));
   }
 
@@ -160,7 +160,7 @@ import { User } from "../Users";
     return {
       id: dbSubscription.id,
       user_id: dbSubscription.user_id,
-      plan: dbSubscription.plan,
+      service_id: dbSubscription.service_id,
       status: dbSubscription.status,
       start_date: dbSubscription.start_date,
       end_date: dbSubscription.end_date ? new Date(dbSubscription.end_date) : undefined,
@@ -186,7 +186,7 @@ async createUserSubscription(
 
   const query = `
     INSERT INTO user_subscriptions (
-      user_id, plan, status, start_date, end_date, next_payment_date
+      user_id, service_id, status, start_date, end_date, next_payment_date
     )
     VALUES ($1, $2, $3, $4, $5, $6)
     RETURNING *
@@ -194,7 +194,7 @@ async createUserSubscription(
 
   const { rows } = await pool.query(query, [
     userId,
-    subscriptionData.plan,
+    subscriptionData.service_id,
     subscriptionData.status || 'active',
     subscriptionData.start_date instanceof Date ?
       subscriptionData.start_date.toISOString() :

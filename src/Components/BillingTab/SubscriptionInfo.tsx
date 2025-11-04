@@ -2,16 +2,37 @@
 
 import { Subscription } from "@/src/Types/Subscription";
 import { getStatusLabel, getStatusStyle } from "./utils";
+import { useEffect, useState } from "react";
+import { getServiceInfo } from "@/src/lib/api";
+import { Service } from "@/src/Types/Services";
 
 interface SubscriptionInfoProps {
-  serviceName?: string;
   subscriptions: Array<Partial<Subscription> & { id: number }>;
 }
 
-export const SubscriptionInfo = ({
-  serviceName,
-  subscriptions = [],
-}: SubscriptionInfoProps) => {
+export const SubscriptionInfo = ({ subscriptions = [] }: SubscriptionInfoProps) => {
+
+  const [serviceInfos, setServiceInfos] = useState<Record<number, Service>>({});
+
+  useEffect(() => {
+    const fetchServiceInfos = async () => {
+      try {
+        const infos: Record<number, Service> = {};
+        for (const subscription of subscriptions) {
+          if (subscription.service_id) {
+            const info = await getServiceInfo(subscription.service_id);
+            infos[subscription.service_id] = info;
+          }
+        }
+        setServiceInfos(infos);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des informations de service:", error);
+      }
+    };
+
+    fetchServiceInfos();
+  }, [subscriptions]);
+
   // Fonction pour formater une date
   const formatDate = (date: string | Date | undefined) => {
     if (!date) return "Non défini";
@@ -36,36 +57,19 @@ export const SubscriptionInfo = ({
     return diffDays > 0 ? diffDays : 0;
   };
 
-  // Fonction pour calculer le coût total des abonnements
-  const calculateTotalCost = () => {
-    return subscriptions.reduce((total, sub) => {
-      let price = 0;
-      if (sub.plan === "Pronta Calls") price = 3.50;
-      else if (sub.plan === "Pronta Invoices") price = 300.00;
-      else if (sub.plan === "Enterprise") price = 49.99;
-      return total + price;
-    }, 0).toFixed(2);
-  };
-
-  const getBillingUnit = (plan?: string): string => {
-    const planToUnit: Record<string, string> = {
-      "Pronta Calls": "appel",
-      "Pronta Invoices": "mois",
-    };
-
-    return plan ? planToUnit[plan] || "mois" : "mois"; 
-  };
 
   return (
     <div className="bg-blue-50 p-4 rounded-lg">
       {subscriptions.length > 0 ? (
         <>
-          {subscriptions.map((subscription) => (
+          {subscriptions.map((subscription) => {
+            const serviceInfo = subscription.service_id ? serviceInfos[subscription.service_id] : undefined;
+            (
             <div key={subscription.id} className="space-y-3 p-4 bg-white rounded-lg shadow-sm mb-4">
               <div className="flex justify-between items-start">
                 <div>
-                  <p className="font-semibold text-lg">{subscription.plan}</p>
-                  <h4 className="font-medium text-gray-700">Total: {calculateTotalCost()} €/{getBillingUnit(subscription.plan)}</h4>
+                  <p className="font-semibold text-lg">{serviceInfo?.name || 'Inconnu'}</p>
+                  <h4 className="font-medium text-gray-700">Total: {serviceInfo?.price.toFixed(2) || '0.00'} €/{serviceInfo?.unit || 'mois'}</h4>
                 </div>
                 <span className={`px-3 py-1 rounded-full text-sm ${getStatusStyle(subscription.status)}`}>
                   {getStatusLabel(subscription.status)}
@@ -98,7 +102,8 @@ export const SubscriptionInfo = ({
                 )}
               </div>
             </div>
-          ))}
+          )}
+        )}
         </>
       ) : (
         <div className="flex flex-col items-center p-6 bg-white rounded-lg shadow-sm text-center">

@@ -41,7 +41,7 @@ export class UserModel {
     return {
       id: dbSubscription.id,
       user_id: dbSubscription.user_id,
-      plan: dbSubscription.plan,
+      service_id: dbSubscription.service_id,
       status: dbSubscription.status,
       start_date: dbSubscription.start_date,
       end_date: dbSubscription.end_date ? new Date(dbSubscription.end_date) : undefined,

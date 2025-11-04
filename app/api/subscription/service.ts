@@ -20,8 +20,8 @@ export class SubscriptionService {
     return this.subscriptionModel.getSubscriptionByUserId(user_id);
   }
 
-  async getSubscriptionByUserIdAndPlan(user_id: number, plan: string): Promise<Subscription[]> {
-    return this.subscriptionModel.getSubscriptionByUserIdAndPlan(user_id, plan);
+  async getSubscriptionByUserIdAndService(user_id: number, service_id: number): Promise<Subscription[]> {
+    return this.subscriptionModel.getSubscriptionByUserIdAndService(user_id, service_id);
   }
 }
 

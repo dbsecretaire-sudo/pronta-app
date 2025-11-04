@@ -2,7 +2,17 @@
 import { useState, useEffect } from 'react';
 import { Service, AvailableService } from '@/src/Types/Services';
 import { UserService, UserServiceWithDetails } from '@/src/Types/UserServices';
-import { fetchUserServices, fetchAllServices, subscribeToService, deactivateUserService, reactivateUserService, updateUserSubscription, deleteSubscription, createSubscription, getSubscriptionByPlan } from '@/src/lib/api';
+import { 
+  fetchUserServices, 
+  fetchAllServices, 
+  subscribeToService, 
+  deactivateUserService, 
+  reactivateUserService, 
+  updateUserSubscription, 
+  deleteSubscription, 
+  createSubscription, 
+  getSubscriptionByService 
+} from '@/src/lib/api';
 
 export const useServices = (userId: string | undefined, status: string) => {
   const [services, setServices] = useState<Service[]>([]);
@@ -90,7 +100,7 @@ export const useServices = (userId: string | undefined, status: string) => {
       
       await subscribeToService(service.id);
    
-      const existingSubscription = await getSubscriptionByPlan(Number(userId), service.name);
+      const existingSubscription = await getSubscriptionByService(Number(userId), service.id);
 
       if (existingSubscription === null) {
       throw new Error("Impossible de vérifier les abonnements existants.");
@@ -100,7 +110,7 @@ export const useServices = (userId: string | undefined, status: string) => {
       // Cas 1 : Aucun abonnement existant → Créer un nouvel abonnement
       await createSubscription({
         user_id: Number(userId),
-        plan: service.name,
+        service_id: service.id,
         start_date: now,
         end_date: endDate,
         next_payment_date: nextDate,
@@ -112,7 +122,7 @@ export const useServices = (userId: string | undefined, status: string) => {
       const firstSubscription = existingSubscription[0];
       await updateUserSubscription(firstSubscription.id, {
         user_id: Number(userId),
-        plan: service.name,
+        service_id: service.id,
         start_date: now,
         end_date: endDate,
         next_payment_date: nextDate,
@@ -149,13 +159,13 @@ export const useServices = (userId: string | undefined, status: string) => {
 
       await deactivateUserService(Number(userId), service.id);
       
-      const existingSubscription = await getSubscriptionByPlan(Number(userId), service.name);
+      const existingSubscription = await getSubscriptionByService(Number(userId), service.id);
       if (existingSubscription && existingSubscription.length > 0) {
       const firstSubscription = existingSubscription[0];
       
       await updateUserSubscription(firstSubscription.id, {
         user_id: Number(userId),
-        plan: service.name,
+        service_id: service.id,
         end_date: now, // Date de fin = maintenant
         next_payment_date: null,
         status: "cancelled",
@@ -175,12 +185,12 @@ export const useServices = (userId: string | undefined, status: string) => {
     try {
       await reactivateUserService(Number(userId), service.id);
 
-      const existingSubscription = await getSubscriptionByPlan(Number(userId), service.name);
+      const existingSubscription = await getSubscriptionByService(Number(userId), service.id);
       if (existingSubscription && existingSubscription.length > 0) {
       const firstSubscription = existingSubscription[0];
       await updateUserSubscription(firstSubscription.id, {
         user_id: Number(userId),
-        plan: service.name,
+        service_id: service.id,
         start_date: now,
         end_date: endDate,
         next_payment_date: nextDate,
@@ -191,7 +201,7 @@ export const useServices = (userId: string | undefined, status: string) => {
       // → Créer un nouvel abonnement
       await createSubscription({
         user_id: Number(userId),
-        plan: service.name,
+        service_id: service.id,
         start_date: now,
         end_date: endDate,
         next_payment_date: nextDate,

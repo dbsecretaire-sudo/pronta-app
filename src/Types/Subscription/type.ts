@@ -1,7 +1,7 @@
 export interface Subscription {
   id: number;
   user_id?: number;
-  plan: string;
+  service_id: number;
   status: string;
   start_date: Date;
   end_date?: Date;
@@ -13,7 +13,7 @@ export interface Subscription {
 export interface ApiSubscription {
   id: number;
   user_id?: number;
-  plan: string;
+  serive_id: number;
   status?: string;  // Peut être undefined depuis l'API
   start_date?: Date;
   end_date?: Date;
@@ -23,7 +23,7 @@ export interface ApiSubscription {
 }
 
 export interface UpdateSubscription {
-  plan?: string;
+  service_id: number;
   status?: string;
   start_date?: Date | string;
   end_date?: Date | string;
@@ -32,7 +32,7 @@ export interface UpdateSubscription {
 
 export interface CreateSubscription {
   user_id: number;
-  plan: string;
+  service_id: number;
   status?: string;
   start_date: Date | string;
   end_date?: Date | string;

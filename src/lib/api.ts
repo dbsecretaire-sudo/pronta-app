@@ -3,7 +3,7 @@ import { CallFilter } from "@/src/Types/Calls/index";
 import { Role } from "../Types/Users";
 import { User } from "@/src/Types/Users";
 import { UserService } from '@/src/Types/UserServices';
-import { AvailableService } from "@/src/Types/Services";
+import { AvailableService, Service } from "@/src/Types/Services";
 import { Subscription } from "../Types/Subscription";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL; // Remplacez par l’URL de votre backend
@@ -153,7 +153,7 @@ export const updateUserSubscription = async (
   subscription_id: number, 
   data: {
     user_id: number;
-    plan: string;
+    service_id: number;
     start_date?: string | Date;
     end_date?: string | Date;  // Rendu optionnel pour correspondre à votre modèle
     next_payment_date?: string | Date | null;  // Rendu optionnel
@@ -226,13 +226,13 @@ export async function deleteSubscription(subscriptionId: number): Promise<void> 
   }
 }
 
-export async function getSubscriptionByPlan(
+export async function getSubscriptionByService(
   userId: number,
-  plan: string
+  service_id: number
 ): Promise<Subscription[] | null> {  // Retourne un tableau ou null
   try {
     const response = await fetch(
-      `/api/subscription/user/${userId}?plan=${encodeURIComponent(plan)}`
+      `/api/subscription/user/${userId}?service_id=${encodeURIComponent(service_id)}`
     );
     if (!response.ok) {
       throw new Error("Failed to fetch subscriptions");
@@ -247,7 +247,7 @@ export async function getSubscriptionByPlan(
 
 export async function createSubscription(subscriptionData: {
   user_id: number;
-  plan: string;
+  service_id: number;
   start_date: Date;
   end_date: Date;
   next_payment_date: Date;
@@ -261,7 +261,7 @@ export async function createSubscription(subscriptionData: {
       },
       body: JSON.stringify({
         user_id: subscriptionData.user_id,
-        plan: subscriptionData.plan,
+        service_id: subscriptionData.service_id,
         status: subscriptionData.status,
         start_date: subscriptionData.start_date.toISOString(),
         end_date: subscriptionData.end_date.toISOString(),
@@ -283,3 +283,12 @@ export async function fetchUserSubscriptions(userId:number) {
   if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
   return res.json();
 };
+
+export async function getServiceInfo(serviceId: number): Promise<Service> {
+  const response = await fetch(`/api/services/${serviceId}`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch service");
+  }
+  const service: Service = await response.json();
+  return service;
+}

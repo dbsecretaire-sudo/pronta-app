@@ -29,6 +29,8 @@ export class UserServiceModel {
             description: row.service_description,
             route: row.service_route,
             icon: row.service_icon,
+            price: row.service_price,
+            unit: row.service_unit,
         },
         }));
     }
@@ -62,6 +64,8 @@ export class UserServiceModel {
         description: row.service_description,
         route: row.service_route,
         icon: row.service_icon,
+        price: row.service_price,
+        unit: row.service_unit,
       },
     };
   }

@@ -6,7 +6,7 @@ export type BillingTabProps = {
     email: string;
     subscriptions: Array<{
       id: number;
-      plan: string;
+      service_id: number;
       status?: string;
       start_date?: Date;
       end_date?: Date;
@@ -27,7 +27,7 @@ export interface BillingTabData {
   email: string;
   subscriptions: Array<{
     id: number;
-    plan: string;
+    service_id: number;
     status: string;
     start_date: string | Date;
     end_date?: string | Date;

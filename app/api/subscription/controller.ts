@@ -18,6 +18,6 @@ export async function getSubscriptionByUserId(userId: number) {
   return await subscriptionService.getSubscriptionByUserId(userId);
 }
 
-export async function getSubscriptionByUserIdAndPlan(userId: number, plan: string) {
-  return await subscriptionService.getSubscriptionByUserIdAndPlan(userId, plan);
+export async function getSubscriptionByUserIdAndService(userId: number, service_id: number) {
+  return await subscriptionService.getSubscriptionByUserIdAndService(userId, service_id);
 }

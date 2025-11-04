@@ -6,6 +6,8 @@ export interface Service {
   description: string | null;
   route: string;
   icon: string | null;
+  price: number;
+  unit: string;
 }
 
 export type CreateService = Omit<Service, "id">;

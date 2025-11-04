@@ -1,4 +1,4 @@
-import { getSubscriptionByUserId, getSubscriptionByUserIdAndPlan } from '@/app/api/subscription/controller';
+import { getSubscriptionByUserId, getSubscriptionByUserIdAndService } from '@/app/api/subscription/controller';
 import { NextResponse } from 'next/server';
 
 export async function GET(
@@ -7,7 +7,7 @@ export async function GET(
 ) {
   const resolvedParams = await params; // Résoudre la Promise
   const { searchParams } = new URL(request.url);
-  const plan = searchParams.get('plan');
+  const service_id = searchParams.get('service_id');
 
   try {
     const userId = Number(resolvedParams.userId); // Utiliser resolvedParams
@@ -18,8 +18,8 @@ export async function GET(
       );
     }
 
-    const subscriptions = plan
-      ? await getSubscriptionByUserIdAndPlan(userId, plan)
+    const subscriptions = Number(service_id)
+      ? await getSubscriptionByUserIdAndService(userId, Number(service_id))
       : await getSubscriptionByUserId(userId);
 
     return NextResponse.json(subscriptions);
