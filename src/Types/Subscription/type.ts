@@ -12,18 +12,6 @@ export interface Subscription {
   updated_at?: Date;
 }
 
-export interface ApiSubscription {
-  id: number;
-  user_id?: number;
-  serive_id: number;
-  status?: string;  // Peut être undefined depuis l'API
-  start_date?: Date;
-  end_date?: Date;
-  next_payment_date?: Date | string | null;
-  created_at?: Date;
-  updated_at?: Date;
-}
-
 export interface UpdateSubscription {
   service_id: number;
   status?: string;

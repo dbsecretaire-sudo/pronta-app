@@ -103,7 +103,7 @@ export const BillingAddressSection  = ({
       </div>
       )}
       {!isEditing?(
-        <div>
+        <div className="bg-gray-50 p-3 rounded-lg border border-gray-200 mt-2">
           {billingAddress ? (
             <div className="space-y-1">
               <p>{billingAddress.street}</p>

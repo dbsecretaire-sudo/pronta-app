@@ -1,12 +1,29 @@
 // src/hooks/useAccount.ts
 import { useUser } from "@/src/Hook/useUser";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Role, User } from "@/src/Types/Users";
+import { fetchUserSubscriptions } from "../lib/api";
 
 export function useAccount() {
   const { userData, loading, error, mutate } = useUser();
   const [activeTab, setActiveTab] = useState("profile");
   const [isUpdating, setIsUpdating] = useState(false);
+  const [subscriptions, setSubscriptions] = useState([]);
+
+
+  useEffect(() => {
+    if (userData?.id) {
+      const loadSubscriptions = async () => {
+        try {
+          const data = await fetchUserSubscriptions(userData.id);
+          setSubscriptions(data);
+        } catch (error) {
+          console.log("Erreur lors de la récupération des souscriptions: ", error);
+        }
+      };
+      loadSubscriptions();
+    }
+  }, [userData?.id]);
 
   // Mise à jour du profil utilisateur (sans toucher aux abonnements)
   const handleProfileUpdate = async (updatedData: {
@@ -102,5 +119,6 @@ export function useAccount() {
     isUpdating,
     handleProfileUpdate,
     handleBillingUpdate,
+    subscriptions,
   };
 }

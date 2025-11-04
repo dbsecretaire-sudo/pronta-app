@@ -284,19 +284,19 @@ export async function fetchUserSubscriptions(userId:number) {
   return res.json();
 };
 
-export async function getServiceInfo(serviceId: number): Promise<Service> {
-  const response = await fetch(`/api/services/${serviceId}`);
-  if (!response.ok) {
-    throw new Error("Failed to fetch service");
-  }
-  const service: Service = await response.json();
-  return service;
-}
+// export async function getServiceInfo(serviceId: number): Promise<Service> {
+//   const response = await fetch(`/api/services/${serviceId}`);
+//   if (!response.ok) {
+//     throw new Error("Failed to fetch service");
+//   }
+//   const service: Service = await response.json();
+//   return service;
+// }
 
-export async function getSubscriptionWithService(subscription: Subscription): Promise<SubscriptionWithService> {
-  const service = await getServiceInfo(subscription.service_id);
-  return {
-    ...subscription,
-    service,
-  };
-}
+// export async function getSubscriptionWithService(subscription: Subscription): Promise<SubscriptionWithService> {
+//   const service = await getServiceInfo(subscription.service_id);
+//   return {
+//     ...subscription,
+//     service,
+//   };
+// }

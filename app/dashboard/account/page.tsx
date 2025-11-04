@@ -1,7 +1,7 @@
 "use client";
 import { ProfileTab, BillingTab, MessagesTab } from "@/src/Components";
 import { useAccount } from "@/src/Hook/useAccount";
-import { Subscription, ApiSubscription, SubscriptionWithService } from "@/src/Types/Subscription";
+import { SubscriptionWithService } from "@/src/Types/Subscription";
 import { useEffect, useState } from "react";
 import { BillingTabData } from "@/src/Components/BillingTab/types";
 import { fetchUserSubscriptions } from "@/src/lib/api";

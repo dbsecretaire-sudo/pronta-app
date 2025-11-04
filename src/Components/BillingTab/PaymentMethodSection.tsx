@@ -180,7 +180,7 @@ export const PaymentMethodSection = ({
       {!isEditing ? (
         <div>
           {paymentMethod ? (
-            <div>
+            <div className="bg-gray-50 p-3 rounded-lg border border-gray-200 mt-2">
               {paymentMethod.type && (
                 <>
                   <p className="capitalize mb-1">
@@ -198,7 +198,7 @@ export const PaymentMethodSection = ({
                     <p>{paymentMethod.details.paypal_email}</p>
                   )}
                   {paymentMethod.type === 'bank_transfer' && (
-                    <div className="bg-gray-50 p-3 rounded-lg border border-gray-200 mt-2">
+                    <div>
                       <h4 className="font-medium text-gray-900 mb-2">Nos coordonnées bancaires</h4>
                       <div className="space-y-1 text-sm">
                         <p className="text-gray-600">
@@ -218,7 +218,7 @@ export const PaymentMethodSection = ({
                         </p>
                       </div>
                     </div>
-                  )}
+                  )} 
                 </>
               )}
             </div>
