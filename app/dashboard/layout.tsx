@@ -5,17 +5,15 @@ import { useSession } from "next-auth/react";
 import { useServices } from '@/src/Hook/useServices';
 import { NavBar } from "@/src/Components";
 import { fetchUserServices } from "@/src/lib/api";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isInService = pathname.includes('/dashboard/Services/');
   const { data: session, status } = useSession();
-  const [refreshKey, setRefreshKey] = useState(0);
   const { availableServices, loading: servicesLoading } = useServices(
     session?.user?.id,
-    status,
-    refreshKey
+    status
   );
 
   const userServices = availableServices
@@ -25,20 +23,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       path: service.route || `/dashboard/services/${service.id}`,
       icon: service.icon || "🔧"
     }));
-
-    const refreshServices = useCallback(async () => {
-      if (status !== "authenticated" || !session?.user?.id) {
-        console.warn("Session ou ID utilisateur non disponible, rafraîchissement annulé.");
-        return;
-      }
-      try {
-        await fetchUserServices(Number(session.user.id));
-        setRefreshKey(prev => prev + 1); // Force le rechargement de `useServices`
-      } catch (error) {
-        console.error("Erreur:", error);
-      }
-    }, [session?.user?.id, status]);
-
 
   if (status === "loading" || servicesLoading) {
     return (
@@ -61,7 +45,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       logoText="Pronta"
       isInService={isInService}
       userServices={userServices}
-      onRefreshServices={refreshServices}
     >
       {children}
     </NavBar>    

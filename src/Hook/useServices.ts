@@ -14,7 +14,7 @@ import {
   getSubscriptionByService 
 } from '@/src/lib/api';
 
-export const useServices = (userId: string | undefined, status: string, refreshKey: number) => {
+export const useServices = (userId: string | undefined, status: string) => {
   const [services, setServices] = useState<Service[]>([]);
   const [availableServices, setAvailableServices] = useState<AvailableService[]>([]);
   const [loading, setLoading] = useState(true);
@@ -31,25 +31,31 @@ export const useServices = (userId: string | undefined, status: string, refreshK
       setLoading(false);
       return;
     }
+
     try {
       setLoading(true);
       setError(null);
+
       const [fetchedUserServices, allServices] = await Promise.all([
         fetchUserServices(Number(userId)),
         fetchAllServices(),
       ]);
+
       setUserServices(fetchedUserServices);
+
       // Services abonnés et actifs (pour la section "Mes services")
       const subscribedServices = Array.isArray(fetchedUserServices)
         ? fetchedUserServices
             .filter((us: UserServiceWithDetails) => us.is_active)
             .map((us: UserServiceWithDetails) => us.service)
         : [];
+
       // Services avec statut (pour la section "Services disponibles")
       const servicesWithStatus = allServices.map((service: Service) => {
         const userService = fetchedUserServices.find(
           (us: UserServiceWithDetails) => us.service_id === service.id
         );
+
         return {
           ...service,
           isSubscribed: !!userService,
@@ -57,10 +63,12 @@ export const useServices = (userId: string | undefined, status: string, refreshK
           userService,
         };
       });
+
       // Filtre les services disponibles
       const availableServices = servicesWithStatus.filter(
         (s: UserService) => !s.subscription_date || (s.subscription_date && !s.is_active)
       );
+
       setServices(subscribedServices);
       setAvailableServices(availableServices);
     } catch (error) {
@@ -71,6 +79,7 @@ export const useServices = (userId: string | undefined, status: string, refreshK
     }
   };
 
+
   useEffect(() => {
     if (status === "loading" || status === "unauthenticated") {
       setLoading(false);
@@ -79,7 +88,7 @@ export const useServices = (userId: string | undefined, status: string, refreshK
     if (status === "authenticated" && userId) {
       fetchData();
     }
-  }, [status, userId, refreshKey]); // Ajoute refreshKey ici
+  }, [status, userId]);
 
   const refreshServices = async () => {
     await fetchData();
@@ -216,5 +225,5 @@ export const useServices = (userId: string | undefined, status: string, refreshK
     }
   }
 
-  return { services, availableServices, loading, error, handleSubscribe, handleDeactivate, handleReactivate, refreshServices};
+  return { services, availableServices, loading, error, handleSubscribe, handleDeactivate, handleReactivate};
 };

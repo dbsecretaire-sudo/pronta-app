@@ -11,7 +11,6 @@ export default function Navbar({
   logoText = "Pronta",
   isInService = false,
   userServices = [], // Services par défaut vide
-  onRefreshServices, 
 }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
