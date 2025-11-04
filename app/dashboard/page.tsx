@@ -14,7 +14,9 @@ export default function DashboardHome() {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
+    route: "",
     price: 0,
+    unit: '',
     icon: "🔧",
   });
   // État pour les erreurs et le chargement
@@ -63,7 +65,9 @@ export default function DashboardHome() {
       setFormData({
         name: "",
         description: "",
+        route: "",
         price: 0,
+        unit: "",
         icon: "🔧",
       });
     } catch (err) {
@@ -168,11 +172,35 @@ export default function DashboardHome() {
                 />
               </div>
               <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">Route - ex: /dashboard/service/nouveauService</label>
+                <textarea
+                  name="route"
+                  value={formData.route}
+                  onChange={handleInputChange}
+                  className="w-full border rounded-lg px-3 py-2"
+                  placeholder="Décrivez le service..."
+                  rows={3}
+                />
+              </div>
+              <div className="mb-4">
                 <label className="block text-sm font-medium mb-1">Prix (€) *</label>
                 <input
                   type="number"
                   name="price"
                   value={formData.price}
+                  onChange={handleInputChange}
+                  className="w-full border rounded-lg px-3 py-2"
+                  min="0"
+                  step="0.01"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">Unité - ex: heure, mois, ...</label>
+                <input
+                  type="string"
+                  name="unit"
+                  value={formData.unit}
                   onChange={handleInputChange}
                   className="w-full border rounded-lg px-3 py-2"
                   min="0"
