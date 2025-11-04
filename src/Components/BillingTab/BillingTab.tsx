@@ -32,33 +32,25 @@ export function BillingTab({ data, onEdit, isUpdating = false }: BillingTabProps
   });
 
   // Gestion de la soumission des modifications
-  const handleSubmit = async (e: React.FormEvent, type: "billing" | "payment" | "subscription") => {
-    e.preventDefault();
-
-    let payload = {};
-    let result;
-
-    if (type === "billing") {
-      payload = { billing_address: formData.billing_address };
-    } else if (type === "payment") {
-      payload = { payment_method: formData.payment_method };
-    } 
-
-    else {
-      // Pour les autres types, on utilise la fonction onEdit fournie
-      result = await onEdit(payload);
-    }
-
-    if (result?.success) {
-      setEditMode({
-        ...editMode,
-        [type]: false,
-        selectedSubscriptionId: null
-      });
-    }
-
-    alert(result?.message);
-  };
+  const handleSubmit = async (e: React.FormEvent, type: "billing" | "payment") => {
+  e.preventDefault();
+  let payload = {};
+  if (type === "billing") {
+    payload = { billing_address: formData.billing_address };
+  } else if (type === "payment") {
+    payload = { payment_method: formData.payment_method };
+  }
+  // Appelle onEdit dans tous les cas
+  const result = await onEdit(payload);
+  if (result?.success) {
+    setEditMode({
+      ...editMode,
+      [type]: false,
+      selectedSubscriptionId: null
+    });
+  }
+  alert(result?.message);
+};
 
   // Gestion des changements dans les formulaires
   const handleChange = (
@@ -78,7 +70,7 @@ export function BillingTab({ data, onEdit, isUpdating = false }: BillingTabProps
   };
 
   // Annulation de l'édition
-  const handleCancel = (type: "billing" | "payment" | "subscription") => {
+  const handleCancel = (type: "billing" | "payment") => {
 
       setEditMode({ ...editMode, [type]: false });
       setFormData({
@@ -90,7 +82,7 @@ export function BillingTab({ data, onEdit, isUpdating = false }: BillingTabProps
 
   return (
     <div className="bg-blue-50 p-4 rounded-lg mb-6">
-      <h2 className="flex justify-between items-center mb-4">Facturation</h2>
+      <h2 className="text-xl font-semibold mb-6">Facturation</h2>
 
       {/* Section Abonnements */}
       <div className="mb-8">
