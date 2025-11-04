@@ -98,7 +98,7 @@ export const useServices = (userId: string | undefined, status: string) => {
      //je souscris à un abonnement// 
     try {
       
-      // await subscribeToService(service.id);
+      // 
    
       const existingSubscription = await getSubscriptionByService(Number(userId), service.id);
 
@@ -108,6 +108,14 @@ export const useServices = (userId: string | undefined, status: string) => {
 
     if (existingSubscription.length === 0) {
       // Cas 1 : Aucun abonnement existant → Créer un nouvel abonnement
+      await subscribeToService({
+        user_id: Number(userId),
+        service_id: service.id,
+        subscription_date: now,
+        is_active: true,
+        can_write: false,
+        can_delete: false,
+      });
       await createSubscription({
         user_id: Number(userId),
         service_id: service.id,

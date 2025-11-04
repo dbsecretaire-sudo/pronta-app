@@ -25,5 +25,4 @@ export type UpdateUserServicePermissions = {
   can_delete?: boolean;
 };
 
-export type CreateUserService = Omit<UserService, 'id' | 'createdAt' | 'updatedAt'>;
-export type UpdateUserService = Partial<CreateUserService>;
+export type UpdateUserService = Partial<UserService>;

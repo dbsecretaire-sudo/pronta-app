@@ -1,4 +1,4 @@
-import { UserService, AssignServiceToUser, UserServiceWithDetails, UpdateUserServicePermissions, CreateUserService } from "./type";
+import { UserService, AssignServiceToUser, UserServiceWithDetails, UpdateUserServicePermissions } from "./type";
 import pool from "@/src/lib/db";
 
 export class UserServiceModel {
@@ -137,7 +137,7 @@ export class UserServiceModel {
     return res.rows[0];
   }
 
-  async createUserService(data: CreateUserService): Promise<UserService> {
+  async createUserService(data: UserService): Promise<UserService> {
     const res = await pool.query(
       `INSERT INTO user_services (
         user_id,
@@ -154,6 +154,7 @@ export class UserServiceModel {
       [
         data.user_id,          // Ajoute user_id ici
         data.service_id,
+        data.subscription_date,
         data.is_active,
         data.can_write,
         data.can_delete,

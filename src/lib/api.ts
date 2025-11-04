@@ -2,7 +2,7 @@ import { CalendarEvent } from "@/src/Types/Calendar/index";
 import { CallFilter } from "@/src/Types/Calls/index"; 
 import { Role } from "../Types/Users";
 import { User } from "@/src/Types/Users";
-import { CreateUserService, UserService } from '@/src/Types/UserServices';
+import { UserService } from '@/src/Types/UserServices';
 import { AvailableService, Service } from "@/src/Types/Services";
 import { Subscription } from "../Types/Subscription";
 import { SubscriptionWithService } from "../Types/Subscription";
@@ -53,7 +53,7 @@ export const fetchAllServices = async () => {
   return res.json();
 };
 
-export const subscribeToService = async (userServiceData: CreateUserService) => {
+export const subscribeToService = async (userServiceData: UserService) => {
   const res = await fetch('/api/userServices', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

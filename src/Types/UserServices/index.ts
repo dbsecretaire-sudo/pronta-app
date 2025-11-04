@@ -3,6 +3,5 @@ export type {
     UserServiceWithDetails,
     AssignServiceToUser,
     UpdateUserServicePermissions,
-    CreateUserService,
     UpdateUserService,
 } from "./type";

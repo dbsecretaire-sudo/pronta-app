@@ -3,8 +3,7 @@ import {
   UserService,
   UserServiceWithDetails,
   AssignServiceToUser,
-  UpdateUserServicePermissions,
-  CreateUserService
+  UpdateUserServicePermissions
 } from "./types";
 import { validateUserServiceAssignment } from "./utils";
 
@@ -15,7 +14,7 @@ export class UserServiceService {
     return this.userServiceModel.getUserServices(userId);
   }
 
-  async createUserService(userServiceData: CreateUserService):Promise<UserService> {
+  async createUserService(userServiceData: UserService):Promise<UserService> {
     return this.userServiceModel.createUserService(userServiceData);
   }
 
