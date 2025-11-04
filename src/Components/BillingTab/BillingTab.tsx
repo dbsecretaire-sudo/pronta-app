@@ -1,12 +1,10 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { SubscriptionInfo } from "./SubscriptionInfo";
 import { BillingAddressSection } from "./BillingAddressSection";
 import { PaymentMethodSection } from "./PaymentMethodSection";
 import { BillingTabProps } from "./types";
-import { Service } from "@/src/Types/Services";
-import { getServiceInfo, getSubscriptionWithService } from "@/src/lib/api";
-import { SubscriptionWithService } from "@/src/Types/Subscription";
+
 
 export function BillingTab({ data, onEdit, isUpdating = false }: BillingTabProps) {
   // État pour gérer les modes d'édition
@@ -101,7 +99,7 @@ export function BillingTab({ data, onEdit, isUpdating = false }: BillingTabProps
           {data.subscriptions.map((subscription) => (
             <div key={subscription.id || Math.random()} className="rounded-lg ">
               <SubscriptionInfo
-                subscriptions={[{
+                subscriptions={{
                     id: subscription.id,  // Assurez-vous que cet ID existe
                     service_id: subscription.service_id,
                     status: subscription.status,
@@ -110,7 +108,7 @@ export function BillingTab({ data, onEdit, isUpdating = false }: BillingTabProps
                     next_payment_date: subscription.next_payment_date,
                     created_at: subscription.created_at,
                     service: subscription.service
-                  }]}
+                  }}
               />
             </div>
           ))}
