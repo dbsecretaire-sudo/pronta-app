@@ -105,7 +105,7 @@ export const useServices = (userId: string | undefined, status: string) => {
       if (existingSubscription === null) {
       throw new Error("Impossible de vérifier les abonnements existants.");
     }
-
+console.log("existingSubscription : ", existingSubscription);
     if (existingSubscription.length === 0) {
       // Cas 1 : Aucun abonnement existant → Créer un nouvel abonnement
       await createSubscription({
