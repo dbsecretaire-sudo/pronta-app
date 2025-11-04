@@ -102,17 +102,20 @@ export const BillingAddressSection  = ({
         </form>
       </div>
       )}
-      <div>
-        {billingAddress ? (
-          <div className="space-y-1">
-            <p>{billingAddress.street}</p>
-            <p>{billingAddress.postal_code} {billingAddress.city}</p>
-            <p>{billingAddress.country}</p>
-          </div>
-        ) : (
-          <p className="text-gray-500">Aucune adresse de facturation</p>
-        )}
-      </div>
+      {!isEditing?(
+        <div>
+          {billingAddress ? (
+            <div className="space-y-1">
+              <p>{billingAddress.street}</p>
+              <p>{billingAddress.postal_code} {billingAddress.city}</p>
+              <p>{billingAddress.country}</p>
+            </div>
+          ) : (
+            <p className="text-gray-500">Aucune adresse de facturation</p>
+          )}
+        </div>
+      ) : null}
+      
     </div>
   );
 };
