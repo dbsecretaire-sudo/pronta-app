@@ -106,13 +106,6 @@ export default function DashboardHome() {
         <section className="mb-10">
           <h2 className="text-xl font-semibold mb-4">Services disponibles</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Bouton "Ajouter un service" */}
-            <button
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium"
-              onClick={() => setIsAddServiceModalOpen}
-            >
-              Ajouter un service
-            </button>
             {/* Services à réactiver */}
             {servicesToReactivate.length > 0 && servicesToReactivate.map((service) => (
               <ServiceCard
@@ -133,7 +126,15 @@ export default function DashboardHome() {
                   onSubscribe={handleSubscribe}
                   userService={service.userService}
                 />
-              ))}
+              ))
+            }
+            {/* Bouton "Ajouter un service" */}
+            <button
+              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium"
+              onClick={() => setIsAddServiceModalOpen(true)}
+            >
+              Ajouter un service
+            </button>
           </div>
         </section>
       
