@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/src/Components";
 import { BillingAddress } from "@/src/Types/Users";
+import { DivideIcon } from "@heroicons/react/24/outline";
 
 interface BillingAddressSectionProps  {
   billingAddress?: BillingAddress;
@@ -27,15 +28,26 @@ export const BillingAddressSection  = ({
 }: BillingAddressSectionProps ) => {
   return (
     <div className="bg-blue-50 p-4 rounded-lg mb-6">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="font-medium">Adresse de facturation</h3>
-        {!isEditing ? (
+      {!isEditing ? (
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="font-medium">Adresse de facturation</h3>
+          
           <Button onClick={onEdit} variant="primary">
             Modifier
-          </Button>
-        ) : null}
-      </div>
-      {isEditing ? (
+            </Button>
+
+          {billingAddress ? (
+            <div className="space-y-1">
+              <p>{billingAddress.street}</p>
+              <p>{billingAddress.postal_code} {billingAddress.city}</p>
+              <p>{billingAddress.country}</p>
+            </div>
+          ) : (
+            <p className="text-gray-500">Aucune adresse de facturation</p>
+          )}
+        </div>
+      ) : (
+      <div className="space-y-3 p-4 bg-white rounded-lg shadow-sm mb-4">
         <form onSubmit={onSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">Rue</label>
@@ -98,18 +110,7 @@ export const BillingAddressSection  = ({
             </Button>
           </div>
         </form>
-      ) : (
-        <div>
-          {billingAddress ? (
-            <div className="space-y-1">
-              <p>{billingAddress.street}</p>
-              <p>{billingAddress.postal_code} {billingAddress.city}</p>
-              <p>{billingAddress.country}</p>
-            </div>
-          ) : (
-            <p className="text-gray-500">Aucune adresse de facturation</p>
-          )}
-        </div>
+      </div>
       )}
     </div>
   );

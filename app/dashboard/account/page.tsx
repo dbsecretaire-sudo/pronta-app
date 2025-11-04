@@ -53,7 +53,7 @@ export default function AccountPage() {
     return typeof date === 'string' ? new Date(date) : date;
   };
 
-  // Fonction pour gérer les mises à jour de facturation et abonnements
+  // Fonction pour gérer les mises à jour de facturation 
   const handleBillingEdit = async (data: {
     billing_address?: any;
     payment_method?: any;
