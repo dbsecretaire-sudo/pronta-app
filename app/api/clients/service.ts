@@ -2,7 +2,11 @@ import { ClientModel, Client, CreateClient, ClientFilter } from "./types";
 import { validateClient } from "./utils";
 
 export class ClientService {
-  private clientModel = new ClientModel({} as Client);
+  private clientModel: ClientModel;
+
+  constructor() {
+    this.clientModel = new ClientModel({} as Client);
+  }
 
   async getClientsByUserId(userId: number): Promise<Client[]> {
     return this.clientModel.getClientsByUserId(userId);

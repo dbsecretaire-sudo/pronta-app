@@ -1,14 +1,13 @@
 // app/api/user/route.ts
 import { NextResponse } from 'next/server';
-import {
-  getAllUsers,
-  createUser
-} from './controller';
+import { UserService} from './service';
+
+const userService = new UserService;
 
 // GET /api/user
 export async function GET(request: Request) {
   try {
-    const users = await getAllUsers();
+    const users = await userService.getAllUsers();
     return NextResponse.json(users);
   } catch (error) {
     return NextResponse.json(
@@ -22,7 +21,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const userData = await request.json();
-    const newUser = await createUser(userData);
+    const newUser = await userService.createUser(userData);
     return NextResponse.json(newUser, { status: 201 });
   } catch (error) {
     return NextResponse.json(

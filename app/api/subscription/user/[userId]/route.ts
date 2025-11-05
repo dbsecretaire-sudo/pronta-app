@@ -1,5 +1,7 @@
-import { getSubscriptionByUserId, getSubscriptionByUserIdAndService } from '@/app/api/subscription/controller';
+import { SubscriptionService } from '../../service';
 import { NextResponse } from 'next/server';
+
+const subscriptionService = new SubscriptionService;
 
 export async function GET(
   request: Request,
@@ -19,8 +21,8 @@ export async function GET(
     }
 
     const subscriptions = Number(service_id)
-      ? await getSubscriptionByUserIdAndService(userId, Number(service_id))
-      : await getSubscriptionByUserId(userId);
+      ? await subscriptionService.getSubscriptionByUserIdAndService(userId, Number(service_id))
+      : await subscriptionService.getSubscriptionByUserId(userId);
 
     return NextResponse.json(subscriptions);
   } catch (error) {

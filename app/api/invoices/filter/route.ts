@@ -1,7 +1,9 @@
 // app/api/invoices/filter/route.ts
 import { NextResponse } from "next/server";
-import { filterInvoices } from "../controller";
+import { InvoiceService } from "../service";
 import { InvoiceFilter, InvoiceStatus } from "@/src/Types/Invoices";
+
+const invoiceService = new InvoiceService;
 
 export async function GET(request: Request) {
   try {
@@ -73,7 +75,7 @@ export async function GET(request: Request) {
     console.log(filters);
 
     // 3. Appeler le contrôleur
-    const invoices = await filterInvoices(filters);
+    const invoices = await invoiceService.filterInvoices(filters);
 
     // 4. Retourner la réponse
     return NextResponse.json(invoices);

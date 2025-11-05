@@ -1,10 +1,8 @@
 // app/api/invoices/[id]/route.ts
 import { NextResponse } from 'next/server';
-import {
-  getInvoiceById,
-  updateInvoice,
-  deleteInvoice
-} from '../controller';
+import { InvoiceService } from '../service';
+
+const invoiceService = new InvoiceService;
 
 export async function GET(
   request: Request,
@@ -12,7 +10,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const invoice = await getInvoiceById(Number(id));
+    const invoice = await invoiceService.getInvoiceById(Number(id));
 
     if (!invoice) {
       return NextResponse.json(
@@ -37,7 +35,7 @@ export async function PUT(
   try {
     const { id } = await params;
     const invoiceData = await request.json();
-    const updatedInvoice = await updateInvoice(Number(id), invoiceData);
+    const updatedInvoice = await invoiceService.updateInvoice(Number(id), invoiceData);
     return NextResponse.json(updatedInvoice);
   } catch (error) {
     return NextResponse.json(
@@ -53,7 +51,7 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    await deleteInvoice(Number(id));
+    await invoiceService.deleteInvoice(Number(id));
     return new NextResponse(null, { status: 204 });
   } catch (error) {
     return NextResponse.json(

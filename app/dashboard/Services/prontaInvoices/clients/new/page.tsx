@@ -2,25 +2,18 @@
 import { useRouter } from "next/navigation";
 import { ClientForm } from "@/src/Components";
 import { emptyClient } from "@/src/Types/Clients/index";
+import { createClient } from "@/src/lib/api";
 
 export default function NewClientPage() {
   const router = useRouter();
 
   const handleSubmit = async (data: typeof emptyClient) => {
     try {
-      const response = await fetch('/api/clients', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (response.ok) {
-        router.push('/dashboard/Services/prontaInvoices/clients');
-      }
+      await createClient(data);
+      router.push('/dashboard/Services/prontaInvoices/clients');
     } catch (error) {
       console.error("Erreur:", error);
+      // Vous pourriez ajouter ici une notification d'erreur pour l'utilisateur
     }
   };
 

@@ -1,7 +1,9 @@
 // app/api/user/[id]/subscription/route.ts
 import { NextResponse } from 'next/server';
-import { updateUserSubscription, createUserSubscription, deleteUserSubscription } from './controller';
+import { SubscriptionService } from './service';
 import { z } from 'zod';
+
+const subscribedServices = new SubscriptionService;
 
 // POST /api/user/[id]/subscription/ - Pour créer un nouvel abonnement
 export async function POST(
@@ -34,7 +36,7 @@ export async function POST(
 
     // Appel au service pour créer un nouvel abonnement
     // Note: Vous devrez implémenter cette méthode dans votre controller
-    const newSubscription = await createUserSubscription(processedData.user_id, processedData);
+    const newSubscription = await subscribedServices.createUserSubscription(processedData.user_id, processedData);
 
     return NextResponse.json(newSubscription, { status: 201 });
   } catch (error) {

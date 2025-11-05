@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
-import { reactivateUserService } from '../../../controller';
+import { UserServiceService } from '../../../service';
+
+const userServiceService = new UserServiceService;
 
 export async function POST(
   request: Request,
@@ -7,7 +9,7 @@ export async function POST(
 ) {
 try {
     const { userId, serviceId } = await params; // ✅ Utilisez await pour obtenir les valeurs
-    const deactivatedService = await reactivateUserService(Number(userId), Number(serviceId));
+    const deactivatedService = await userServiceService.reactivateUserService(Number(userId), Number(serviceId));
     return NextResponse.json(deactivatedService);
 } catch (error) {
     return NextResponse.json(

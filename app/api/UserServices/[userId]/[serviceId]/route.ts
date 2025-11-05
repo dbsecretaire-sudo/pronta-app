@@ -1,6 +1,8 @@
 // app/api/UserServices/[userId]/[serviceId]/route.ts
 import { NextResponse } from 'next/server';
-import { getUserService, updateUserServicePermissions, deactivateUserService } from '../../controller';
+import { UserServiceService } from '../../service';
+
+const userServiceService = new UserServiceService;
 
 // GET /api/UserServices/[userId]/[serviceId]
 export async function GET(
@@ -9,7 +11,7 @@ export async function GET(
 ) {
   try {
     const { userId, serviceId } = await params; // ✅ Utilisez await pour obtenir les valeurs
-    const userService = await getUserService(Number(userId), Number(serviceId));
+    const userService = await userServiceService.getUserService(Number(userId), Number(serviceId));
     if (!userService) {
       return NextResponse.json(
         { error: "User service not found" },
@@ -33,7 +35,7 @@ export async function PUT(
   try {
     const { userId, serviceId } = await params; // ✅ Utilisez await pour obtenir les valeurs
     const permissions = await request.json();
-    const updatedUserService = await updateUserServicePermissions(
+    const updatedUserService = await userServiceService.updateUserServicePermissions(
       Number(userId),
       Number(serviceId),
       permissions

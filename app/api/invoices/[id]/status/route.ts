@@ -1,6 +1,8 @@
 // app/api/invoices/[id]/status/route.ts
 import { NextResponse } from 'next/server';
-import { updateInvoiceStatus } from '../../controller';
+import { InvoiceService } from '../../service';
+
+const invoiceService = new InvoiceService;
 
 export async function PATCH(
   request: Request,
@@ -9,7 +11,7 @@ export async function PATCH(
   try {
     const { id } = await params;
     const { status } = await request.json();
-    const updatedInvoice = await updateInvoiceStatus(Number(id), status);
+    const updatedInvoice = await invoiceService.updateInvoiceStatus(Number(id), status);
     return NextResponse.json(updatedInvoice);
   } catch (error) {
     return NextResponse.json(

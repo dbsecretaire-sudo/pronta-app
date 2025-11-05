@@ -32,3 +32,4 @@ export { BillingAddressSection }  from "./BillingTab/BillingAddressSection";
 export { PaymentMethodSection }  from "./BillingTab/PaymentMethodSection";
 export { MessagesTab } from "./MessagesTab";
 export { Button } from "./Button";
+export { default as ServiceForm} from './Modal/ServiceForm';

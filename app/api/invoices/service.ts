@@ -2,7 +2,11 @@ import { InvoiceModel, Invoice, InvoiceItem, CreateInvoice, CreateInvoiceItem, I
 import { validateInvoice, validateInvoiceItem, isValidInvoiceStatus } from "./utils";
 
 export class InvoiceService {
-  private invoiceModel = new InvoiceModel({} as Invoice);
+  private invoiceModel: InvoiceModel;
+
+  constructor() {
+    this.invoiceModel = new InvoiceModel({} as Invoice)
+  }
 
   async getInvoicesByUserId(userId: number): Promise<Invoice[]> {
     return this.invoiceModel.getInvoicesByUserId(userId);

@@ -46,13 +46,6 @@ export default function AccountPage() {
   if (error) return <div className="text-center py-8 text-red-500">Erreur: {error}</div>;
   if (!userData) return <div className="text-center py-8">Utilisateur non trouvé</div>;
 
-
-  // Fonction utilitaire pour convertir les dates en objets Date
-  const ensureDate = (date: string | Date | undefined): Date | undefined => {
-    if (!date) return undefined;
-    return typeof date === 'string' ? new Date(date) : date;
-  };
-
   // Fonction pour gérer les mises à jour de facturation 
   const handleBillingEdit = async (data: {
     billing_address?: any;

@@ -1,6 +1,8 @@
 // app/api/user/[id]/route.ts
 import { NextResponse } from 'next/server';
-import { getUserById, updateUser, deleteUser } from '@/app/api/user/controller';
+import { UserService } from '../service';
+
+const userService = new UserService;
 
 // GET /api/user/[id]
 export async function GET(
@@ -9,7 +11,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const user = await getUserById(Number(id));
+    const user = await userService.getUserById(Number(id));
 
     if (!user) {
       return NextResponse.json(
@@ -35,7 +37,7 @@ export async function PUT(
   try {
     const { id } = await params;
     const userData = await request.json();
-    const updatedUser = await updateUser(Number(id), userData);
+    const updatedUser = await userService.updateUser(Number(id), userData);
     return NextResponse.json(updatedUser);
   } catch (error) {
     return NextResponse.json(
@@ -52,7 +54,7 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    await deleteUser(Number(id));
+    await userService.deleteUser(Number(id));
     return new NextResponse(null, { status: 204 });
   } catch (error) {
     return NextResponse.json(

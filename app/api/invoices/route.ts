@@ -1,6 +1,8 @@
 // app/api/invoices/route.ts
 import { NextResponse } from 'next/server';
-import { getInvoicesByUserId, createInvoice } from './controller';
+import { InvoiceService } from './service';
+
+const invoiceService = new InvoiceService;
 
 export async function GET(request: Request) {
   try {
@@ -14,7 +16,7 @@ export async function GET(request: Request) {
       );
     }
 
-    const invoices = await getInvoicesByUserId(Number(userId));
+    const invoices = await invoiceService.getInvoicesByUserId(Number(userId));
     return NextResponse.json(invoices);
   } catch (error) {
     return NextResponse.json(
@@ -27,7 +29,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const invoiceData = await request.json();
-    const newInvoice = await createInvoice(invoiceData);
+    const newInvoice = await invoiceService.createInvoice(invoiceData);
     return NextResponse.json(newInvoice, { status: 201 });
   } catch (error) {
     return NextResponse.json(

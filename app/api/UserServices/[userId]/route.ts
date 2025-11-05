@@ -1,10 +1,8 @@
 // app/api/UserServices/[userId]/route.ts
 import { NextResponse } from 'next/server';
-import {
-  getUserServices,
-  assignServiceToUser,
-  deactivateUserService
-} from '../controller';
+import { UserServiceService } from '../service';
+
+const userServiceService = new UserServiceService;
 
 // GET /api/UserServices/[userId]
 export async function GET(
@@ -13,7 +11,7 @@ export async function GET(
 ) {
   try {
     const { userId } = await params; // ✅ Utilise await pour les params
-    const services = await getUserServices(Number(userId));
+    const services = await userServiceService.getUserServices(Number(userId));
     return NextResponse.json(services);
   } catch (error) {
     return NextResponse.json(
@@ -31,7 +29,7 @@ export async function POST(
   try {
     const { userId } = await params; // ✅ Utilisez await pour obtenir userId
     const data = await request.json();
-    const newUserService = await assignServiceToUser({
+    const newUserService = await userServiceService.assignServiceToUser({
       user_id: Number(userId),
       ...data
     });

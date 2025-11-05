@@ -1,10 +1,8 @@
 // app/api/services/[id]/route.ts
 import { NextResponse } from 'next/server';
-import {
-  getServiceById,
-  updateService,
-  deleteService
-} from '../controller';
+import { ServiceService } from '../service';
+
+const serviceService = new ServiceService;
 
 // GET /api/services/[id]
 export async function GET(
@@ -13,7 +11,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const service = await getServiceById(Number(id));
+    const service = await serviceService.getServiceById(Number(id));
     return NextResponse.json(service);
   } catch (error) {
     if (error instanceof Error && error.message.includes("not found")) {
@@ -37,7 +35,7 @@ export async function PUT(
   try {
     const { id } = await params;
     const serviceData = await request.json();
-    const updatedService = await updateService(Number(id), serviceData);
+    const updatedService = await serviceService.updateService(Number(id), serviceData);
     return NextResponse.json(updatedService);
   } catch (error) {
     return NextResponse.json(
@@ -54,7 +52,7 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    await deleteService(Number(id));
+    await serviceService.deleteService(Number(id));
     return new NextResponse(null, { status: 204 });
   } catch (error) {
     return NextResponse.json(

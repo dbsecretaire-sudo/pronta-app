@@ -1,7 +1,8 @@
-import { updateUserSubscription, deleteUserSubscription } from '../controller';
+import { SubscriptionService } from '../service';
 import { NextResponse } from 'next/server';
-
 import { z } from 'zod';
+
+const subscriptionService = new SubscriptionService;
 
 // Schéma de validation pour les données d'abonnement
 const subscriptionUpdateSchema = z.object({
@@ -33,7 +34,7 @@ export async function PUT(
     };
 
     // Appel au service pour mettre à jour l'abonnement
-    const updatedSubscription = await updateUserSubscription(Number(id), processedUpdates);
+    const updatedSubscription = await subscriptionService.updateUserSubscription(Number(id), processedUpdates);
 
     return NextResponse.json(updatedSubscription);
   } catch (error) {
@@ -64,7 +65,7 @@ export async function DELETE(
 
     // Appel au service pour supprimer l'abonnement
     // Note: Vous devrez implémenter cette méthode dans votre controller
-    await deleteUserSubscription(Number(id));
+    await subscriptionService.deleteUserSubscription(Number(id));
 
     return NextResponse.json(
       { success: true, message: "Subscription deleted successfully" },

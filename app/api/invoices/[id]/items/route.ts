@@ -1,6 +1,8 @@
 // app/api/invoices/[id]/items/route.ts
 import { NextResponse } from 'next/server';
-import { addInvoiceItem, deleteInvoiceItem } from '../../controller';
+import { InvoiceService } from '../../service';
+
+const invoiceService = new InvoiceService;
 
 export async function POST(
   request: Request,
@@ -9,7 +11,7 @@ export async function POST(
   try {
     const { id } = await params;
     const itemData = await request.json();
-    const newItem = await addInvoiceItem(Number(id), itemData);
+    const newItem = await invoiceService.addInvoiceItem(itemData);
     return NextResponse.json(newItem, { status: 201 });
   } catch (error) {
     return NextResponse.json(
@@ -35,7 +37,7 @@ export async function DELETE(
       );
     }
 
-    await deleteInvoiceItem(Number(id), Number(itemId));
+    await invoiceService.deleteInvoiceItem(Number(itemId));
     return new NextResponse(null, { status: 204 });
   } catch (error) {
     return NextResponse.json(

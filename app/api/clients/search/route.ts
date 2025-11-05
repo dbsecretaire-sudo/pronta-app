@@ -1,6 +1,8 @@
 // app/api/clients/search/route.ts
 import { NextResponse } from 'next/server';
-import { searchClients } from '../controller'; // Importez votre fonction
+import { ClientService } from '../service';
+
+const clientService = new ClientService;
 
 // GET /api/clients/search
 export async function GET(request: Request) {
@@ -16,9 +18,9 @@ export async function GET(request: Request) {
       );
     }
 
-    const results = await searchClients({
-      query,
+    const results = await clientService.searchClients({
       userId: Number(userId),
+      searchTerm: query,
     });
 
     return NextResponse.json(results);

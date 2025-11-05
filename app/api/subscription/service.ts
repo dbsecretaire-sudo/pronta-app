@@ -2,7 +2,11 @@ import { Subscription } from "@/src/Types/Subscription";
 import { SubscriptionModel } from "@/src/Types/Subscription/model";
 
 export class SubscriptionService {
-  private subscriptionModel = new SubscriptionModel({} as Subscription);
+  private subscriptionModel: SubscriptionModel;
+  
+  constructor () {
+    this.subscriptionModel = new SubscriptionModel({} as Subscription);
+  }
 
   async updateUserSubscription(subscription_id: number, updatedData: any): Promise<Subscription> {
     return this.subscriptionModel.updateSubscription(subscription_id, updatedData);
