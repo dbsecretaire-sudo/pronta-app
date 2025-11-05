@@ -1,29 +1,73 @@
-import { Call } from "./types";
-import { formatDuration, formatDate } from "./utils";
+// src/Components/CallList.tsx
+import { PhoneIcon } from "@heroicons/react/24/outline";
 
-export default function CallList({ calls }: { calls: Call[] }) {
+interface CallListProps {
+  calls: Array<{
+    id: number;
+    phoneNumber: string;
+    contactName: string | null;
+    date: Date | string;
+    duration?: number;
+    type: 'incoming' | 'outgoing' | 'missed';
+  }>;
+  onCallClick?: (phoneNumber: string) => void;
+}
+
+export function CallList({ calls, onCallClick }: CallListProps) {
   return (
-    <div className="bg-white rounded shadow p-4">
-      <table className="w-full">
-        <thead>
-          <tr className="border-b">
-            <th className="p-2 text-left">Nom</th>
-            <th className="p-2 text-left">Téléphone</th>
-            <th className="p-2 text-left">Type</th>
-            <th className="p-2 text-left">Date</th>
-            <th className="p-2 text-left">Durée</th>
-            <th className="p-2 text-left">Résumé</th>
+    <div className="bg-white rounded-lg shadow overflow-hidden">
+      <table className="min-w-full divide-y divide-gray-200">
+        <thead className="bg-gray-50">
+          <tr>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Numéro</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Durée</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+            <th className="px-6 py-3"></th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="bg-white divide-y divide-gray-200">
           {calls.map((call) => (
-            <tr key={call.id} className="border-b hover:bg-gray-50">
-              <td className="p-2">{call.name}</td>
-              <td className="p-2">{call.phone}</td>
-              <td className="p-2">{call.type}</td>
-              <td className="p-2">{formatDate(call.date)}</td>  {/* ✅ Utilise formatDate */}
-              <td className="p-2">{formatDuration(call.duration)}</td>
-              <td className="p-2">{call.summary}</td>
+            <tr key={call.id}>
+              <td className="px-6 py-4 whitespace-nowrap">{call.contactName || "Inconnu"}</td>
+              <td className="px-6 py-4 whitespace-nowrap">{call.phoneNumber}</td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                {new Date(call.date).toLocaleString('fr-FR', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: '2-digit',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                {call.duration !== undefined ?
+                  `${Math.floor(call.duration / 60)}:${String(call.duration % 60).padStart(2, '0')}` :
+                  'N/A'
+                }
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                  call.type === 'missed' ? 'bg-red-100 text-red-800' :
+                  call.type === 'incoming' ? 'bg-green-100 text-green-800' :
+                  'bg-blue-100 text-blue-800'
+                }`}>
+                  {call.type === 'missed' ? 'Manqué' :
+                   call.type === 'incoming' ? 'Entrant' : 'Sortant'}
+                </span>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                {onCallClick && (
+                  <button
+                    onClick={() => onCallClick(call.phoneNumber)}
+                    className="text-blue-600 hover:text-blue-900"
+                    title="Rappeler"
+                  >
+                    <PhoneIcon className="h-5 w-5" />
+                  </button>
+                )}
+              </td>
             </tr>
           ))}
         </tbody>
