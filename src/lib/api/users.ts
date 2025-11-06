@@ -1,5 +1,7 @@
 import { Role } from "@/src/Types/Users";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 export async function updateProfile(userId: number, data: {
   email: string;
   phone: string;
@@ -40,7 +42,7 @@ export async function updateBilling(userId: number, data: {
 }
 
 export async function getRoleByUserId(userId: number){
-  const res = await fetch(`/api/user/${userId}/role`, { credentials: 'include' });
+  const res = await fetch(`${API_URL}/api/user/${userId}/role`, { credentials: 'include' });
   if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
   return res.json();
 }
