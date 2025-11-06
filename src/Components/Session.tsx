@@ -7,7 +7,6 @@ declare module "next-auth" {
     id: string;
     email: string;
     name?: string;
-    role: string;
   }
 
   interface Session {
@@ -15,13 +14,11 @@ declare module "next-auth" {
       id: string;
       email: string;
       name?: string;
-      role?: string | null;
     } & DefaultSession["user"];
     auth?: {
       userId: string;
       email: string;
       name?: string;
-      role? : string | null
     };
   }
 }
@@ -31,7 +28,6 @@ declare module "next-auth/jwt" {
     id: string;
     email: string;
     name?: string;
-    role: string
   }
 }
 
@@ -39,5 +35,4 @@ export interface CustomUser extends Omit<User, 'id' | "password_hash" | "role" |
   id: string; // Redéfini en string
   email: string;
   name: string;
-  role: string;
 }
