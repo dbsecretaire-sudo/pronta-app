@@ -101,6 +101,26 @@ export class UserModel {
     return { ...user };
   }
 
+  async getRoleByUserId(id: number): Promise<{ role: Role }> {
+    if (!id || typeof id !== 'number') {
+      throw new Error('Invalid user ID');
+    }
+
+    const res = await pool.query("SELECT role FROM users WHERE id = $1", [id]);
+
+    if (res.rows.length === 0) {
+      throw new Error(`User with id ${id} not found`);
+    }
+
+    // Vérifie que `res.rows[0].role` existe et est valide
+    if (!res.rows[0].role) {
+      throw new Error(`User with id ${id} has no role assigned`);
+    }
+
+    // Retourne directement l'objet avec le rôle
+    return { role: res.rows[0].role as Role };
+  }
+
   async getUserByEmail(email: string): Promise<User> {
     const res = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
     if (res.rows.length === 0) {

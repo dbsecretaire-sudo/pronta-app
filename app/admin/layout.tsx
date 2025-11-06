@@ -2,6 +2,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
+import { getRoleByUserId } from "@/src/lib/api";
 
 export default async function AdminLayout({
   children,
@@ -14,9 +15,8 @@ export default async function AdminLayout({
     redirect('/login');
   }
 
-  // Maintenant TypeScript connaît la propriété role
-  console.log(session.user.role);
-  if (session.user.role !== 'ADMIN') {
+  const role = await getRoleByUserId(Number(session.user.id));
+  if (role.role !== 'ADMIN') {
     redirect('/unauthorized');
   }
 

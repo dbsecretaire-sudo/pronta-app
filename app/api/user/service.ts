@@ -1,4 +1,4 @@
-import { User, CreateUser, UpdateUser, UserFilter, UserModel } from "./types";
+import { User, CreateUser, UpdateUser, UserFilter, UserModel, Role } from "./types";
 import { validateUser, hashPassword, isValidRole } from "./utils";
 
 export class UserService {
@@ -8,6 +8,10 @@ export class UserService {
     return this.userModel.getAllUsers(filters);
   }
 
+  async getRoleByUserId(id: number): Promise<{role: Role}> {
+    return this.userModel.getRoleByUserId(id);
+  } 
+  
   async getUserById(id: number): Promise<User | null> {
     return this.userModel.getUserById(id);
   }
