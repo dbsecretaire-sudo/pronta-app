@@ -34,3 +34,4 @@ export { MessagesTab } from "./MessagesTab";
 export { Button } from "./Button";
 export { default as ServiceForm} from './Modal/ServiceForm';
 export { CallModal } from './Modal/CallModal';
+export { SignOutButton } from "./SignOutButton";
