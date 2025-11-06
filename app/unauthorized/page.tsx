@@ -6,7 +6,7 @@ import Link from "next/link";
 
 export default async function UnauthorizedPage() {
   const session = await getServerSession(authOptions);
-
+  console.log(session?.user.role);
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
       <div className="max-w-md p-8 bg-white rounded-lg shadow-md text-center">
