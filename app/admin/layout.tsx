@@ -15,6 +15,7 @@ export default async function AdminLayout({
   }
 
   // Maintenant TypeScript connaît la propriété role
+  console.log(session.user.role);
   if (session.user.role !== 'ADMIN') {
     redirect('/unauthorized');
   }
