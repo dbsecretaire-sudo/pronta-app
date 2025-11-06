@@ -1,8 +1,6 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  productionBrowserSourceMaps: true,
-
   // Turbopack est activé par défaut dans Next.js 16
   turbopack: {}, // Ajoute cette ligne pour éviter les avertissements
 
@@ -13,12 +11,14 @@ const nextConfig: NextConfig = {
     ],
   },
 
+  ...(process.env.NODE_ENV === 'development' && {
+    swcMinify: false,
+  }),
+
   compiler: {
-    // swcMinify: false,
+        removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error'] } : false,
   },
 
-  // Optionnel : désactive la compression pour voir les erreurs plus facilement
-  compress: false,
 };
 
 export default nextConfig;
