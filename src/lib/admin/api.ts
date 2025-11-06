@@ -1,69 +1,50 @@
-import pool from '@/src/lib/db';
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+export async function fetchResourceItem(resource: string, id: number) {
+    
+  const response = await fetch(`/api/admin/${resource}/${id}`);
+  if (!response.ok) throw new Error('Failed to fetch item');
+  return response.json();
+}
+
+export async function updateResource(resource: string, id: number | undefined, data: any) {
+  const url = `${API_URL}/api/admin/${resource}`;
+  const method = id ? 'PUT' : 'POST';
+  const body = JSON.stringify(id ? { id, ...data } : data);
+
+  const response = await fetch(url, {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+    body,
+  });
+
+  if (!response.ok) throw new Error('Failed to update resource');
+  return response.json();
+}
+
+
+export async function getResourceById(resourceName: string, id: number) {
+  // Appel à votre API ou base de données
+  const response = await fetch(`/api/admin/${resourceName}/${id}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch resource');
+  }
+  return response.json();
+}
 
 export async function fetchResource(resource: string) {
-  switch (resource) {
-    case 'clients':
-      const clients = await pool.query('SELECT * FROM clients');
-      return clients.rows;
-    case 'calls':
-      const calls = await pool.query('SELECT * FROM calls ORDER BY date DESC');
-      return calls.rows;
-    default:
-      return [];
-  }
+  const response = await fetch(`${API_URL}/api/admin/${resource}`);
+  if (!response.ok) throw new Error('Failed to fetch');
+  return response.json();
 }
 
-export async function fetchResourceItem(resource: string, id: string) {
-  switch (resource) {
-    case 'clients':
-      const client = await pool.query('SELECT * FROM clients WHERE id = $1', [id]);
-      return client.rows[0] || null;
-    case 'calls':
-      const call = await pool.query('SELECT * FROM calls WHERE id = $1', [id]);
-      return call.rows[0] || null;
-    default:
-      return null;
-  }
+export async function createResource(resource: string, prevState: any, formData: FormData) {
+  const data = Object.fromEntries(formData.entries());
+  const response = await fetch(`/api/admin/${resource}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) throw new Error('Failed to create');
+  return response.json();
 }
-
-export async function updateResource(resource: string, id: string | undefined, data: any) {
-  switch (resource) {
-    case 'clients':
-      if (id) {
-        // Mise à jour
-        const fields = Object.keys(data).map((key, i) => `${key} = $${i + 2}`).join(', ');
-        const values = Object.values(data);
-        const query = `UPDATE clients SET ${fields} WHERE id = $1 RETURNING *`;
-        const updatedClient = await pool.query(query, [id, ...values]);
-        return updatedClient.rows[0];
-      } else {
-        // Création
-        const fields = Object.keys(data).join(', ');
-        const placeholders = Object.keys(data).map((_, i) => `$${i + 1}`).join(', ');
-        const values = Object.values(data);
-        const query = `INSERT INTO clients (${fields}) VALUES (${placeholders}) RETURNING *`;
-        const newClient = await pool.query(query, values);
-        return newClient.rows[0];
-      }
-    case 'calls':
-      if (id) {
-        // Mise à jour
-        const fields = Object.keys(data).map((key, i) => `${key} = $${i + 2}`).join(', ');
-        const values = Object.values(data);
-        const query = `UPDATE calls SET ${fields} WHERE id = $1 RETURNING *`;
-        const updatedCall = await pool.query(query, [id, ...values]);
-        return updatedCall.rows[0];
-      } else {
-        // Création
-        const fields = Object.keys(data).join(', ');
-        const placeholders = Object.keys(data).map((_, i) => `$${i + 1}`).join(', ');
-        const values = Object.values(data);
-        const query = `INSERT INTO calls (${fields}) VALUES (${placeholders}) RETURNING *`;
-        const newCall = await pool.query(query, values);
-        return newCall.rows[0];
-      }
-    default:
-      throw new Error('Resource not supported');
-  }
-}
-

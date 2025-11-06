@@ -35,3 +35,7 @@ export { Button } from "./Button";
 export { default as ServiceForm} from './Modal/ServiceForm';
 export { CallModal } from './Modal/CallModal';
 export { SignOutButton } from "./SignOutButton";
+export { DataTable } from "./admin/resources/DataTable";
+export { ResourceEditForm } from "./admin/resources/ResourceEditForm";
+export { DataTable as DataTableUi } from "./admin/ui/DataTable";
+export { AdminForm } from "./admin/ui/FormFields";

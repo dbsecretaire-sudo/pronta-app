@@ -6,12 +6,14 @@ import { Column } from "@/src/Components/admin/ui/DataTable"
 import { Call } from '@/src/Components';
 
 interface ResourcePageProps {
-  params: { resource: string };
+  params: Promise<{ resource: string }>;
   searchParams: { [key: string]: string | string[] | undefined };
 }
 
 export default async function ResourcePage({ params }: ResourcePageProps) {
-  const { resource } = params;
+
+  const { resource } = await params;
+console.log( "Resource : ", resource);
   const data = await fetchResource(resource);
 
   if (!data) {

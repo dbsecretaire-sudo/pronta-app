@@ -13,7 +13,7 @@ export default async function ResourceItemPage({ params }: ResourceItemPageProps
 
   let defaultValues = {};
   if (!isNew) {
-    const data = await fetchResourceItem(resource, id);
+    const data = await fetchResourceItem(resource, Number(id));
     if (!data) return notFound();
     defaultValues = data;
   }
@@ -47,7 +47,7 @@ export default async function ResourceItemPage({ params }: ResourceItemPageProps
 
   const handleSubmit = async (formData: any) => {
     'use server';
-    await updateResource(resource, isNew ? undefined : id, formData);
+    await updateResource(resource, isNew ? undefined : Number(id), formData);
     redirect(`/admin/${resource}`);
   };
 
