@@ -41,7 +41,8 @@ export const authOptions: import("next-auth").NextAuthOptions = {
           return {
             id: user.id.toString(),
             email: user.email,
-            name: user.name
+            name: user.name,
+            role: user.role
           };
         } catch (error) {
           console.error("Erreur lors de la vérification des identifiants:", error);
