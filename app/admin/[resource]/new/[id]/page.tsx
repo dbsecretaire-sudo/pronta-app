@@ -25,7 +25,7 @@ export default async function ResourceItemPage({ params }: ResourceItemPageProps
         return [
           { name: 'name', label: 'Nom complet', type: 'text', required: true },
           { name: 'email', label: 'Email', type: 'email', required: true },
-          { name: 'phone', label: 'Téléphone', type: 'tel' },
+          { name: 'phoneNumber', label: 'Téléphone', type: 'tel' },
           { name: 'company', label: 'Entreprise', type: 'text' },
         ];
       case 'calls':

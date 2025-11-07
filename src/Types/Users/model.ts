@@ -187,57 +187,94 @@ export class UserModel {
   }
 
   async updateUser(id: number, userData: UpdateUser): Promise<User> {
-    const fields: string[] = [];
-    const values: any[] = [];
-    let paramIndex = 1;
+  console.log('updateUser called with:', { id, userData }); // Log initial
 
-    const addField = (sql: string, value: any) => {
-      fields.push(sql);
-      values.push(value);
-      paramIndex++;
-    };
+  const fields: string[] = [];
+  const values: any[] = [];
+  let paramIndex = 1;
 
-    // Champs simples
-    userData.email !== undefined && addField(`email = $${paramIndex}`, userData.email);
-    userData.name !== undefined && addField(`name = $${paramIndex}`, userData.name);
-    userData.role !== undefined && addField(`role = $${paramIndex}`, userData.role);
-    userData.phone !== undefined && addField(`phone = $${paramIndex}`, userData.phone);
-    userData.company !== undefined && addField(`company = $${paramIndex}`, userData.company);
+  const addField = (sql: string, value: any) => {
+    console.log(`Adding field: ${sql} with value:`, value); // Log pour chaque champ
+    fields.push(sql);
+    values.push(value);
+    paramIndex++;
+  };
 
-    // Champs JSONB complexes
-    if (userData.billing_address !== undefined) {
-      addField(
-        `billing_address = $${paramIndex}`,
-        userData.billing_address ? JSON.stringify(userData.billing_address) : null
-      );
-    }
-    if (userData.payment_method !== undefined) {
-      addField(
-        `payment_method = $${paramIndex}`,
-        userData.payment_method ? JSON.stringify(userData.payment_method) : null
-      );
-    }
+  // Champs simples
+  if (userData.email !== undefined) {
+    console.log('Updating email:', userData.email);
+    addField(`email = $${paramIndex}`, userData.email);
+  }
+  if (userData.name !== undefined) {
+    console.log('Updating name:', userData.name);
+    addField(`name = $${paramIndex}`, userData.name);
+  }
+  if (userData.role !== undefined) {
+    console.log('Updating role:', userData.role);
+    addField(`role = $${paramIndex}`, userData.role);
+  }
+  if (userData.phone !== undefined) {
+    console.log('Updating phone:', userData.phone);
+    addField(`phone = $${paramIndex}`, userData.phone);
+  }
+  if (userData.company !== undefined) {
+    console.log('Updating company:', userData.company);
+    addField(`company = $${paramIndex}`, userData.company);
+  }
 
-    if (fields.length === 0) {
-      throw new Error('No fields to update');
-    }
+  // Champs JSONB complexes
+  if (userData.billing_address !== undefined) {
+    console.log('Updating billing_address:', userData.billing_address);
+    addField(
+      `billing_address = $${paramIndex}`,
+      userData.billing_address ? JSON.stringify(userData.billing_address) : null
+    );
+  }
+  if (userData.payment_method !== undefined) {
+    console.log('Updating payment_method:', userData.payment_method);
+    addField(
+      `payment_method = $${paramIndex}`,
+      userData.payment_method ? JSON.stringify(userData.payment_method) : null
+    );
+  }
 
-    const query = `
-      UPDATE users
-      SET ${fields.join(', ')}
-      WHERE id = $${paramIndex}
-      RETURNING *
-    `;
-    values.push(id);
+  if (fields.length === 0) {
+    console.error('No fields to update');
+    throw new Error('No fields to update');
+  }
 
+  console.log('Final query parts:', { fields, values }); // Log avant l'exécution
+
+  const query = `
+    UPDATE users
+    SET ${fields.join(', ')}
+    WHERE id = $${paramIndex}
+    RETURNING *
+  `;
+
+  console.log('Final query:', query); // Log de la requête finale
+  console.log('Final values:', values); // Log des valeurs finales
+
+  values.push(id);
+
+  try {
     const res = await pool.query(query, values);
+    console.log('Query result:', res.rows); // Log du résultat
+
     if (res.rows.length === 0) {
+      console.error('User not found');
       throw new Error('User not found');
     }
 
     const user = this.mapDbUserToUser(res.rows[0]);
+    console.log('Returning user:', user); // Log de l'utilisateur retourné
     return { ...user };
+  } catch (error) {
+    console.error('Database error:', error); // Log des erreurs de base de données
+    throw error;
   }
+}
+
 
   // Création d'un utilisateur (sans abonnement)
   async createUser(user: Omit<CreateUser, "password"> & { password_hash: string }): Promise<User> {

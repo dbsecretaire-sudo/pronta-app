@@ -37,13 +37,12 @@ export class UserServiceModel {
     
     async getAllUserServices(): Promise<UserServiceWithDetails[]> {
         const res = await pool.query(
-        `SELECT us.user_id, us.service_id, us.subscription_date, us.is_active, us.can_write, us.can_delete,
-                s.id AS service_id, s.name AS service_name,
-                s.description AS service_description, s.route AS service_route,
-                s.icon AS service_icon
-        FROM user_services us
-        JOIN services s ON us.service_id = s.id`,
-
+          `SELECT us.user_id, us.service_id, us.subscription_date, us.is_active, us.can_write, us.can_delete,
+            s.id AS service_id, s.name AS service_name,
+            s.description AS service_description, s.route AS service_route,
+            s.icon AS service_icon, s.price AS service_price, s.unit AS service_unit
+          FROM user_services us
+          JOIN services s ON us.service_id = s.id`,
         );
 
         return res.rows.map(row => ({

@@ -14,7 +14,7 @@ export async function fetchCalls(filter: CallFilter) {
 }
 
 export const fetchAllCalls = async (): Promise<Call[]> => {
-  const res = await fetch(`${API_URL}/api/calls`, { credentials: 'include' });
+  const res = await fetch(`${API_URL}/api/calls/All`, { credentials: 'include' });
   if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
   return res.json();
 }

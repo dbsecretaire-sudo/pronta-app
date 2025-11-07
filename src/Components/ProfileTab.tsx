@@ -71,11 +71,10 @@ const getRoleLabel = (role: Role) => {
 interface ProfileTabProps {
   data: {
     email: string;
-    phone: string;
     name: string;
     role: Role;
   };
-  onEdit: (data: { email: string; phone: string; name: string; role: Role }) => Promise<{ success: boolean; message: string }>;
+  onEdit: (data: { email: string; name: string; role: Role }) => Promise<{ success: boolean; message: string }>;
   isUpdating?: boolean;
 }
 
@@ -95,7 +94,6 @@ export function ProfileTab({ data, onEdit, isUpdating = false }: ProfileTabProps
   const fields = [
     { name: "name", label: "Nom complet", required: true },
     { name: "email", label: "Email", type: "email", required: true },
-    { name: "phone", label: "Téléphone", type: "tel" },
     { name: "role", label: "Rôle d'accès", options: roleOptions },
   ];
 

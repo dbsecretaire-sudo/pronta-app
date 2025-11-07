@@ -25,7 +25,6 @@ export class SubscriptionService {
   }
 
   async getSubscriptionByUserId(user_id: number): Promise<SubscriptionWithService[]> {
-    console.log("getSubscriptionByUserId");
     return this.subscriptionModel.getSubscriptionByUserId(user_id);
   }
 

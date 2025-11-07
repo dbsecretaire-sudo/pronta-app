@@ -13,10 +13,13 @@ export default function DashboardHome() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+
+
   // Séparation des services
   const subscribedServices = availableServices.filter((s) => s.userService?.is_active);
   const servicesToReactivate = availableServices.filter((s) => s.userService && !s.userService.is_active);
   const servicesToSubscribe = availableServices.filter((s) => !s.userService);
+  const unsubscribedServices = availableServices.filter((s) => !s.userService || (s.userService && !s.userService.is_active));
 
   if (loading) return <div className="p-8">Chargement...</div>;
 
@@ -47,34 +50,36 @@ export default function DashboardHome() {
       </section>
 
       {/* Services disponibles */}
-      <section className="mb-10">
-        <h2 className="text-xl font-semibold mb-4">Services disponibles</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {servicesToReactivate.map((service) => (
-            <ServiceCard
-              key={service.id}
-              service={service}
-              isSubscribed={true}
-              onReactivate={handleReactivate}
-              userService={service.userService}
-            />
-          ))}
-          {servicesToSubscribe.map((service) => (
-            <ServiceCard
-              key={service.id}
-              service={service}
-              isSubscribed={false}
-              onSubscribe={handleSubscribe}
-            />
-          ))}
-          <button
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium"
-            onClick={() => setIsAddServiceModalOpen(true)}
-          >
-            Ajouter un service
-          </button>
-        </div>
-      </section>
+      {unsubscribedServices.length > 0 ? (
+        <section className="mb-10">
+          <h2 className="text-xl font-semibold mb-4">Services disponibles</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {servicesToReactivate.map((service) => (
+              <ServiceCard
+                key={service.id}
+                service={service}
+                isSubscribed={true}
+                onReactivate={handleReactivate}
+                userService={service.userService}
+              />
+            ))}
+            {servicesToSubscribe.map((service) => (
+              <ServiceCard
+                key={service.id}
+                service={service}
+                isSubscribed={false}
+                onSubscribe={handleSubscribe}
+              />
+            ))}
+            {/* <button
+              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium"
+              onClick={() => setIsAddServiceModalOpen(true)}
+            >
+              Ajouter un service
+            </button> */}
+          </div>
+        </section>
+      ) : ( '' )}
 
       {/* Modal d'ajout de service */}
       {isAddServiceModalOpen && (

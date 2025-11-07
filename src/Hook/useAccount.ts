@@ -28,7 +28,6 @@ export function useAccount() {
   // Mise à jour du profil utilisateur (sans toucher aux abonnements)
   const handleProfileUpdate = async (updatedData: {
     email: string;
-    phone: string;
     name: string;
     role: Role;
   }) => {

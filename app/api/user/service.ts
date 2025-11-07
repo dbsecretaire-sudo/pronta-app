@@ -55,7 +55,6 @@ export class UserService {
   }
 
   async updateUser(id: number, user: UpdateUser): Promise<User> {
-
     return this.userModel.updateUser(id, user);
   }
 

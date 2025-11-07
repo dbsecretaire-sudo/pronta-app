@@ -15,7 +15,7 @@ interface CallListProps {
 
 export function CallList({ calls, onCallClick }: CallListProps) {
   return (
-    <div className="bg-white rounded-lg shadow overflow-hidden">
+    <div className="bg-white rounded-lg shadow">
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           <tr>

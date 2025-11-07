@@ -13,8 +13,10 @@ export async function GET(request: Request) {
     const byPhone = searchParams.get('byPhone');
 
     if (!userId || isNaN(Number(userId))) {
-      const calls = await callService.getAllCalls();
-      return NextResponse.json(calls);
+      return NextResponse.json(
+        { error: "Invalid userId" },
+        { status: 400 }
+      );
     }
 
     const calls = await callService.getCallsByUserId({

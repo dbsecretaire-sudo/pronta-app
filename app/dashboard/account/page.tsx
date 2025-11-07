@@ -62,7 +62,6 @@ export default function AccountPage() {
         <ProfileTab
           data={{
             email: userData.email,
-            phone: userData.phone || "",
             name: userData.name || "",
             role: userData.role || ""
           }}

@@ -65,12 +65,12 @@ export const useServices = (userId: string | undefined, status: string) => {
       });
 
       // Filtre les services disponibles
-      const availableServices = servicesWithStatus.filter(
-        (s) => !s.isSubscribed || (s.isSubscribed && !s.isActive)
-      );
+      // const availableServices = servicesWithStatus.filter(
+      //   (s) => !s.isSubscribed || (s.isSubscribed && !s.isActive)
+      // );
 
       setServices(subscribedServices);
-      setAvailableServices(availableServices);
+      setAvailableServices(servicesWithStatus);
     } catch (error) {
       console.error("Erreur:", error);
       setError("Impossible de charger les services.");
