@@ -40,6 +40,7 @@ console.log( "Resource : ", resource);
         return [
           { header: 'ID', accessor: 'id' as keyof T},
           { header: 'Numéro', accessor: 'phoneNumber'  as keyof T},
+          { header: "Client", accessor: 'user_id' as keyof T },
           {
             header: 'Type',
             accessor: 'type' as keyof T,
