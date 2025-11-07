@@ -71,41 +71,10 @@ export default function DashboardHome() {
                 onSubscribe={handleSubscribe}
               />
             ))}
-            {/* <button
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium"
-              onClick={() => setIsAddServiceModalOpen(true)}
-            >
-              Ajouter un service
-            </button> */}
+           
           </div>
         </section>
       ) : ( '' )}
-
-      {/* Modal d'ajout de service */}
-      {isAddServiceModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
-            <h3 className="text-lg font-semibold mb-4">Ajouter un nouveau service</h3>
-            <ServiceForm
-              onSubmit={async (data) => {
-                setIsSubmitting(true);
-                setError(null);
-                try {
-                  await createService(data);
-                  setIsAddServiceModalOpen(false);
-                } catch (err) {
-                  setError(err instanceof Error ? err.message : "Une erreur est survenue");
-                } finally {
-                  setIsSubmitting(false);
-                }
-              }}
-              onCancel={() => setIsAddServiceModalOpen(false)}
-              isSubmitting={isSubmitting}
-              error={error}
-            />
-          </div>
-        </div>
-      )}
 
       {/* Messages importants */}
       <section className="mb-10 bg-white rounded-lg shadow-md p-6">

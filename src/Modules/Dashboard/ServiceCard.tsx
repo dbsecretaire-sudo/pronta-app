@@ -30,12 +30,12 @@ export const ServiceCard = ({
     {/* Actions */}
     {isSubscribed ? (
       <>
-        {userService?.is_active && ( // ✅ Affiche "Accéder" uniquement si actif
+        {userService?.is_active && (
           <Link href={service.route} className="text-sm text-blue-600 font-medium block mb-2">
             Accéder →
           </Link>
         )}
-        {userService?.is_active ? (
+        {/* {userService?.is_active ? (
           <button
             onClick={() => onDeactivate?.(service)} // ✅ Bouton "Désactiver" pour les services actifs
             className="bg-red-100 text-red-800 px-4 py-2 rounded-md hover:bg-red-200"
@@ -49,7 +49,7 @@ export const ServiceCard = ({
           >
             Réactiver
           </button>
-        )}
+        )} */}
       </>
     ) : (
       <button

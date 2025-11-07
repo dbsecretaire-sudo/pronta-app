@@ -29,7 +29,6 @@ export function useAccount() {
   const handleProfileUpdate = async (updatedData: {
     email: string;
     name: string;
-    role: Role;
   }) => {
     if(!userData?.id) {
       console.error('User data is not available');

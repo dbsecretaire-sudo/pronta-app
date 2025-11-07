@@ -13,28 +13,8 @@ interface ProfileFieldProps {
   required?: boolean;
 }
 
-const ProfileField = ({ label, value, type = "text", options, onChange, editMode, required }: ProfileFieldProps) => {
+const ProfileField = ({ label, value, type = "text", onChange, editMode, required }: ProfileFieldProps) => {
   if (editMode) {
-    if (options) {
-      return (
-        <div>
-          <label className="block text-sm font-medium text-gray-700">{label}</label>
-          <select
-            value={value}
-            onChange={(e) => onChange?.(e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            required={required}
-          >
-            {options.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
-      );
-    }
-
     return (
       <div>
         <label className="block text-sm font-medium text-gray-700">{label}</label>
@@ -57,24 +37,12 @@ const ProfileField = ({ label, value, type = "text", options, onChange, editMode
   );
 };
 
-const roleOptions = [
-  { value: "ADMIN", label: "Administrateur" },
-  { value: "CLIENT", label: "Client" },
-  { value: "SECRETARY", label: "Secrétaire" },
-  { value: "SUPERVISOR", label: "Superviseur" },
-];
-
-const getRoleLabel = (role: Role) => {
-  return roleOptions.find(option => option.value === role)?.label || role || "Non spécifié";
-};
-
 interface ProfileTabProps {
   data: {
     email: string;
     name: string;
-    role: Role;
   };
-  onEdit: (data: { email: string; name: string; role: Role }) => Promise<{ success: boolean; message: string }>;
+  onEdit: (data: { email: string; name: string }) => Promise<{ success: boolean; message: string }>;
   isUpdating?: boolean;
 }
 
@@ -94,7 +62,6 @@ export function ProfileTab({ data, onEdit, isUpdating = false }: ProfileTabProps
   const fields = [
     { name: "name", label: "Nom complet", required: true },
     { name: "email", label: "Email", type: "email", required: true },
-    { name: "role", label: "Rôle d'accès", options: roleOptions },
   ];
 
   return (
@@ -107,9 +74,8 @@ export function ProfileTab({ data, onEdit, isUpdating = false }: ProfileTabProps
             <ProfileField
               key={field.name}
               label={field.label}
-              value={field.name === "role" ? formData.role : formData[field.name as keyof typeof formData]}
+              value={formData[field.name as keyof typeof formData]}
               type={field.type}
-              options={field.options}
               onChange={handleChange(field.name as keyof typeof formData)}
               editMode={editMode}
               required={field.required}
@@ -142,7 +108,7 @@ export function ProfileTab({ data, onEdit, isUpdating = false }: ProfileTabProps
             <ProfileField
               key={field.name}
               label={field.label}
-              value={field.name === "role" ? getRoleLabel(formData.role) : formData[field.name as keyof typeof formData]}
+              value={formData[field.name as keyof typeof formData]}
               editMode={editMode}
             />
           ))}

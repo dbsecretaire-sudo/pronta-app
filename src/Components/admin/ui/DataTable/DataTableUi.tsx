@@ -32,7 +32,11 @@ type ExtendedColumnDef<TData> = ColumnDef<TData, any> & {
   meta?: ExtendedColumnMeta;
 };
 
-interface DataTableProps<TData> {
+interface DataWithId {
+  id: number;  // ou string, selon ton cas
+}
+
+interface DataTableProps<TData extends DataWithId> {
   data: TData[];
   columns: ExtendedColumnDef<TData>[];
   resourceName: string;
@@ -74,7 +78,7 @@ const TypeBadgeCell = ({ value, typeData }: { value: string, typeData?: Record<s
   );
 };
 
-export function DataTableUi<TData>({
+export function DataTableUi<TData extends DataWithId>({
   data,
   columns,
   resourceName,
@@ -248,7 +252,7 @@ export function DataTableUi<TData>({
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex justify-end space-x-2">
                       <Link
-                        href={`/admin/${resourceName}/${row.id}`}
+                        href={`/admin/${resourceName}/${row.original.id}`}
                         className="text-blue-600 hover:text-blue-900"
                         title="Modifier"
                       >
