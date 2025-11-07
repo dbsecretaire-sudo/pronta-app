@@ -40,4 +40,3 @@ export { DataTableUi } from "./admin/ui/DataTable/DataTableUi";
 export { AdminForm } from "./admin/ui/FormFields";
 export { default as ResourceForm } from "./admin/resources/ResourceForm";
 export { CallDataTable } from "./admin/ui/DataTable/CallDataTable";
-export { getTableColumns } from "./admin/ui/DataTable/tableColumns";
