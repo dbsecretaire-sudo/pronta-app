@@ -5,7 +5,7 @@ import { notFound, redirect } from 'next/navigation';
 import { createResource } from '@/app/actions/admin';
 
 
-export default async function NewResourcePage(
+export async function NewResourcePage(
     request: Request,
     {  params } : { params: Promise<{ resource: string }> }
 ) {

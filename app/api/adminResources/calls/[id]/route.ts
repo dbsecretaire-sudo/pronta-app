@@ -4,10 +4,11 @@ import { getResourceById, updateResource } from '@/src/lib/admin/api';
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const call = await getResourceById('calls', parseInt(params.id));
+    const { id } = await params;
+    const call = await getResourceById('calls', Number(id));
     if (!call) {
       return NextResponse.json({ error: 'Call not found' }, { status: 404 });
     }
@@ -22,11 +23,12 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const id = await params;
     const data = await request.json();
-    const updatedCall = await updateResource('calls', parseInt(params.id), data);
+    const updatedCall = await updateResource('calls', Number(id), data);
     return NextResponse.json(updatedCall);
   } catch (error) {
     return NextResponse.json(
