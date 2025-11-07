@@ -5,12 +5,12 @@ import { notFound, redirect } from 'next/navigation';
 import { createResource } from '@/app/actions/admin';
 
 
-export default function NewResourcePage({
-  params,
-}: {
-  params: { resource: string };
-}) {
-  const { resource } = params;
+export default async function NewResourcePage(
+    request: Request,
+    {  params } : { params: Promise<{ resource: string }> }
+) {
+
+  const { resource } = await params;
   const [state, formAction] = useFormState(
     createResource.bind(null, resource),
     {}

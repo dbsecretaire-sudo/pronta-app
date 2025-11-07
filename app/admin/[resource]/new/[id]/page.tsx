@@ -4,11 +4,11 @@ import { fetchResourceItem, updateResource } from '@/src/lib/admin/api';
 import { notFound, redirect } from 'next/navigation';
 
 interface ResourceItemPageProps {
-  params: { resource: string; id: string };
+  params: Promise<{ resource: string, id: string }>;
 }
 
 export default async function ResourceItemPage({ params }: ResourceItemPageProps) {
-  const { resource, id } = params;
+  const { resource, id } = await params;
   const isNew = id === 'new';
 
   let defaultValues = {};

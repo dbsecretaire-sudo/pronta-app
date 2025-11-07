@@ -3,14 +3,11 @@ import { ResourceEditForm } from '@/src/Components';
 import { notFound } from 'next/navigation';
 
 interface ResourceEditPageProps {
-  params: {
-    resource: string;
-    id: string;
-  };
+  params: Promise<{ resource: string, id: string }>;
 }
 
-export default function ResourceEditPage({ params }: ResourceEditPageProps) {
-  const { resource, id } = params;
+export default async function ResourceEditPage({ params }: ResourceEditPageProps) {
+  const { resource, id } = await params;
 
   // Vérifiez que l'ID est un nombre valide
   if (!/^\d+$/.test(id)) {
