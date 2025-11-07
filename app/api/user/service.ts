@@ -11,6 +11,10 @@ export class UserService {
   async getAllUsersName(): Promise<Record<number, { id: number; name: string; }>> {
     return this.userModel.getAllUsersName();
   }
+  
+  async getAllUsersRole(): Promise<Record<number, { id: number; role: string; }>> {
+    return this.userModel.getAllUsersRole();
+  }
 
   async getRoleByUserId(id: number): Promise<{role: Role}> {
     return this.userModel.getRoleByUserId(id);

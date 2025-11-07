@@ -26,7 +26,7 @@ export class UserModel {
           : undefined,
       phone: dbUser.phone || undefined,
       company: dbUser.company || undefined,
-      role: dbUser.role,
+      role: dbUser.role
     };
   }
 
@@ -68,6 +68,20 @@ export class UserModel {
     const res = await pool.query(query);
     // Crée une map { id: { id, name } } pour un accès rapide
     return res.rows.reduce((acc: Record<number, { id: number; name: string }>, user) => {
+      acc[user.id] = user;
+      return acc;
+    }, {});
+  }
+  
+  async getAllUsersRole(): Promise<Record<number, { id: number; role: string }>> {
+    const query = `
+      SELECT id, role
+      FROM users
+      ORDER BY created_at DESC
+    `;
+    const res = await pool.query(query);
+    // Crée une map { id: { id, name } } pour un accès rapide
+    return res.rows.reduce((acc: Record<number, { id: number; role: string }>, user) => {
       acc[user.id] = user;
       return acc;
     }, {});

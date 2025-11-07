@@ -11,7 +11,7 @@ export interface Call {
   type: CallType;
   summary: string;
   duration?: number;
-  company_id: number;
+  client_id: number;
 }
 
 export interface CallFilter {

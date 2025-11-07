@@ -53,14 +53,26 @@ export const fetchUsers = async () => {
     return res.json();
 }
 
-export const fetchUsersName = async () => {
-    const res = await fetch(`${API_URL}/api/user/name`, {credentials : 'include'});
+export const fetchUsersRole = async () => {
+    const res = await fetch(`${API_URL}/api/user/role`, {credentials : 'include'});
     if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
     return res.json();
 }
 
-export const fetchCompaniesName = async () => {
-    const res = await fetch(`${API_URL}/api/Company/name`, {credentials : 'include'});
+
+export const fetchUsersForAdmin = async () => {
+    const res = await fetch(`${API_URL}/api/user/role`, {credentials : 'include'});
+    const users = await res.json();
+     
+    return users.reduce((acc: Record<number, any>, user: any) => {
+        acc[user.id] = user;
+        return acc;
+    }, {});
+
+}
+
+export const fetchUsersName = async () => {
+    const res = await fetch(`${API_URL}/api/user/name`, {credentials : 'include'});
     if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
     return res.json();
 }
