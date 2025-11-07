@@ -1,5 +1,5 @@
-import { Role } from "@/src/Types/Users";
-import { User } from "next-auth";
+import { Role, User } from "@/src/Types/Users";
+
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 

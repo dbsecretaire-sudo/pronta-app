@@ -45,7 +45,7 @@ export default function AdminPage() {
     },
     {
       name: 'Utilisateurs',
-      path: '/admin/users',
+      path: '/admin/user',
       icon: <FaUserCog className="mr-2 text-gray-500" />
     },
     {
