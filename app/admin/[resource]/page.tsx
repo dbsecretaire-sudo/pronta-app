@@ -2,7 +2,7 @@
 import { fetchResource } from '@/src/lib/admin/api';
 import { notFound } from 'next/navigation';
 import { Call, Column, DataTableUi } from '@/src/Components';
-import { fetchUsersName } from '@/src/lib/api';
+import { fetchCompaniesName, fetchUsersName } from '@/src/lib/api';
 import { User } from '@/src/Types/Users';
 
 interface ResourcePageProps {
@@ -13,28 +13,25 @@ interface ResourcePageProps {
 interface SerializableColumn<T> {
   header: string;
   accessor: keyof T;
-  type?: 'text' | 'date' | 'duration' | 'typeBadge';
+  type?: 'text' | 'date' | 'duration' | 'typeBadge' | 'userName';
   typeData?: Record<string, { label: string; color: string }>;
+  users?: Record<number, { id: number; name: string }>;
 }
 
 export default async function ResourcePage({ params }: ResourcePageProps) {
 
   const { resource } = await params;
-console.log( "Resource : ", resource);
   const data = await fetchResource(resource);
+  const users = resource === 'calls' ? await fetchUsersName() : {};
+  const companies = resource === 'calls' ? await fetchCompaniesName() : {};
+
 
   if (!data) {
     return notFound();
   }
 
-  let users: Record<number, { id: number; name: string }> = {};
-  if (resource === 'calls') {
-    const clientsData = await fetchUsersName();
-    users = Object.fromEntries(clientsData.map((user: { id: any; }) => [user.id, user]));
-  }
-
   // Définissez les colonnes en fonction de la ressource
-  const getColumns = <T extends { id: number }>(resourceName: string): SerializableColumn<T>[] => {
+  const getColumns = <T extends { id: number | any }>(resourceName: string): SerializableColumn<T>[] => {
     switch (resourceName) {
       case 'clients':
         return [
@@ -46,9 +43,19 @@ console.log( "Resource : ", resource);
         ];
       case 'calls':
         return [
-          { header: 'ID', accessor: 'id' as keyof T},
-          { header: 'Numéro', accessor: 'phoneNumber'  as keyof T},
-          { header: 'Utilisateur', accessor: 'user_name' as keyof T }, 
+          { header: 'Numéro', accessor: 'phone'  as keyof T},
+          {
+            header: 'Secrétaire',
+            accessor: 'user_id'  as keyof T,
+            type: 'userName', // Utilisez un type pour identifier le rendu
+            users: users 
+          },
+          {
+            header: 'Client',
+            accessor: 'company_id'  as keyof T,
+            type: 'userName', // Utilisez un type pour identifier le rendu
+            users: companies 
+          },
           {
             header: 'Type',
             accessor: 'type' as keyof T,

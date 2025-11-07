@@ -54,7 +54,13 @@ export const fetchUsers = async () => {
 }
 
 export const fetchUsersName = async () => {
-    const res = await fetch(`/api/user/name`, {credentials : 'include'});
+    const res = await fetch(`${API_URL}/api/user/name`, {credentials : 'include'});
+    if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+    return res.json();
+}
+
+export const fetchCompaniesName = async () => {
+    const res = await fetch(`${API_URL}/api/Company/name`, {credentials : 'include'});
     if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
     return res.json();
 }

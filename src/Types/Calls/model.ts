@@ -30,10 +30,10 @@ export class CallModel {
     // Créer un appel
     async createCall(call: Omit<Call, 'id'>): Promise<Call> {
         const res = await pool.query(
-            `INSERT INTO calls (user_id, name, phone, date, type, summary, duration, phone_number, contact_name)
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            `INSERT INTO calls (user_id, name, phone, date, type, summary, duration, phone_number, contact_name, company_id)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
             RETURNING *`,
-            [call.user_id, call.name, call.phone, call.date, call.type, call.summary, call.duration, call.phoneNumber, call.contactName]
+            [call.user_id, call.name, call.phone, call.date, call.type, call.summary, call.duration, call.phoneNumber, call.contactName, call.company_id]
         );
         return res.rows[0];
     }
