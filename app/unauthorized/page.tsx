@@ -1,7 +1,7 @@
 // src/app/unauthorized/page.tsx
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { SignOutButton } from "@/src/Components/SignOutButton"; // À créer
+import { SignOutButton } from "@/src/Components"; // À créer
 import Link from "next/link";
 
 export default async function UnauthorizedPage() {

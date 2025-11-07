@@ -38,5 +38,6 @@ export { SignOutButton } from "./SignOutButton";
 export { DataTable } from "./admin/resources/DataTable";
 export { ResourceEditForm } from "./admin/resources/ResourceEditForm";
 export { DataTable as DataTableUi } from "./admin/ui/DataTable";
+export type { Column } from "./admin/ui/DataTable";
 export { AdminForm } from "./admin/ui/FormFields";
 export { default as ResourceForm } from "./admin/resources/ResourceForm";

@@ -1,8 +1,8 @@
 // src/components/admin/ResourceDataTable.tsx
 'use client';
 
-import { DataTable as DataTableUi } from '@/src/Components/admin/ui/DataTable';
-import { Column } from "@/src/Components/admin/ui/DataTable";
+import { DataTableUi } from '@/src/Components';
+import { Column } from "@/src/Components";
 import { Call } from '@/src/Components';
 import Link from 'next/link';
 

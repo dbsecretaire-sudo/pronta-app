@@ -1,13 +1,18 @@
 // src/app/admin/[resource]/page.tsx
-import { DataTable } from '@/src/Components/admin/ui/DataTable';
 import { fetchResource } from '@/src/lib/admin/api';
 import { notFound } from 'next/navigation';
-import { Column } from "@/src/Components/admin/ui/DataTable"
-import { Call } from '@/src/Components';
+import { Call, Column, DataTableUi } from '@/src/Components';
 
 interface ResourcePageProps {
   params: Promise<{ resource: string }>;
   searchParams: { [key: string]: string | string[] | undefined };
+}
+
+interface SerializableColumn<T> {
+  header: string;
+  accessor: keyof T;
+  type?: 'text' | 'date' | 'duration' | 'typeBadge';
+  typeData?: Record<string, { label: string; color: string }>;
 }
 
 export default async function ResourcePage({ params }: ResourcePageProps) {
@@ -21,7 +26,7 @@ console.log( "Resource : ", resource);
   }
 
   // Définissez les colonnes en fonction de la ressource
-  const getColumns = <T extends {id : number}>(resourceName: string): Column<T>[] => {
+  const getColumns = <T extends { id: number }>(resourceName: string): SerializableColumn<T>[] => {
     switch (resourceName) {
       case 'clients':
         return [
@@ -33,44 +38,31 @@ console.log( "Resource : ", resource);
         ];
       case 'calls':
         return [
-          { header: 'ID', accessor: 'id' as keyof T },
-          { header: 'Numéro', accessor: 'phoneNumber' as keyof T },
-          { 
-            header: 'Type', 
-            accessor: 'type' as keyof T, 
-            render: (value: Call['type']) => {
-                const types: Record<Call['type'], { label: string; color: string }> = {
-                incoming: { label: 'Entrant', color: 'green' },
-                outgoing: { label: 'Sortant', color: 'blue' },
-                missed: { label: 'Manqué', color: 'red' }
-                };
-
-                // Vérification de sécurité
-                const typeInfo = types[value];
-                return (
-                    <span className={`px-2 py-1 text-xs rounded-full bg-${types[value]?.color || 'gray'}-100 text-${types[value]?.color || 'gray'}-800`}>
-                        {types[value]?.label || value}
-                    </span>
-                );
-              }
-          },
-          { 
-            header: 'Date', 
-            accessor: 'date' as keyof T , 
-            render: (value: any) => new Date(value).toLocaleString('fr-FR')
-          },
-          { 
-            header: 'Durée', 
-            accessor: 'duration' as keyof T , 
-            render: (value: number) => {
-                const mins = Math.floor(value / 60);
-                const secs = value % 60;
-                return `${mins}:${String(secs).padStart(2, '0')}`;
+          { header: 'ID', accessor: 'id' as keyof T},
+          { header: 'Numéro', accessor: 'phoneNumber'  as keyof T},
+          {
+            header: 'Type',
+            accessor: 'type' as keyof T,
+            type: 'typeBadge',
+            typeData: {
+              incoming: { label: 'Entrant', color: 'green' },
+              outgoing: { label: 'Sortant', color: 'blue' },
+              missed: { label: 'Manqué', color: 'red' }
             }
           },
-        ]
-        default:
-            return [];
+          {
+            header: 'Date',
+            accessor: 'date' as keyof T,
+            type: 'date'
+          },
+          {
+            header: 'Durée',
+            accessor: 'duration' as keyof T,
+            type: 'duration'
+          },
+        ];
+      default:
+        return [];
     }
   };
 
@@ -78,7 +70,7 @@ console.log( "Resource : ", resource);
 
   return (
     <div className="space-y-6">
-      <DataTable
+      <DataTableUi
         data={data}
         columns={columns}
         resourceName={resource}

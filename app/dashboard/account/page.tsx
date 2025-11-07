@@ -3,7 +3,6 @@ import { ProfileTab, BillingTab, MessagesTab } from "@/src/Components";
 import { useAccount } from "@/src/Hook/useAccount";
 import { SubscriptionWithService } from "@/src/Types/Subscription";
 import { useEffect, useState } from "react";
-import { BillingTabData } from "@/src/Components/BillingTab/types";
 import { fetchUserSubscriptions } from "@/src/lib/api";
 import { useSession } from "next-auth/react";
 

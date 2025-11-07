@@ -1,7 +1,7 @@
 // src/components/admin/ui/Form.tsx
 "use client";
 import { useForm, UseFormReturn, FieldValues, DefaultValues } from 'react-hook-form';
-import { Button } from '@/src/Components/Button';
+import { Button } from '@/src/Components';
 
 interface FormField {
   name: string;

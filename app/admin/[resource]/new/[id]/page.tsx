@@ -1,5 +1,5 @@
 // src/app/admin/[resource]/[id]/page.tsx
-import { AdminForm } from '@/src/Components/admin/ui/FormFields';
+import { AdminForm } from '@/src/Components';
 import { fetchResourceItem, updateResource } from '@/src/lib/admin/api';
 import { notFound, redirect } from 'next/navigation';
 
