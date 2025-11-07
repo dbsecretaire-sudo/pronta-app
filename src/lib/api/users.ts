@@ -46,3 +46,15 @@ export async function getRoleByUserId(userId: number){
   if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
   return res.json();
 }
+
+export const fetchUsers = async () => {
+    const res = await fetch(`/api/user`, {credentials : 'include'});
+    if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+    return res.json();
+}
+
+export const fetchUsersName = async () => {
+    const res = await fetch(`/api/user/name`, {credentials : 'include'});
+    if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+    return res.json();
+}

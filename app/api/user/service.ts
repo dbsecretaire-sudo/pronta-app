@@ -8,6 +8,10 @@ export class UserService {
     return this.userModel.getAllUsers(filters);
   }
 
+  async getAllUsersName(): Promise<Record<number, { id: number; name: string; }>> {
+    return this.userModel.getAllUsersName();
+  }
+
   async getRoleByUserId(id: number): Promise<{role: Role}> {
     return this.userModel.getRoleByUserId(id);
   } 

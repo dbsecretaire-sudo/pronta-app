@@ -2,6 +2,8 @@
 import { fetchResource } from '@/src/lib/admin/api';
 import { notFound } from 'next/navigation';
 import { Call, Column, DataTableUi } from '@/src/Components';
+import { fetchUsersName } from '@/src/lib/api';
+import { User } from '@/src/Types/Users';
 
 interface ResourcePageProps {
   params: Promise<{ resource: string }>;
@@ -25,6 +27,12 @@ console.log( "Resource : ", resource);
     return notFound();
   }
 
+  let users: Record<number, { id: number; name: string }> = {};
+  if (resource === 'calls') {
+    const clientsData = await fetchUsersName();
+    users = Object.fromEntries(clientsData.map((user: { id: any; }) => [user.id, user]));
+  }
+
   // Définissez les colonnes en fonction de la ressource
   const getColumns = <T extends { id: number }>(resourceName: string): SerializableColumn<T>[] => {
     switch (resourceName) {
@@ -40,7 +48,7 @@ console.log( "Resource : ", resource);
         return [
           { header: 'ID', accessor: 'id' as keyof T},
           { header: 'Numéro', accessor: 'phoneNumber'  as keyof T},
-          { header: "Client", accessor: 'user_id' as keyof T },
+          { header: 'Utilisateur', accessor: 'user_name' as keyof T }, 
           {
             header: 'Type',
             accessor: 'type' as keyof T,

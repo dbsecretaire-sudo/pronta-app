@@ -59,6 +59,20 @@ export class UserModel {
     };
   }
 
+  async getAllUsersName(): Promise<Record<number, { id: number; name: string }>> {
+    const query = `
+      SELECT id, name
+      FROM users
+      ORDER BY created_at DESC
+    `;
+    const res = await pool.query(query);
+    // Crée une map { id: { id, name } } pour un accès rapide
+    return res.rows.reduce((acc: Record<number, { id: number; name: string }>, user) => {
+      acc[user.id] = user;
+      return acc;
+    }, {});
+  }
+
   async getAllUsers(filters?: UserFilter): Promise<User[]> {
     let query = "SELECT * FROM users WHERE 1=1";
     const params: any[] = [];
