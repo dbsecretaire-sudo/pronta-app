@@ -64,6 +64,13 @@ export class ClientModel {
     return res.rows;
   }
 
+  async getAllClients(): Promise<Client[]> {
+    const res = await pool.query(
+        'SELECT * FROM clients'
+    );
+    return res.rows;
+  }
+
   //Méthode pour créer une instance depuis un formulaire
   static fromFormData(formData: ClientFormData, userId?: number): CreateClient {
     return {

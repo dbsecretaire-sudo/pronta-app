@@ -7,7 +7,7 @@ export interface Call {
   contactName: string | null;
   name: string;
   phone: string;
-  date: Date;          // Changé de `string` à `Date` pour plus de précision
+  date: Date;  
   type: CallType;
   summary: string;
   duration?: number;

@@ -12,6 +12,11 @@ export class InvoiceModel {
       );
       return res.rows;
     }
+
+    async getAllInvoices(): Promise<Invoice[]> {
+      const res = await pool.query('SELECT * FROM invoices ORDER BY created_at DESC');
+      return res.rows;
+    }
     
     // Récupérer une facture par son ID (avec ses lignes)
     async getInvoiceById(id: number): Promise<{

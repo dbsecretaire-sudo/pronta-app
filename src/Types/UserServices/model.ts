@@ -34,6 +34,37 @@ export class UserServiceModel {
         },
         }));
     }
+    
+    async getAllUserServices(): Promise<UserServiceWithDetails[]> {
+        const res = await pool.query(
+        `SELECT us.user_id, us.service_id, us.subscription_date, us.is_active, us.can_write, us.can_delete,
+                s.id AS service_id, s.name AS service_name,
+                s.description AS service_description, s.route AS service_route,
+                s.icon AS service_icon
+        FROM user_services us
+        JOIN services s ON us.service_id = s.id`,
+
+        );
+
+        return res.rows.map(row => ({
+        user_id: row.user_id,
+        service_id: row.service_id,
+        subscription_date: row.subscription_date,
+        is_active: row.is_active,
+        can_write: row.can_write,
+        can_delete: row.can_delete,
+        service: {
+            id: row.service_id,
+            name: row.service_name,
+            description: row.service_description,
+            route: row.service_route,
+            icon: row.service_icon,
+            price: row.service_price,
+            unit: row.service_unit,
+        },
+        }));
+    }
+
 
     // Récupère un service spécifique d'un utilisateur
   async getUserService(userId: number, serviceId: number): Promise<UserServiceWithDetails | null> {

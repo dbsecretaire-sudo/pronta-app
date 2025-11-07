@@ -7,6 +7,10 @@ export class CallService {
     this.callModel = new CallModel({} as Call);
   }
 
+  async getAllCalls() {
+    return this.callModel.getAllCalls();
+  }
+  
   async getCallsByUserId(filters: CallFilter) {
     return this.callModel.getCallsByUserId(filters);
   }

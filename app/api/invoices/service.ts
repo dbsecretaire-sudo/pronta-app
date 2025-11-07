@@ -12,6 +12,10 @@ export class InvoiceService {
     return this.invoiceModel.getInvoicesByUserId(userId);
   }
 
+  async getAllInvoices(): Promise<Invoice[]> {
+    return this.invoiceModel.getAllInvoices();
+  }
+
   async getInvoiceById(id: number): Promise<{ invoice: Invoice; items: InvoiceItem[] } | null> {
     return this.invoiceModel.getInvoiceById(id);
   }

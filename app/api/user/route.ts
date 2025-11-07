@@ -5,7 +5,7 @@ import { UserService} from './service';
 const userService = new UserService;
 
 // GET /api/user
-export async function GET(request: Request) {
+export async function GET() {
   try {
     const users = await userService.getAllUsers();
     return NextResponse.json(users);

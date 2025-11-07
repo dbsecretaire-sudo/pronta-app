@@ -4,8 +4,12 @@ import { validateUser, hashPassword, isValidRole } from "./utils";
 export class UserService {
   private userModel = new UserModel({} as User);
 
-  async getAllUsers(filters?: UserFilter): Promise<User[]> {
-    return this.userModel.getAllUsers(filters);
+  // async getAllUsers(filters?: UserFilter): Promise<User[]> {
+  //   return this.userModel.getAllUsers(filters);
+  // }
+
+  async getAllUsers(): Promise<User[]> {
+    return this.userModel.getAllUsers();
   }
 
   async getAllUsersName(): Promise<Record<number, { id: number; name: string; }>> {

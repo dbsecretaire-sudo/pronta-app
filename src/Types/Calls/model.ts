@@ -44,6 +44,11 @@ export class CallModel {
         return res.rows[0] || null;
     }
 
+    async getAllCalls(): Promise<Call[]> {
+        const res = await pool.query('SELECT * FROM calls');
+        return res.rows;
+    }
+
     // Mettre à jour un appel
     async updateCall(id: number, call: Partial<Call>): Promise<Call> {
         const entries = Object.entries(call).filter(([_, value]) => value !== undefined);

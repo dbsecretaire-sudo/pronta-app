@@ -8,6 +8,10 @@ export class ClientService {
     this.clientModel = new ClientModel({} as Client);
   }
 
+  async getAllClients(): Promise<Client[]> {
+    return this.clientModel.getAllClients();
+  }
+
   async getClientsByUserId(userId: number): Promise<Client[]> {
     return this.clientModel.getClientsByUserId(userId);
   }

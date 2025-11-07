@@ -1,4 +1,5 @@
 import { Subscription, SubscriptionWithService } from "@/src/Types/Subscription";
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export const updateUserSubscription = async (
   subscription_id: number,
@@ -63,6 +64,12 @@ export async function createSubscription(subscriptionData: {
 
 export async function fetchUserSubscriptions(userId: number) {
   const res = await fetch(`/api/subscription/user/${userId}`, { credentials: 'include' });
+  if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+  return res.json();
+}
+
+export async function fetchAllSubscriptions(): Promise<Subscription[]> {
+     const res = await fetch(`${API_URL}/api/subscription/`, { credentials: 'include' });
   if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
   return res.json();
 }

@@ -1,4 +1,4 @@
-import { Subscription } from "@/src/Types/Subscription";
+import { Subscription, SubscriptionWithService } from "@/src/Types/Subscription";
 import { SubscriptionModel } from "@/src/Types/Subscription/model";
 
 export class SubscriptionService {
@@ -16,11 +16,16 @@ export class SubscriptionService {
     return this.subscriptionModel.createUserSubscription(subscription_id, updatedData);
   }
 
+  async getAllSubscriptions(): Promise<Subscription[]> {
+    return this.subscriptionModel.getAllSubscriptions();
+  }
+
    async deleteUserSubscription(subscription_id: number): Promise<void> {
     this.subscriptionModel.deleteUserSubscription(subscription_id);
   }
 
-  async getSubscriptionByUserId(user_id: number): Promise<Subscription[]> {
+  async getSubscriptionByUserId(user_id: number): Promise<SubscriptionWithService[]> {
+    console.log("getSubscriptionByUserId");
     return this.subscriptionModel.getSubscriptionByUserId(user_id);
   }
 

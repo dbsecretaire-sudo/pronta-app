@@ -14,6 +14,10 @@ export class UserServiceService {
     return this.userServiceModel.getUserServices(userId);
   }
 
+  async getAllUserServices(): Promise<UserServiceWithDetails[]> {
+    return this.userServiceModel.getAllUserServices();
+  }
+
   async createUserService(data: UserService): Promise<UserService> {
     try {
       return await this.userServiceModel.createUserService(data);

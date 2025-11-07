@@ -1,3 +1,5 @@
+import { resourcesConfig } from './resources';
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export async function fetchResourceItem(resource: string, id: number) {
@@ -33,9 +35,10 @@ export async function getResourceById(resourceName: string, id: number) {
 }
 
 export async function fetchResource(resource: string) {
-  const response = await fetch(`${API_URL}/api/admin/${resource}`);
-  if (!response.ok) throw new Error('Failed to fetch');
-  return response.json();
+//   const response = await fetch(`${API_URL}/api/admin/${resource}`);
+//   if (!response.ok) throw new Error('Failed to fetch');
+//   return response.json();
+    return resourcesConfig[resource]?.fetchData();
 }
 
 export async function createResource(resource: string, prevState: any, formData: FormData) {

@@ -66,7 +66,7 @@ export const useServices = (userId: string | undefined, status: string) => {
 
       // Filtre les services disponibles
       const availableServices = servicesWithStatus.filter(
-        (s: UserService) => !s.subscription_date || (s.subscription_date && !s.is_active)
+        (s) => !s.isSubscribed || (s.isSubscribed && !s.isActive)
       );
 
       setServices(subscribedServices);

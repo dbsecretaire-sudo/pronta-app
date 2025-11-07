@@ -208,6 +208,11 @@ import { User } from "../Users";
     };
   }
 
+async getAllSubscriptions(): Promise<Subscription[]> {
+  const res = await pool.query('SELECT * FROM user_subscriptions ORDER BY created_at DESC');
+  return res.rows;
+}
+
 /**
  * Crée un nouvel abonnement pour un utilisateur
  * @param userId ID de l'utilisateur

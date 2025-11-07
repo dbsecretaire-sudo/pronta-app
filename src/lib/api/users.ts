@@ -1,4 +1,5 @@
 import { Role } from "@/src/Types/Users";
+import { User } from "next-auth";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -47,11 +48,12 @@ export async function getRoleByUserId(userId: number){
   return res.json();
 }
 
-export const fetchUsers = async () => {
-    const res = await fetch(`/api/user`, {credentials : 'include'});
+export const fetchUsers = async ():Promise<User[]> => {
+    const res = await fetch(`${API_URL}/api/user`, {credentials : 'include'});
     if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
     return res.json();
 }
+
 
 export const fetchUsersRole = async () => {
     const res = await fetch(`${API_URL}/api/user/role`, {credentials : 'include'});

@@ -56,3 +56,15 @@ export async function POST(
   }
 }
 
+// GET /api/user
+export async function GET(request: Request) {
+  try {
+    const subscriptions = await subscribedServices.getAllSubscriptions();
+    return NextResponse.json(subscriptions);
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to fetch users" },
+      { status: 500 }
+    );
+  }
+}

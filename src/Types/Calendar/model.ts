@@ -12,6 +12,12 @@ export class CalendarEventModel {
         );
         return res.rows;
     }
+    
+    async getEvents(): Promise<CalendarEvent[]> {
+        const res = await pool.query(
+            'SELECT * FROM calendar_events ORDER BY start_time');
+        return res.rows;
+    }
 
     // Créer un nouvel événement
     async createEvent(event: CreateCalendarEvent): Promise<CalendarEvent> {

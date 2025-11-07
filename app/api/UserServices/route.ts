@@ -18,3 +18,15 @@ export async function POST(request: Request) {
     );
   }
 }
+
+export async function GET(){
+    try{
+        const userServices = await userServiceService.getAllUserServices();
+        return NextResponse.json(userServices);
+    } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to get user service", details: error instanceof Error ? error.message : String(error) },
+      { status: 500 }
+    );
+  }
+}

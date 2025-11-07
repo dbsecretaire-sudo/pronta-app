@@ -1,8 +1,9 @@
 import { AvailableService, Service } from "@/src/Types/Services";
-import { UserService } from '@/src/Types/UserServices';
+import { UserService, UserServiceWithDetails } from '@/src/Types/UserServices';
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export const fetchAllServices = async () => {
-  const res = await fetch('/api/services', { credentials: 'include' });
+export const fetchAllServices = async ():Promise<Service[]> => {
+  const res = await fetch(`${API_URL}/api/services`, { credentials: 'include' });
   if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
   return res.json();
 };
@@ -12,6 +13,12 @@ export const fetchUserServices = async (userId: number) => {
   if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
   return res.json();
 };
+
+export const fetchAllUserServices = async (): Promise<UserServiceWithDetails[]> => {
+  const res = await fetch(`${API_URL}/api/UserServices`, { credentials: 'include' });
+  if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+  return res.json();
+}
 
 export const subscribeToService = async (userServiceData: UserService): Promise<void> => {
   const res = await fetch('/api/UserServices', {

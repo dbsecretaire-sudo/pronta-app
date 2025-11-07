@@ -8,6 +8,10 @@ export class CalendarEventService {
     return this.eventModel.getEventsByUserId(userId);
   }
 
+  async getEvents(): Promise<CalendarEvent[]> {
+    return this.eventModel.getEvents();
+  }
+
   async getEventById(id: number): Promise<CalendarEvent | null> {
     return this.eventModel.getEventById(id);
   }
