@@ -2,11 +2,20 @@
 "use client";
 import Link from 'next/link';
 import { useAccount } from '@/src/Hook/useAccount';
-import { SubscriptionWithService } from '@/src/Types/Subscription';
+import { Subscription, SubscriptionWithService } from '@/src/Types/Subscription';
 import { useTab } from '@/src/context/TabContext';
 import { useRouter } from 'next/navigation';
+import { Service } from '@/src/Types/Services';
 
-export const AccountSummary = () => {
+interface AccountProps {
+  sN: Service[];
+  sO: Service[];
+}
+
+export const AccountSummary = ({
+  sN,
+  sO,
+}: AccountProps) => {
   const { userData, subscriptions, loading, error } = useAccount();
   const { setActiveTab } = useTab();
   const router = useRouter();
@@ -58,7 +67,10 @@ export const AccountSummary = () => {
 
 
   // Trouve les abonnements actifs
-  const activeSubscriptions: SubscriptionWithService[] = subscriptions?.filter((sub: SubscriptionWithService) => sub.status === 'active') || [];
+  const activeSubscriptions: SubscriptionWithService[] = subscriptions?.filter(
+    (sub: SubscriptionWithService) =>
+      sO.some((service: { id: number; }) => service.id === sub.service_id)
+  ) || [];
 
   if (loading) {
     return (

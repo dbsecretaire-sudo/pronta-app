@@ -68,7 +68,10 @@ export default function DashboardHome() {
       </section>
 
       {/* Mon Compte */}
-        <AccountSummary />
+        <AccountSummary
+          sN={sN}
+          sO={sO}
+        />
     </div>
   );
 }
