@@ -52,6 +52,7 @@ export default function DashboardHome() {
                 key={service.id}
                 service={service}
                 isSubscribed={false}
+                onSubscribe={handleSubscribe}
                 onReactivate={handleReactivate}
               />
             ))}           
@@ -69,8 +70,8 @@ export default function DashboardHome() {
 
       {/* Mon Compte */}
         <AccountSummary
-          sN={sN}
-          sO={sO}
+          sN={unSubscribedServices}
+          sO={subscribedServices}
         />
     </div>
   );

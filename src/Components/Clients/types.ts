@@ -1,11 +1,5 @@
-export interface Client {
-  id: number;
-  name: string;
-  email: string;
-  phone?: string;
-  address?: string;
-  company?: string;
-}
+import { Client } from "@/src/Types/Clients";
+export type { Client } from "@/src/Types/Clients";
 
 export interface ClientCardProps {
   client: Client;

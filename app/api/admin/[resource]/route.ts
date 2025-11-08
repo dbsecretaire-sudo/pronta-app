@@ -8,10 +8,12 @@ export async function PUT(
 ) {
   const { resource } = await params;
   const { id, ...data } = await request.json();
+  console.log(resource, id, data)
   try {
     const fields = Object.keys(data).map((key, i) => `${key} = $${i + 2}`).join(', ');
     const values = Object.values(data);
     const query = `UPDATE ${resource} SET ${fields} WHERE id = $1 RETURNING *`;
+    console.log(query);
     const result = await pool.query(query, [id, ...values]);
     return NextResponse.json(result.rows[0]);
   } catch (error) {

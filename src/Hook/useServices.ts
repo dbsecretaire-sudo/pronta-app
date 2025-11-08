@@ -8,11 +8,15 @@ import {
   subscribeToService,
   deactivateUserService,
   reactivateUserService,
+  createSubscription,
+  updateUserSubscription,
+  getSubscriptionByService,
 } from '@/src/lib/api';
 
 export const useServices = (userId: string | undefined, status: string) => {
   const [sO, setSO] = useState<Service[]>([]);
   const [sN, setSN] = useState<Service[]>([]);
+  const [s, setS] = useState<Service[]>([]);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -39,7 +43,7 @@ export const useServices = (userId: string | undefined, status: string) => {
       ]);
 
       setUser(fetchedUser);
-
+      setS(allServices);
       const servicesWithStatus = allServices.map(service => {
         return {
           ...service,
@@ -79,19 +83,44 @@ export const useServices = (userId: string | undefined, status: string) => {
     await fetchData();
   };
 
-  const handleSubscribe = async (service: Service) => {
-    try {
-      if (!userId) throw new Error("User ID is required");
+ const handleSubscribe = async (service: Service) => {
+  try {
+    if (!userId) throw new Error("User ID is required");
 
-      await subscribeToService(Number(userId), service.id);
+    // 1. Vérifie si une subscription existe déjà
+    const subscription = await getSubscriptionByService(
+      Number(userId),
+      Number(service.id)
+    );
 
-      await refreshServices();
-    } catch (error) {
-      console.error("Erreur lors de l'abonnement:", error);
-      setError(error instanceof Error ? error.message : "Échec de l'abonnement au service.");
+    if (subscription?.id) {
+      // 2. Si elle existe, mets-la à jour
+      await updateUserSubscription(subscription.id, {
+        user_id: Number(userId),
+        service_id: Number(service.id),
+        start_date: now,
+        end_date: endDate,
+        next_payment_date: nextDate,
+        status: 'active',
+      });
+    } else {
+      // 3. Sinon, crée une nouvelle subscription
+      await createSubscription({
+        user_id: Number(userId),
+        service_id: Number(service.id),
+        start_date: now,
+        end_date: endDate,
+        next_payment_date: nextDate,
+        status: 'active',
+      });
     }
-  };
-
+    await reactivateUserService(Number(userId), service.id);
+    await refreshServices();
+  } catch (error) {
+    console.error("Erreur lors de l'abonnement:", error);
+    setError(error instanceof Error ? error.message : "Échec de l'abonnement au service.");
+  }
+};
   const handleDeactivate = async (service: Service) => {
     if (!userId) return;
 
@@ -127,5 +156,5 @@ export const useServices = (userId: string | undefined, status: string) => {
     }
   };
 
-  return { sO, sN, loading, error, handleSubscribe, handleDeactivate, handleReactivate };
+  return { s, sO, sN, loading, error, handleSubscribe, handleDeactivate, handleReactivate };
 };

@@ -35,7 +35,7 @@ export async function deleteSubscription(subscriptionId: number): Promise<void> 
   if (!response.ok) throw new Error("Failed to delete subscription");
 }
 
-export async function getSubscriptionByService(userId: number, service_id: number): Promise<Subscription[] | null> {
+export async function getSubscriptionByService(userId: number, service_id: number): Promise<Subscription | null> {
   const response = await fetch(`/api/subscription/user/${userId}?service_id=${encodeURIComponent(service_id)}`);
   if (!response.ok) throw new Error("Failed to fetch subscriptions");
   return response.json();

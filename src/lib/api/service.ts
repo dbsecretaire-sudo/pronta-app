@@ -17,7 +17,7 @@ export const fetchUserServices = async (userId: number) => {
 
 
 export const subscribeToService = async (userId: number, serviceId: number): Promise<void> => {
-  const res = await fetch(`${API_URL}/api/user/${userId}/${serviceId}/reactive`, {
+  const res = await fetch(`${API_URL}/api/user/${userId}/${serviceId}/reactivate`, {
     method: 'POST', 
     credentials: 'include',
   });

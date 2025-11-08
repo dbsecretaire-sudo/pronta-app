@@ -103,39 +103,7 @@ export class UserModel {
     }, {});
   }
 
-  // async getAllUsers(filters?: UserFilter): Promise<User[]> {
-  //   let query = "SELECT * FROM users WHERE 1=1";
-  //   const params: any[] = [];
-  //   let paramIndex = 1;
-
-  //   if (filters?.role) {
-  //     query += ` AND role = $${paramIndex}`;
-  //     params.push(filters.role);
-  //     paramIndex++;
-  //   }
-  //   if (filters?.searchTerm) {
-  //     query += ` AND (email ILIKE $${paramIndex} OR name ILIKE $${paramIndex})`;
-  //     params.push(`%${filters.searchTerm}%`);
-  //     paramIndex++;
-  //   }
-
-  //   query += " ORDER BY created_at DESC";
-
-  //   const res = await pool.query(query, params);
-
-  //   // Pour chaque utilisateur, récupérer ses abonnements
-  //   const usersWithSubscriptions = await Promise.all(
-  //     res.rows.map(async (row) => {
-  //       const user = this.mapDbUserToUser(row);
-  //       const subscriptions = await this.getUserSubscriptions(user.id);
-  //       return { ...user, subscriptions };
-  //     })
-  //   );
-
-  //   return usersWithSubscriptions;
-  // }
-
-   async getAllUsers(): Promise<User[]> {
+  async getAllUsers(): Promise<User[]> {
     let query = "SELECT * FROM users";
     const res = await pool.query(query);
 

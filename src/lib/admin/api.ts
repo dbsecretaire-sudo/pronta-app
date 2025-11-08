@@ -13,7 +13,7 @@ export async function updateResource(resource: string, id: number | undefined, d
   const url = `${API_URL}/api/admin/${resource}`;
   const method = id ? 'PUT' : 'POST';
   const body = JSON.stringify(id ? { id, ...data } : data);
-
+console.log(body);
   const response = await fetch(url, {
     method,
     headers: { 'Content-Type': 'application/json' },

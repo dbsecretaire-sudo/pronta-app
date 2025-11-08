@@ -7,5 +7,6 @@ export type {
     CreateUser, 
     UpdateUser, 
     UserFilter,
+    PaymentMethodType,
     // UpdateUserSubscription,
 } from "./type";

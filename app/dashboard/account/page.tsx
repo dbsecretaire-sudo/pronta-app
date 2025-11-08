@@ -3,8 +3,9 @@ import { ProfileTab, BillingTab, MessagesTab } from "@/src/Components";
 import { useAccount } from "@/src/Hook/useAccount";
 import { SubscriptionWithService } from "@/src/Types/Subscription";
 import { useEffect, useState } from "react";
-import { fetchUserSubscriptions } from "@/src/lib/api";
+import { fetchAllServices, fetchUser, fetchUserSubscriptions } from "@/src/lib/api";
 import { useSession } from "next-auth/react";
+import { useServices } from "@/src/Hook/useServices";
 
 export default function AccountPage() {
   const {
@@ -19,7 +20,6 @@ export default function AccountPage() {
   } = useAccount();
 
   const { data: session, status} = useSession();
-
   const [userSubscriptions, setUserSubscriptions] = useState<SubscriptionWithService[]>([]);
 
   useEffect(() => {
@@ -30,9 +30,28 @@ export default function AccountPage() {
     }
     try {
       const result = await fetchUserSubscriptions(Number(session.user.id));
+      const [fetchedUser, allServices] = await Promise.all([
+        fetchUser(Number(session?.user.id)),
+        fetchAllServices(),
+      ]);
+      const servicesWithStatus = allServices.map(service => {
+        return {
+          ...service,
+          isSubscribed: fetchedUser.service_ids.includes(service.id),
+        };
+      });
+
+      const sO = servicesWithStatus.filter(service => 
+        service.isSubscribed === true
+      );
+
       // S'assurer que result est un tableau, sinon utiliser un tableau vide
-      const subscriptions = Array.isArray(result) ? result : [];
-      setUserSubscriptions(subscriptions);
+      const activeSubscriptions: SubscriptionWithService[] = result?.filter(
+        (sub: SubscriptionWithService) =>
+          sO.some((service: { id: number; }) => service.id === sub.service_id)
+      ) || [];
+
+      setUserSubscriptions(activeSubscriptions);
     } catch (error) {
       console.error("Erreur lors du chargement des abonnements:", error);
       setUserSubscriptions([]); 

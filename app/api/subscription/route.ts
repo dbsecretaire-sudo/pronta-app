@@ -2,41 +2,41 @@
 import { NextResponse } from 'next/server';
 import { SubscriptionService } from './service';
 import { z } from 'zod';
+import { CreateSubscriptionSchema } from "@/src/lib/schemas/subscription"; // Import du schéma existant
 
-const subscribedServices = new SubscriptionService;
+const subscriptionService = new SubscriptionService();
 
 // POST /api/user/[id]/subscription/ - Pour créer un nouvel abonnement
-export async function POST(
-  request: Request,
-) {
+export async function POST(request: Request) {
   try {
+    const body = await request.json();
 
-    // Schéma de validation pour la création d'abonnement
-    const subscriptionCreateSchema = z.object({
-      user_id: z.number(),
-      service_id: z.number(),
-      status: z.string().optional(),
-      start_date: z.union([z.string().datetime(), z.date()]).optional(),
-      end_date: z.union([z.string().datetime(), z.date()]).optional(),
-      next_payment_date: z.union([z.string().datetime(), z.date()]).optional(),
+    // Utilise le schéma existant pour la validation
+    const subscriptionData = CreateSubscriptionSchema.parse({
+      ...body,
+      user_id: Number(body.user_id), // Assure-toi que c'est un number
+      status: body.status || 'active' // Valeur par défaut
     });
 
-    const body = await request.json();
-    const subscriptionData = subscriptionCreateSchema.parse(body);
-
-    // Conversion des dates en ISOString si ce sont des objets Date
+    // Conversion des dates en ISOString si nécessaire
     const processedData = {
       ...subscriptionData,
-      ...(subscriptionData.start_date instanceof Date && { start_date: subscriptionData.start_date.toISOString() }),
-      ...(subscriptionData.end_date instanceof Date && { end_date: subscriptionData.end_date.toISOString() }),
-      ...(subscriptionData.next_payment_date instanceof Date && { next_payment_date: subscriptionData.next_payment_date.toISOString() }),
-      status: subscriptionData.status || 'active',
-      start_date: subscriptionData.start_date || new Date().toISOString()
+      start_date: subscriptionData.start_date instanceof Date
+        ? subscriptionData.start_date.toISOString()
+        : subscriptionData.start_date || new Date().toISOString(),
+      end_date: subscriptionData.end_date instanceof Date
+        ? subscriptionData.end_date.toISOString()
+        : subscriptionData.end_date,
+      next_payment_date: subscriptionData.next_payment_date instanceof Date
+        ? subscriptionData.next_payment_date.toISOString()
+        : subscriptionData.next_payment_date
     };
 
     // Appel au service pour créer un nouvel abonnement
-    // Note: Vous devrez implémenter cette méthode dans votre controller
-    const newSubscription = await subscribedServices.createUserSubscription(processedData.user_id, processedData);
+    const newSubscription = await subscriptionService.createUserSubscription(
+      processedData.user_id,
+      processedData
+    );
 
     return NextResponse.json(newSubscription, { status: 201 });
   } catch (error) {
@@ -50,20 +50,29 @@ export async function POST(
     }
 
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to create user subscription" },
+      {
+        error: error instanceof Error
+          ? error.message
+          : "Failed to create user subscription"
+      },
       { status: 500 }
     );
   }
 }
 
-// GET /api/user
-export async function GET(request: Request) {
+// GET /api/user/subscription - Pour récupérer les abonnements d'un utilisateur
+export async function GET() {
   try {
-    const subscriptions = await subscribedServices.getAllSubscriptions();
+    const subscriptions = await subscriptionService.getAllSubscriptions();
     return NextResponse.json(subscriptions);
   } catch (error) {
+    console.error("Error fetching subscriptions:", error);
     return NextResponse.json(
-      { error: "Failed to fetch users" },
+      {
+        error: error instanceof Error
+          ? error.message
+          : "Failed to fetch subscriptions"
+      },
       { status: 500 }
     );
   }

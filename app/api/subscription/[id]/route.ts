@@ -1,40 +1,41 @@
 import { SubscriptionService } from '../service';
 import { NextResponse } from 'next/server';
-import { z } from 'zod';
+import { UpdateSubscriptionSchema } from "@/src/lib/schemas/subscription";
+import { z } from "zod";
 
-const subscriptionService = new SubscriptionService;
-
-// Schéma de validation pour les données d'abonnement
-const subscriptionUpdateSchema = z.object({
-  user_id: z.number(),
-  service_id: z.number(),
-  status: z.string().optional(),
-  start_date: z.union([z.string().datetime(), z.date()]).optional(),
-  end_date: z.union([z.string().datetime(), z.date()]).optional(),
-  next_payment_date: z.union([z.string().datetime(), z.date(), z.null()]).optional(),
-});
+const subscriptionService = new SubscriptionService();
 
 // PUT /api/subscription/[subscriptionId]
 export async function PUT(
   request: Request,
-{ params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> }  // Correction: params n'est pas une Promise ici
 ) {
   try {
     const { id } = await params;
-
     const body = await request.json();
-    const updates = subscriptionUpdateSchema.parse(body);
 
-    // Conversion des dates en ISOString si ce sont des objets Date
+    // Utilise le schéma existant pour valider les données
+    const updates = UpdateSubscriptionSchema.parse(body);
+
+    // Conversion des dates en ISOString si nécessaire
     const processedUpdates = {
       ...updates,
-      ...(updates.start_date instanceof Date && { start_date: updates.start_date.toISOString() }),
-      ...(updates.end_date instanceof Date && { end_date: updates.end_date.toISOString() }),
-      ...(updates.next_payment_date instanceof Date && { next_payment_date: updates.next_payment_date.toISOString() })
+      start_date: updates.start_date instanceof Date
+        ? updates.start_date.toISOString()
+        : updates.start_date,
+      end_date: updates.end_date instanceof Date
+        ? updates.end_date.toISOString()
+        : updates.end_date,
+      next_payment_date: updates.next_payment_date instanceof Date
+        ? updates.next_payment_date.toISOString()
+        : updates.next_payment_date
     };
 
     // Appel au service pour mettre à jour l'abonnement
-    const updatedSubscription = await subscriptionService.updateUserSubscription(Number(id), processedUpdates);
+    const updatedSubscription = await subscriptionService.updateUserSubscription(
+      Number(id),
+      processedUpdates
+    );
 
     return NextResponse.json(updatedSubscription);
   } catch (error) {
@@ -48,7 +49,11 @@ export async function PUT(
     }
 
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to update user subscription" },
+      {
+        error: error instanceof Error
+          ? error.message
+          : "Failed to update user subscription"
+      },
       { status: 500 }
     );
   }
@@ -57,14 +62,12 @@ export async function PUT(
 // DELETE /api/subscription/[subscriptionId]
 export async function DELETE(
   request: Request,
-    { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> }  // Correction: params n'est pas une Promise
 ) {
   try {
-
     const { id } = await params;
 
     // Appel au service pour supprimer l'abonnement
-    // Note: Vous devrez implémenter cette méthode dans votre controller
     await subscriptionService.deleteUserSubscription(Number(id));
 
     return NextResponse.json(
@@ -75,7 +78,33 @@ export async function DELETE(
     console.error("Error deleting user subscription:", error);
 
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to delete user subscription" },
+      {
+        error: error instanceof Error
+          ? error.message
+          : "Failed to delete user subscription"
+      },
+      { status: 500 }
+    );
+  }
+}
+
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const userId = Number(id);
+    const subscriptions = await subscriptionService.getSubscriptionByUserId(userId);
+    return NextResponse.json(subscriptions);
+  } catch (error) {
+    console.error("Error fetching subscriptions:", error);
+    return NextResponse.json(
+      {
+        error: error instanceof Error
+          ? error.message
+          : "Failed to fetch subscriptions"
+      },
       { status: 500 }
     );
   }

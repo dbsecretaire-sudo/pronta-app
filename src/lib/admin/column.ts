@@ -41,8 +41,8 @@ export const getClientColumns = (): ExtendedColumnDef<Client>[] => [
     meta: { sortable: true, filterType: 'text', },
   }),
   clientColumnHelper.accessor('company', {
-        header: 'Companie',
-        meta: { sortable: true, filterType: 'text' },
+    header: 'Companie',
+    meta: { sortable: true, filterType: 'text' },
   })
 ];
 

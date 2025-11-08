@@ -6,6 +6,7 @@ import { Subscription, SubscriptionWithService } from '@/src/Types/Subscription'
 import { useTab } from '@/src/context/TabContext';
 import { useRouter } from 'next/navigation';
 import { Service } from '@/src/Types/Services';
+import { PaymentMethodType } from '@/src/Types/Users';
 
 interface AccountProps {
   sN: Service[];
@@ -48,7 +49,7 @@ export const AccountSummary = ({
     if (!type) return "Moyen de paiement inconnu";
 
     // Déclare un type pour les clés possibles
-    type PaymentMethodType = 'credit_card' | 'paypal' | 'bank_transfer';
+
 
     // Vérifie que `type` est une clé valide
     const paymentMethods: Record<PaymentMethodType, string> = {
@@ -64,7 +65,6 @@ export const AccountSummary = ({
 
     return "Moyen de paiement inconnu";
   };
-
 
   // Trouve les abonnements actifs
   const activeSubscriptions: SubscriptionWithService[] = subscriptions?.filter(

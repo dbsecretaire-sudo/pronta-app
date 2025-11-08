@@ -1,11 +1,27 @@
- import pool from "@/src/lib/db";
- import {  Subscription, CreateSubscription, UpdateSubscription, SubscriptionWithService } from "./index";
+import pool from "@/src/lib/db";
+import {
+  Subscription,
+  CreateSubscription,
+  UpdateSubscription,
+  SubscriptionWithService,
+  SubscriptionStatus,
+  CreateSubscriptionSchema,
+  UpdateSubscriptionSchema,
+  SubscriptionSchema,
+  formatDateForDB,
+  parseDateFromDB,
+  validateCreateSubscription,
+  validateUpdateSubscription
+} from "@/src/lib/schemas/subscription";
 import { User } from "../Users";
- 
- export class SubscriptionModel {
-   constructor(public data: Subscription) {}
- 
- async createSubscription(subscription: CreateSubscription): Promise<Subscription> {
+
+export class SubscriptionModel {
+  /**
+   * Crée un nouvel abonnement
+   */
+  async createSubscription(subscriptionData: unknown): Promise<Subscription> {
+    const validatedData = validateCreateSubscription(subscriptionData);
+
     const query = `
       INSERT INTO user_subscriptions (
         user_id, service_id, status, start_date, end_date, next_payment_date
@@ -15,61 +31,54 @@ import { User } from "../Users";
     `;
 
     const { rows } = await pool.query(query, [
-      subscription.user_id,
-      subscription.service_id,
-      subscription.status || 'active',
-      subscription.start_date instanceof Date ?
-        subscription.start_date.toISOString() :
-        subscription.start_date,
-      subscription.end_date instanceof Date ?
-        subscription.end_date?.toISOString() :
-        subscription.end_date,
-      subscription.next_payment_date instanceof Date ?
-        subscription.next_payment_date?.toISOString() :
-        subscription.next_payment_date
+      validatedData.user_id,
+      validatedData.service_id,
+      validatedData.status || 'active',
+      formatDateForDB(validatedData.start_date),
+      formatDateForDB(validatedData.end_date),
+      formatDateForDB(validatedData.next_payment_date)
     ]);
+
+    if (rows.length === 0) {
+      throw new Error("Failed to create subscription");
+    }
 
     return this.mapDbSubscriptionToSubscription(rows[0]);
   }
 
-  async updateSubscription(id: number, subscriptionData: UpdateSubscription): Promise<Subscription> {
+  /**
+   * Met à jour un abonnement existant
+   */
+  async updateSubscription(id: number, subscriptionData: unknown): Promise<Subscription> {
+    const validatedData = validateUpdateSubscription(subscriptionData);
+
     const fields: string[] = [];
     const values: any[] = [];
     let paramIndex = 1;
 
-    if (subscriptionData.service_id !== undefined) {
+    if (validatedData.service_id !== undefined) {
       fields.push(`service_id = $${paramIndex}`);
-      values.push(subscriptionData.service_id);
+      values.push(validatedData.service_id);
       paramIndex++;
     }
-    if (subscriptionData.status !== undefined) {
+    if (validatedData.status !== undefined) {
       fields.push(`status = $${paramIndex}`);
-      values.push(subscriptionData.status);
+      values.push(validatedData.status);
       paramIndex++;
     }
-    if (subscriptionData.start_date !== undefined) {
+    if (validatedData.start_date !== undefined) {
       fields.push(`start_date = $${paramIndex}`);
-      values.push(subscriptionData.start_date instanceof Date ?
-        subscriptionData.start_date.toISOString() :
-        subscriptionData.start_date);
+      values.push(formatDateForDB(validatedData.start_date));
       paramIndex++;
     }
-    if (subscriptionData.end_date !== undefined) {
+    if (validatedData.end_date !== undefined) {
       fields.push(`end_date = $${paramIndex}`);
-      values.push(subscriptionData.end_date instanceof Date ?
-        subscriptionData.end_date?.toISOString() :
-        subscriptionData.end_date);
+      values.push(formatDateForDB(validatedData.end_date));
       paramIndex++;
     }
-    if (subscriptionData.next_payment_date !== undefined) { // Inclut null
+    if (validatedData.next_payment_date !== undefined) {
       fields.push(`next_payment_date = $${paramIndex}`);
-      values.push(
-        subscriptionData.next_payment_date === null
-          ? null // ⬅️ Envoie NULL à PostgreSQL
-          : subscriptionData.next_payment_date instanceof Date
-            ? subscriptionData.next_payment_date.toISOString()
-            : subscriptionData.next_payment_date // string déjà au format ISO
-      );
+      values.push(formatDateForDB(validatedData.next_payment_date));
       paramIndex++;
     }
 
@@ -77,7 +86,7 @@ import { User } from "../Users";
       throw new Error('No fields to update');
     }
 
-    const query = `
+    const updateQuery = `
       UPDATE user_subscriptions
       SET ${fields.join(', ')}, updated_at = NOW()
       WHERE id = $${paramIndex}
@@ -85,7 +94,8 @@ import { User } from "../Users";
     `;
     values.push(id);
 
-    const { rows } = await pool.query(query, values);
+    const { rows } = await pool.query(updateQuery, values);
+
     if (rows.length === 0) {
       throw new Error('Subscription not found');
     }
@@ -93,8 +103,11 @@ import { User } from "../Users";
     return this.mapDbSubscriptionToSubscription(rows[0]);
   }
 
+  /**
+   * Récupère un utilisateur avec ses abonnements
+   */
   async getUserWithSubscriptions(userId: number): Promise<User & { subscriptions: Subscription[] }> {
-    // 1. Récupérer l'utilisateur
+    // Vérifie que l'utilisateur existe
     const userQuery = 'SELECT * FROM users WHERE id = $1';
     const { rows: userRows } = await pool.query(userQuery, [userId]);
 
@@ -102,7 +115,7 @@ import { User } from "../Users";
       throw new Error('User not found');
     }
 
-    // 2. Récupérer les abonnements
+    // Récupère les abonnements
     const subscriptionsQuery = `
       SELECT * FROM user_subscriptions
       WHERE user_id = $1
@@ -110,13 +123,15 @@ import { User } from "../Users";
     `;
     const { rows: subscriptionRows } = await pool.query(subscriptionsQuery, [userId]);
 
-    // 3. Construire l'objet complet
     return {
       ...this.mapDbUserToUser(userRows[0]),
       subscriptions: subscriptionRows.map(row => this.mapDbSubscriptionToSubscription(row))
     };
   }
 
+  /**
+   * Récupère un abonnement par son ID
+   */
   async getSubscriptionById(subscriptionId: number): Promise<Subscription> {
     const query = 'SELECT * FROM user_subscriptions WHERE id = $1';
     const { rows } = await pool.query(query, [subscriptionId]);
@@ -128,6 +143,9 @@ import { User } from "../Users";
     return this.mapDbSubscriptionToSubscription(rows[0]);
   }
 
+  /**
+   * Récupère les abonnements d'un utilisateur avec les détails des services
+   */
   async getSubscriptionByUserId(userId: number): Promise<SubscriptionWithService[]> {
     const query = `
       SELECT
@@ -137,27 +155,125 @@ import { User } from "../Users";
         services.unit AS service_unit,
         services.route AS service_route,
         services.icon AS service_icon,
-        services.description AS service_description
-      FROM
-        user_subscriptions
-      JOIN
-        services
-      ON
-        user_subscriptions.service_id = services.id
-      WHERE
-        user_subscriptions.user_id = $1;
+        services.description AS service_description,
+        services.is_active AS service_is_active
+      FROM user_subscriptions
+      JOIN services ON user_subscriptions.service_id = services.id
+      WHERE user_subscriptions.user_id = $1
+      ORDER BY user_subscriptions.created_at DESC
     `;
+
     const { rows } = await pool.query(query, [userId]);
     return rows.map(row => this.mapDbSubscriptionToSubscriptionWithService(row));
   }
 
-  async getSubscriptionByUserIdAndService(userId: number, service_id: number): Promise<Subscription[]> {
-    const query = 'SELECT * FROM user_subscriptions WHERE user_id = $1 AND service_id = $2';
-    const { rows } = await pool.query(query, [userId, service_id]);
+  /**
+   * Récupère un abonnement spécifique pour un utilisateur et un service
+   */
+  async getSubscriptionByUserIdAndService(userId: number, serviceId: number): Promise<Subscription | null> {
+    const query = `
+      SELECT * FROM user_subscriptions
+      WHERE user_id = $1 AND service_id = $2
+      LIMIT 1
+    `;
+
+    const { rows } = await pool.query(query, [userId, serviceId]);
+
+    if (rows.length === 0) {
+      return null;
+    }
+
+    return this.mapDbSubscriptionToSubscription(rows[0]);
+  }
+
+  /**
+   * Récupère tous les abonnements
+   */
+  async getAllSubscriptions(): Promise<Subscription[]> {
+    const { rows } = await pool.query(`
+      SELECT * FROM user_subscriptions
+      ORDER BY created_at DESC
+    `);
+
     return rows.map(row => this.mapDbSubscriptionToSubscription(row));
   }
 
-  // Mappers
+  /**
+   * Crée un abonnement pour un utilisateur spécifique
+   */
+  async createUserSubscription(userId: number, subscriptionData: CreateSubscription): Promise<Subscription> {
+    // Vérifie que l'utilisateur existe
+    const { rows: userRows } = await pool.query('SELECT id FROM users WHERE id = $1', [userId]);
+    if (userRows.length === 0) {
+      throw new Error(`User with id ${userId} not found`);
+    }
+
+    // Valide les données avec le schéma
+    const validatedData = CreateSubscriptionSchema.parse({
+      ...subscriptionData,
+      user_id: userId
+    });
+
+    const query = `
+      INSERT INTO user_subscriptions (
+        user_id, service_id, status, start_date, end_date, next_payment_date
+      )
+      VALUES ($1, $2, $3, $4, $5, $6)
+      RETURNING *
+    `;
+
+    const { rows } = await pool.query(query, [
+      validatedData.user_id,
+      validatedData.service_id,
+      validatedData.status || 'active',
+      formatDateForDB(validatedData.start_date),
+      formatDateForDB(validatedData.end_date),
+      formatDateForDB(validatedData.next_payment_date)
+    ]);
+
+    return this.mapDbSubscriptionToSubscription(rows[0]);
+  }
+
+  /**
+   * Supprime un abonnement
+   */
+  async deleteUserSubscription(subscriptionId: number): Promise<void> {
+    // Vérifie que l'abonnement existe
+    const { rows } = await pool.query(
+      'SELECT id FROM user_subscriptions WHERE id = $1',
+      [subscriptionId]
+    );
+
+    if (rows.length === 0) {
+      throw new Error(`Subscription with id ${subscriptionId} not found`);
+    }
+
+    await pool.query(`
+      DELETE FROM user_subscriptions
+      WHERE id = $1
+    `, [subscriptionId]);
+  }
+
+  /**
+   * Mappe une ligne de la base de données à un objet Subscription
+   */
+  private mapDbSubscriptionToSubscription(dbSubscription: any): Subscription {
+    return SubscriptionSchema.parse({
+      id: dbSubscription.id,
+      user_id: dbSubscription.user_id,
+      service_id: dbSubscription.service_id,
+      status: dbSubscription.status,
+      start_date: parseDateFromDB(dbSubscription.start_date),
+      end_date: parseDateFromDB(dbSubscription.end_date),
+      next_payment_date: parseDateFromDB(dbSubscription.next_payment_date),
+      created_at: parseDateFromDB(dbSubscription.created_at),
+      updated_at: parseDateFromDB(dbSubscription.updated_at)
+    });
+  }
+
+  /**
+   * Mappe une ligne de la base de données à un objet User
+   */
   private mapDbUserToUser(dbUser: any): User {
     return {
       id: dbUser.id,
@@ -176,29 +292,12 @@ import { User } from "../Users";
     };
   }
 
-  private mapDbSubscriptionToSubscription(dbSubscription: any): Subscription {
-    return {
-      id: dbSubscription.id,
-      user_id: dbSubscription.user_id,
-      service_id: dbSubscription.service_id,
-      status: dbSubscription.status,
-      start_date: dbSubscription.start_date,
-      end_date: dbSubscription.end_date ? new Date(dbSubscription.end_date) : undefined,
-      next_payment_date: dbSubscription.next_payment_date ? new Date(dbSubscription.next_payment_date) : undefined
-    };
-  }
-
+  /**
+   * Mappe une ligne de la base de données à un objet SubscriptionWithService
+   */
   private mapDbSubscriptionToSubscriptionWithService(row: any): SubscriptionWithService {
     return {
-      id: row.id,
-      user_id: row.user_id,
-      service_id: row.service_id,
-      status: row.status,
-      start_date: row.start_date,
-      end_date: row.end_date,
-      next_payment_date: row.next_payment_date,
-      created_at: row.created_at,
-      updated_at: row.updated_at,
+      ...this.mapDbSubscriptionToSubscription(row),
       service: {
         id: row.service_id,
         name: row.service_name,
@@ -207,80 +306,8 @@ import { User } from "../Users";
         icon: row.service_icon,
         route: row.service_route,
         description: row.service_description,
-        is_active: row.service_isActive
-      },
+        is_active: row.service_is_active
+      }
     };
   }
-
-async getAllSubscriptions(): Promise<Subscription[]> {
-  const res = await pool.query('SELECT * FROM user_subscriptions ORDER BY created_at DESC');
-  return res.rows;
-}
-
-/**
- * Crée un nouvel abonnement pour un utilisateur
- * @param userId ID de l'utilisateur
- * @param subscriptionData Données de l'abonnement à créer
- * @returns L'abonnement créé
- */
-async createUserSubscription(
-  userId: number,
-  subscriptionData: CreateSubscription
-): Promise<Subscription> {
-  // Vérification que l'utilisateur existe
-  const userCheck = await pool.query('SELECT id FROM users WHERE id = $1', [userId]);
-  if (userCheck.rows.length === 0) {
-    throw new Error(`User with id ${userId} not found`);
-  }
-
-  const query = `
-    INSERT INTO user_subscriptions (
-      user_id, service_id, status, start_date, end_date, next_payment_date
-    )
-    VALUES ($1, $2, $3, $4, $5, $6)
-    RETURNING *
-  `;
-
-  const { rows } = await pool.query(query, [
-    userId,
-    subscriptionData.service_id,
-    subscriptionData.status || 'active',
-    subscriptionData.start_date instanceof Date ?
-      subscriptionData.start_date.toISOString() :
-      subscriptionData.start_date || new Date().toISOString(),
-    subscriptionData.end_date instanceof Date ?
-      subscriptionData.end_date?.toISOString() :
-      subscriptionData.end_date,
-    subscriptionData.next_payment_date instanceof Date ?
-      subscriptionData.next_payment_date?.toISOString() :
-      subscriptionData.next_payment_date
-  ]);
-
-  return this.mapDbSubscriptionToSubscription(rows[0]);
-}
-
-/**
- * Supprime un abonnement
- * @param subscriptionId ID de l'abonnement à supprimer
- * @returns Promesse vide
- */
-async deleteUserSubscription(subscriptionId: number): Promise<void> {
-  // Vérification que l'abonnement existe
-  const subscriptionCheck = await pool.query(
-    'SELECT id FROM user_subscriptions WHERE id = $1',
-    [subscriptionId]
-  );
-  if (subscriptionCheck.rows.length === 0) {
-    throw new Error(`Subscription with id ${subscriptionId} not found`);
-  }
-
-  const query = `
-    DELETE FROM user_subscriptions
-    WHERE id = $1
-  `;
-
-  await pool.query(query, [subscriptionId]);
-}
-
-
 }

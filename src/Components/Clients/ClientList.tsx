@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { PencilIcon, TrashIcon, PlusIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import {Table, Pagination, Modal, Client, ClientListProps} from "@/src/Components";
+import { Table, Pagination, Modal, Client, ClientListProps, TableColumn } from "@/src/Components";
 
 export default function ClientList({
   clients,
@@ -25,23 +25,26 @@ export default function ClientList({
 
   const totalPages = Math.ceil(totalClients / itemsPerPage);
 
-  const columns : {
-    header : string;
-    accessor : keyof Client;
-    render? : (value: any, row: Client) => React.ReactNode;
-  }[] = [
-    { header: "Nom", accessor: "name" },
-    { header: "Email", accessor: "email" },
+  // Définition typée des colonnes
+  const columns: TableColumn<Client>[] = [
+    {
+      header: "Nom",
+      accessor: "name",
+    },
+    {
+      header: "Email",
+      accessor: "email",
+    },
     {
       header: "Téléphone",
       accessor: "phone",
-      render: (value: string) => value || "N/A"
+      render: (value: string) => value || "N/A",
     },
     {
       header: "Entreprise",
       accessor: "company",
-      render: (value: string) => value || "N/A"
-    }
+      render: (value: string) => value || "N/A",
+    },
   ];
 
   return (
@@ -101,11 +104,19 @@ export default function ClientList({
           </div>
         )}
         emptyMessage={
-          loading ? "Chargement..." :
-          "Aucun client trouvé. " +
-          <Link href="/dashboard/Services/prontaInvoices/clients/new" className="text-blue-600 hover:underline">
-            Créer un nouveau client
-          </Link>
+          loading ? (
+            "Chargement..."
+          ) : (
+            <>
+              Aucun client trouvé.{" "}
+              <Link
+                href="/dashboard/Services/prontaInvoices/clients/new"
+                className="text-blue-600 hover:underline"
+              >
+                Créer un nouveau client
+              </Link>
+            </>
+          )
         }
       />
 
@@ -147,8 +158,8 @@ export default function ClientList({
       >
         {clientToDelete && (
           <p className="text-gray-600">
-            Êtes-vous sûr de vouloir supprimer le client <strong>{clientToDelete.name}</strong> ?
-            Cette action est irréversible.
+            Êtes-vous sûr de vouloir supprimer le client{" "}
+            <strong>{clientToDelete.name}</strong> ? Cette action est irréversible.
           </p>
         )}
       </Modal>

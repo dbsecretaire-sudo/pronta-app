@@ -8,6 +8,8 @@ export interface BillingAddress {
   country?: string;
 }
 
+export type PaymentMethodType = 'credit_card' | 'paypal' | 'bank_transfer';
+
 export interface PaymentMethodDetails {
   card_number?: string;
   card_last_four?: string;
