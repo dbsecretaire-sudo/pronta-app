@@ -17,6 +17,7 @@ export default function AccountPage() {
     handleProfileUpdate,
     handleBillingUpdate
   } = useAccount();
+
   const { data: session, status} = useSession();
 
   const [userSubscriptions, setUserSubscriptions] = useState<SubscriptionWithService[]>([]);

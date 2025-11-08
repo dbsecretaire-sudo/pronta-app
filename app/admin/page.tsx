@@ -48,11 +48,11 @@ export default function AdminPage() {
       path: '/admin/user',
       icon: <FaUserCog className="mr-2 text-gray-500" />
     },
-    {
-      name: 'Utilisateurs et Services',
-      path: '/admin/userServices',
-      icon: <FaUserTag className="mr-2 text-teal-500" />
-    },
+    // {
+    //   name: 'Utilisateurs et Services',
+    //   path: '/admin/userServices',
+    //   icon: <FaUserTag className="mr-2 text-teal-500" />
+    // },
   ];
 
   return (

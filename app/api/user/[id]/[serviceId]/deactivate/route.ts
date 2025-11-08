@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import { UserServiceService } from '../../../service';
+import { UserService } from '../../../service';
 
-const userServiceService = new UserServiceService;
+const userService = new UserService;
 
 export async function POST(
   request: Request,
@@ -9,7 +9,7 @@ export async function POST(
 ) {
   try {
     const { userId, serviceId } = await params; // ✅ Utilisez await pour obtenir les valeurs
-    const deactivatedService = await userServiceService.deactivateUserService(Number(userId), Number(serviceId));
+    const deactivatedService = await userService.deactivateUserService(Number(userId), Number(serviceId));
     return NextResponse.json(deactivatedService);
   } catch (error) {
     return NextResponse.json(

@@ -1,13 +1,13 @@
 import pool from "@/src/lib/db";
 import { User, CreateUser, UpdateUser, UserFilter, Role, BillingAddress, PaymentMethod } from "./type";
 import { Subscription } from "../Subscription";
+import { Service } from "../Services";
 
 export class UserModel {
   constructor(public data: User) {}
 
   // Helper pour mapper les résultats de la base de données vers un objet User
   mapDbUserToUser(dbUser: any): User {
-    console.log("Type de billing_address:", typeof dbUser.billing_address, dbUser.billing_address);
     return {
       id: dbUser.id,
       email: dbUser.email,
@@ -26,7 +26,10 @@ export class UserModel {
           : undefined,
       phone: dbUser.phone || undefined,
       company: dbUser.company || undefined,
-      role: dbUser.role
+      role: dbUser.role,
+      can_write: dbUser.can_write,
+      can_delete: dbUser.can_delete,
+      service_ids: dbUser.service_ids
     };
   }
 
@@ -57,6 +60,19 @@ export class UserModel {
       created_at: dbSubscription.created_at ? new Date(dbSubscription.created_at) : undefined,
       updated_at: dbSubscription.updated_at ? new Date(dbSubscription.updated_at) : undefined
     };
+  }
+
+  private mapDbServiceToService(dbService: any): Service {
+    return {
+      id : dbService.id,
+      name: dbService.name,
+      description: dbService.description,
+      route: dbService.route,
+      icon: dbService.icon,
+      price: dbService.price,
+      unit: dbService.unit,
+      is_active: dbService.is_active,
+    }
   }
 
   async getAllUsersName(): Promise<Record<number, { id: number; name: string }>> {
@@ -165,6 +181,40 @@ export class UserModel {
     return { role: res.rows[0].role as Role };
   }
 
+  async getUserServices(id: number): Promise<{ services: Service[] }> {
+    if (!id || typeof id !== 'number') {
+      throw new Error('Invalid user ID');
+    }
+
+    // 1. Récupérer les service_ids de l'utilisateur
+    const userRes = await pool.query(
+      "SELECT service_ids FROM users WHERE id = $1",
+      [id]
+    );
+
+    if (userRes.rows.length === 0) {
+      throw new Error(`User with id ${id} not found`);
+    }
+
+    const { service_ids } = userRes.rows[0];
+
+    // 2. Si l'utilisateur n'a aucun service, retourner un tableau vide
+    if (!service_ids || service_ids.length === 0) {
+      return { services: [] };
+    }
+
+    // 3. Récupérer les détails des services correspondants
+    const servicesRes = await pool.query(
+      "SELECT * FROM services WHERE id = ANY($1)",
+      [service_ids]
+    );
+
+    // 4. Mapper les résultats en objets Service
+    const services = servicesRes.rows.map(row => this.mapDbServiceToService(row));
+
+    return { services };
+  }
+
   async getUserByEmail(email: string): Promise<User> {
     const res = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
     if (res.rows.length === 0) {
@@ -187,103 +237,75 @@ export class UserModel {
   }
 
   async updateUser(id: number, userData: UpdateUser): Promise<User> {
-  console.log('updateUser called with:', { id, userData }); // Log initial
+    const fields: string[] = [];
+    const values: any[] = [];
+    let paramIndex = 1;
+    const addField = (sql: string, value: any) => {
+      fields.push(sql);
+      values.push(value);
+      paramIndex++;
+    };
 
-  const fields: string[] = [];
-  const values: any[] = [];
-  let paramIndex = 1;
+    // Champs simples
+    if (userData.email !== undefined) addField(`email = $${paramIndex}`, userData.email);
+    if (userData.name !== undefined) addField(`name = $${paramIndex}`, userData.name);
+    if (userData.role !== undefined) addField(`role = $${paramIndex}`, userData.role);
+    if (userData.phone !== undefined) addField(`phone = $${paramIndex}`, userData.phone);
+    if (userData.company !== undefined) addField(`company = $${paramIndex}`, userData.company);
+    if (userData.can_write !== undefined) addField(`can_write = $${paramIndex}`, userData.can_write);
+    if (userData.can_delete !== undefined) addField(`can_delete = $${paramIndex}`, userData.can_delete);
 
-  const addField = (sql: string, value: any) => {
-    console.log(`Adding field: ${sql} with value:`, value); // Log pour chaque champ
-    fields.push(sql);
-    values.push(value);
-    paramIndex++;
-  };
-
-  // Champs simples
-  if (userData.email !== undefined) {
-    console.log('Updating email:', userData.email);
-    addField(`email = $${paramIndex}`, userData.email);
-  }
-  if (userData.name !== undefined) {
-    console.log('Updating name:', userData.name);
-    addField(`name = $${paramIndex}`, userData.name);
-  }
-  if (userData.role !== undefined) {
-    console.log('Updating role:', userData.role);
-    addField(`role = $${paramIndex}`, userData.role);
-  }
-  if (userData.phone !== undefined) {
-    console.log('Updating phone:', userData.phone);
-    addField(`phone = $${paramIndex}`, userData.phone);
-  }
-  if (userData.company !== undefined) {
-    console.log('Updating company:', userData.company);
-    addField(`company = $${paramIndex}`, userData.company);
-  }
-
-  // Champs JSONB complexes
-  if (userData.billing_address !== undefined) {
-    console.log('Updating billing_address:', userData.billing_address);
-    addField(
-      `billing_address = $${paramIndex}`,
-      userData.billing_address ? JSON.stringify(userData.billing_address) : null
-    );
-  }
-  if (userData.payment_method !== undefined) {
-    console.log('Updating payment_method:', userData.payment_method);
-    addField(
-      `payment_method = $${paramIndex}`,
-      userData.payment_method ? JSON.stringify(userData.payment_method) : null
-    );
-  }
-
-  if (fields.length === 0) {
-    console.error('No fields to update');
-    throw new Error('No fields to update');
-  }
-
-  console.log('Final query parts:', { fields, values }); // Log avant l'exécution
-
-  const query = `
-    UPDATE users
-    SET ${fields.join(', ')}
-    WHERE id = $${paramIndex}
-    RETURNING *
-  `;
-
-  console.log('Final query:', query); // Log de la requête finale
-  console.log('Final values:', values); // Log des valeurs finales
-
-  values.push(id);
-
-  try {
-    const res = await pool.query(query, values);
-    console.log('Query result:', res.rows); // Log du résultat
-
-    if (res.rows.length === 0) {
-      console.error('User not found');
-      throw new Error('User not found');
+    // Gestion du tableau service_ids (remplacement complet)
+    if (userData.service_ids !== undefined) {
+      addField(`service_ids = $${paramIndex}`, userData.service_ids);
     }
 
-    const user = this.mapDbUserToUser(res.rows[0]);
-    console.log('Returning user:', user); // Log de l'utilisateur retourné
-    return { ...user };
-  } catch (error) {
-    console.error('Database error:', error); // Log des erreurs de base de données
-    throw error;
+    // Champs JSONB complexes
+    if (userData.billing_address !== undefined) {
+      addField(
+        `billing_address = $${paramIndex}`,
+        userData.billing_address ? JSON.stringify(userData.billing_address) : null
+      );
+    }
+    if (userData.payment_method !== undefined) {
+      addField(
+        `payment_method = $${paramIndex}`,
+        userData.payment_method ? JSON.stringify(userData.payment_method) : null
+      );
+    }
+
+    if (fields.length === 0) {
+      throw new Error('No fields to update');
+    }
+
+    const query = `
+      UPDATE users
+      SET ${fields.join(', ')}
+      WHERE id = $${paramIndex}
+      RETURNING *
+    `;
+    values.push(id);
+
+    try {
+      const res = await pool.query(query, values);
+      if (res.rows.length === 0) {
+        throw new Error('User not found');
+      }
+      return this.mapDbUserToUser(res.rows[0]);
+    } catch (error) {
+      throw error;
+    }
   }
-}
 
-
-  // Création d'un utilisateur (sans abonnement)
-  async createUser(user: Omit<CreateUser, "password"> & { password_hash: string }): Promise<User> {
+ async createUser(
+    user: Omit<CreateUser, "password"> & { password_hash: string }
+  ): Promise<User> {
     const res = await pool.query(
       `INSERT INTO users (
-        email, password_hash, name, role, phone, company,
-        billing_address, payment_method
+        email, password_hash, name, role, phone, company, can_write, can_delete,
+        billing_address, payment_method, service_ids
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
       RETURNING *`,
       [
         user.email,
@@ -292,16 +314,17 @@ export class UserModel {
         user.role || 'CLIENT',
         user.phone || '',
         user.company || '',
+        user.can_write || false,
+        user.can_delete || false, // Corrigé : can_delete au lieu de can_write
         user.billing_address ? JSON.stringify(user.billing_address) : null,
-        user.payment_method ? JSON.stringify(user.payment_method) : null
+        user.payment_method ? JSON.stringify(user.payment_method) : null,
+        user.service_ids || [] // Ajout du tableau service_ids (par défaut, un tableau vide)
       ]
     );
-
     const createdUser = this.mapDbUserToUser(res.rows[0]);
-
-    // Retourner l'utilisateur avec ses abonnements
     return this.getUserById(createdUser.id);
   }
+
 
   // Nouvelle méthode pour créer un abonnement
   async createUserSubscription(userId: number, subscription: {
@@ -469,5 +492,23 @@ export class UserModel {
     }
   ): Promise<void> {
     return this.createUserSubscription(userId, subscription);
+  }
+
+  async addServiceToUser(userId: number, serviceId: number): Promise<void> {
+    await pool.query(
+      `UPDATE users
+      SET service_ids = array_append(service_ids, $1)
+      WHERE id = $2 AND NOT ($1 = ANY(service_ids))`,
+      [serviceId, userId]
+    );
+  }
+
+  async removeServiceFromUser(userId: number, serviceId: number): Promise<void> {
+    await pool.query(
+      `UPDATE users
+      SET service_ids = array_remove(service_ids, $1)
+      WHERE id = $2`,
+      [serviceId, userId]
+    );
   }
 }

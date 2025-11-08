@@ -1,6 +1,6 @@
 // src/Modules/ServiceCard.tsx
 import { Service } from '@/src/Types/Services';
-import { UserService, UserServiceWithDetails } from '@/src/Types/UserServices';
+// import { UserService, UserServiceWithDetails } from '@/src/Types/UserServices';
 import Link from 'next/link';
 
 interface ServiceCardProps {
@@ -9,7 +9,7 @@ interface ServiceCardProps {
   onSubscribe?: (service: Service) => void;
   onDeactivate?: (service: Service) => void;
   onReactivate?: (service: Service) => void;
-  userService?: UserService;
+  // userService?: UserService;
 }
 
 export const ServiceCard = ({ 
@@ -18,7 +18,6 @@ export const ServiceCard = ({
   onSubscribe, 
   onDeactivate,
   onReactivate,
-  userService
 }: ServiceCardProps) => (
   <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100">
     <div className="flex items-center mb-3">
@@ -30,11 +29,11 @@ export const ServiceCard = ({
     {/* Actions */}
     {isSubscribed ? (
       <>
-        {userService?.is_active && (
+
           <Link href={service.route} className="text-sm text-blue-600 font-medium block mb-2">
             Accéder →
           </Link>
-        )}
+
         {/* {userService?.is_active ? (
           <button
             onClick={() => onDeactivate?.(service)} // ✅ Bouton "Désactiver" pour les services actifs

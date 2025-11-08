@@ -1,5 +1,6 @@
 import { AvailableService, Service } from "@/src/Types/Services";
-import { UserService, UserServiceWithDetails } from '@/src/Types/UserServices';
+import { UpdateUser } from "@/src/Types/Users";
+// import { UserService, UserServiceWithDetails } from '@/src/Types/UserServices';
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export const fetchAllServices = async ():Promise<Service[]> => {
@@ -9,30 +10,24 @@ export const fetchAllServices = async ():Promise<Service[]> => {
 };
 
 export const fetchUserServices = async (userId: number) => {
-  const res = await fetch(`/api/UserServices/${userId}`, { credentials: 'include' });
+  const res = await fetch(`${API_URL}/api/user/${userId}/service`, { credentials: 'include' });
   if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
   return res.json();
 };
 
-export const fetchAllUserServices = async (): Promise<UserServiceWithDetails[]> => {
-  const res = await fetch(`${API_URL}/api/UserServices`, { credentials: 'include' });
-  if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
-  return res.json();
-}
 
-export const subscribeToService = async (userServiceData: UserService): Promise<void> => {
-  const res = await fetch('/api/UserServices', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+
+export const subscribeToService = async (userId: number, serviceId: number): Promise<void> => {
+  const res = await fetch(`${API_URL}/api/user/${userId}/${serviceId}/reactive`, {
+    method: 'POST', 
     credentials: 'include',
-    body: JSON.stringify(userServiceData),
   });
   if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
   return res.json();
 };
 
 export const deactivateUserService = async (userId: number, serviceId: number): Promise<void> => {
-  const response = await fetch(`/api/UserServices/${userId}/${serviceId}/deactivate`, {
+  const response = await fetch(`${API_URL}/api/user/${userId}/${serviceId}/deactivate`, {
     method: 'POST',
     credentials: 'include',
   });
@@ -43,7 +38,7 @@ export const deactivateUserService = async (userId: number, serviceId: number): 
 };
 
 export const reactivateUserService = async (userId: number, serviceId: number): Promise<void> => {
-  const response = await fetch(`/api/UserServices/${userId}/${serviceId}/reactivate`, {
+  const response = await fetch(`${API_URL}/api/user/${userId}/${serviceId}/reactivate`, {
     method: 'POST',
     credentials: 'include',
   });
@@ -54,7 +49,7 @@ export const reactivateUserService = async (userId: number, serviceId: number): 
 };
 
 export const createService = async (serviceData: Omit<Service, 'id'>): Promise<Service> => {
-  const response = await fetch('/api/services', {
+  const response = await fetch(`${API_URL}/api/services`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

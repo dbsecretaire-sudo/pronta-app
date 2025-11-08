@@ -32,8 +32,16 @@ export interface User {
   phone?: string,
   company?: string,
   role: Role;
+  can_write: boolean;
+  can_delete: boolean;
+  service_ids: number[];
   // messages?: Message[]; // Si vous avez besoin des messages
 }
+
+export type UpdateUserPermissions = {
+  can_write?: boolean;
+  can_delete?: boolean;
+};
 
 export type CreateUser = Omit<User, "id" | "created_at" | "password_hash"> & {
   password: string;

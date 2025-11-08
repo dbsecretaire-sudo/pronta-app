@@ -3,10 +3,11 @@ import { useUser } from "@/src/Hook/useUser";
 import { useEffect, useState } from "react";
 import { Role, User } from "@/src/Types/Users";
 import { fetchUserSubscriptions } from "../lib/api";
+import { useTab } from '@/src/context/TabContext';
 
 export function useAccount() {
   const { userData, loading, error, mutate } = useUser();
-  const [activeTab, setActiveTab] = useState("profile");
+  const { activeTab, setActiveTab } = useTab();
   const [isUpdating, setIsUpdating] = useState(false);
   const [subscriptions, setSubscriptions] = useState([]);
 

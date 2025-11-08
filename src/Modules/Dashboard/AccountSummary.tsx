@@ -3,10 +3,13 @@
 import Link from 'next/link';
 import { useAccount } from '@/src/Hook/useAccount';
 import { SubscriptionWithService } from '@/src/Types/Subscription';
+import { useTab } from '@/src/context/TabContext';
+import { useRouter } from 'next/navigation';
 
 export const AccountSummary = () => {
   const { userData, subscriptions, loading, error } = useAccount();
- 
+  const { setActiveTab } = useTab();
+  const router = useRouter();
 
   const formatDate = (date: string | Date | null | undefined) => { // ✅ Ajoute `null` au type
     if (!date) return "Aucune date";
@@ -87,9 +90,15 @@ export const AccountSummary = () => {
     <section className="bg-white rounded-lg shadow-md p-6">
       <div className="flex justify-between items-center mb-5">
         <h2 className="text-xl font-semibold">Mon compte</h2>
-        <Link href="/dashboard/account" className="text-blue-600 hover:underline text-sm">
+        <button
+          className="text-blue-600 hover:underline text-sm"
+          onClick={() => {
+            setActiveTab('profile');
+            router.push('/dashboard/account');
+          }}
+        >
           Voir tous les détails →
-        </Link>
+        </button>
       </div>
 
       {/* Affichage des abonnements actifs */}
@@ -144,12 +153,15 @@ export const AccountSummary = () => {
                       Prochain paiement: {formatDate(subscription.next_payment_date)}
                     </p>
                   </div>
-                  <Link
-                    href={subscription.service.route}
+                  <button
                     className="text-blue-600 text-sm hover:underline"
+                    onClick={() => {
+                      setActiveTab('billing');
+                      router.push('/dashboard/account');
+                    }}
                   >
                     Gérer →
-                  </Link>
+                  </button>
                 </div>
               </div>
             ))}

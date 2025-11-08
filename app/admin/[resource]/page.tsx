@@ -2,7 +2,7 @@
 import { notFound } from 'next/navigation';
 import { DataTableUi } from '@/src/Components'; // Utilise DataTableUi à la place de CallDataTable
 import { resourcesConfig } from '@/src/lib/admin/resources';
-import { fetchUsersRole, fetchUsersName, fetchAllServices, fetchAllCalls, fetchAllClients, fetchAllSubscriptions, fetchInvoices, fetchCalendar, fetchUsers, fetchAllUserServices } from '@/src/lib/api';
+import { fetchUsersRole, fetchUsersName, fetchAllServices, fetchAllCalls, fetchAllClients, fetchAllSubscriptions, fetchInvoices, fetchCalendar, fetchUsers } from '@/src/lib/api';
 
 interface ResourcePageProps {
   params: Promise<{ resource: string }>;
@@ -19,14 +19,14 @@ export default async function ResourcePage({ params }: ResourcePageProps) {
   const data = await config.fetchData();
 
   // Récupérer les données pour dataMaps
-  const [usersRole, usersName, services, subscriptions, invoices, calendarEvents, userServices, clients, calls, users] = await Promise.all([
+  const [usersRole, usersName, services, subscriptions, invoices, calendarEvents, clients, calls, users] = await Promise.all([
     fetchUsersRole(),
     fetchUsersName(),
     fetchAllServices(),
     fetchAllSubscriptions(),
     fetchInvoices(),
     fetchCalendar(),
-    fetchAllUserServices(),
+    // fetchAllUserServices(),
     fetchAllClients(),
     fetchAllCalls(), 
     fetchUsers(),
@@ -65,10 +65,10 @@ export default async function ResourcePage({ params }: ResourcePageProps) {
       subscriptions: Object.fromEntries(
         subscriptions.map((sub) => [sub.id, sub])
       ),
-      // Services utilisateurs (clé composite)
-      userServices: Object.fromEntries(
-        userServices.map((us) => [`${us.user_id}-${us.service_id}`, us])
-      ),
+      // // Services utilisateurs (clé composite)
+      // userServices: Object.fromEntries(
+      //   userServices.map((us) => [`${us.user_id}-${us.service_id}`, us])
+      // ),
       // Factures
       invoices: Object.fromEntries(
         invoices.map((invoice) => [invoice.id, invoice])

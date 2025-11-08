@@ -1,5 +1,7 @@
+import { UpdateUserPermissions } from "@/src/Types/Users/type";
 import { User, CreateUser, UpdateUser, UserFilter, UserModel, Role } from "./types";
 import { validateUser, hashPassword, isValidRole } from "./utils";
+import { Service } from "../services/types";
 
 export class UserService {
   private userModel = new UserModel({} as User);
@@ -22,6 +24,10 @@ export class UserService {
 
   async getRoleByUserId(id: number): Promise<{role: Role}> {
     return this.userModel.getRoleByUserId(id);
+  } 
+
+  async getUserServices(id: number): Promise<{services: Service[]}> {
+    return this.userModel.getUserServices(id);
   } 
   
   async getUserById(id: number): Promise<User | null> {
@@ -76,5 +82,12 @@ export class UserService {
     return this.userModel.getUsersWithActiveSubscription();
   }
 
-
+  async deactivateUserService(userId: number, serviceId: number): Promise<void> {
+      return this.userModel.removeServiceFromUser(userId, serviceId);
+    }
+    
+  async reactivateUserService(userId: number, serviceId: number): Promise<void> {
+    return this.userModel.addServiceToUser(userId, serviceId);
+  }
+  
 }

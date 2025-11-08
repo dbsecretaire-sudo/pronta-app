@@ -7,7 +7,7 @@ import { Service } from '@/src/Types/Services';
 import { CalendarEvent } from '@/src/Types/Calendar';
 import { Subscription } from '@/src/Types/Subscription';
 import { BillingAddress, PaymentMethod, PaymentMethodDetails, Role, User } from '@/src/Types/Users';
-import { UserService } from '@/src/Types/UserServices';
+// import { UserService } from '@/src/Types/UserServices';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -32,7 +32,7 @@ const serviceColumnHelper = createColumnHelper<Service>();
 const calendarColumnHelper = createColumnHelper<CalendarEvent>();
 const subscriptionColumnHelper = createColumnHelper<Subscription>();
 const userColumnHelper = createColumnHelper<User>();
-const userServicesColumnHelper = createColumnHelper<UserService>();
+// const userServicesColumnHelper = createColumnHelper<UserService>();
 
 export type ResourceConfig<TData> = {
   columns: ExtendedColumnDef<TData>[];
@@ -554,66 +554,66 @@ export const resourcesConfig: Record<string, ResourceConfig<any>> = {
       return res.json();
     },
   },
-  userServices: {
-    columns: [
-      userServicesColumnHelper.accessor('user_id', {
-        header: 'ID Utilisateur',
-        meta: {
-          sortable: true,
-          filterType: 'select',
-          type: 'userName',
-          dataMap: 'users',
-        },
-      }),
-      userServicesColumnHelper.accessor('service_id', {
-        header: 'ID Service',
-        meta: {
-          sortable: true,
-          filterType: 'select',
-          type: 'userName',
-          dataMap: 'services',
-        },
-      }),
-      userServicesColumnHelper.accessor('subscription_date', {
-        header: 'Date de souscription',
-        meta: {
-          sortable: true,
-          filterType: 'date',
-          type: 'date',
-        },
-      }),
-      userServicesColumnHelper.accessor('is_active', {
-        header: 'Actif',
-        meta: {
-          sortable: true,
-          filterType: 'select',
-          type: 'booleanBadge',
-        },
-      }),
-      userServicesColumnHelper.accessor('can_write', {
-        header: 'Écriture',
-        meta: {
-          sortable: true,
-          filterType: 'select',
-          type: 'booleanBadge',
-        },
-      }),
-      userServicesColumnHelper.accessor('can_delete', {
-        header: 'Suppression',
-        meta: {
-          sortable: true,
-          filterType: 'select',
-          type: 'booleanBadge',
-        },
-      }),
-      userServicesColumnHelper.display({
-        id: 'permissions',
-        header: 'Permissions',
-      }),
-    ],
-    fetchData: async () => {
-      const res = await fetch(`${API_URL}/api/UserServices`);
-      return res.json();
-    },
-  },
+  // userServices: {
+  //   columns: [
+  //     userServicesColumnHelper.accessor('user_id', {
+  //       header: 'ID Utilisateur',
+  //       meta: {
+  //         sortable: true,
+  //         filterType: 'select',
+  //         type: 'userName',
+  //         dataMap: 'users',
+  //       },
+  //     }),
+  //     userServicesColumnHelper.accessor('service_id', {
+  //       header: 'ID Service',
+  //       meta: {
+  //         sortable: true,
+  //         filterType: 'select',
+  //         type: 'userName',
+  //         dataMap: 'services',
+  //       },
+  //     }),
+  //     userServicesColumnHelper.accessor('subscription_date', {
+  //       header: 'Date de souscription',
+  //       meta: {
+  //         sortable: true,
+  //         filterType: 'date',
+  //         type: 'date',
+  //       },
+  //     }),
+  //     userServicesColumnHelper.accessor('is_active', {
+  //       header: 'Actif',
+  //       meta: {
+  //         sortable: true,
+  //         filterType: 'select',
+  //         type: 'booleanBadge',
+  //       },
+  //     }),
+  //     userServicesColumnHelper.accessor('can_write', {
+  //       header: 'Écriture',
+  //       meta: {
+  //         sortable: true,
+  //         filterType: 'select',
+  //         type: 'booleanBadge',
+  //       },
+  //     }),
+  //     userServicesColumnHelper.accessor('can_delete', {
+  //       header: 'Suppression',
+  //       meta: {
+  //         sortable: true,
+  //         filterType: 'select',
+  //         type: 'booleanBadge',
+  //       },
+  //     }),
+  //     userServicesColumnHelper.display({
+  //       id: 'permissions',
+  //       header: 'Permissions',
+  //     }),
+  //   ],
+  //   fetchData: async () => {
+  //     const res = await fetch(`${API_URL}/api/UserServices`);
+  //     return res.json();
+  //   },
+  // },
 };

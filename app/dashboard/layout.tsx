@@ -6,18 +6,18 @@ import { useServices } from '@/src/Hook/useServices';
 import { NavBar } from "@/src/Components";
 import { fetchUserServices } from "@/src/lib/api";
 import { useCallback } from "react";
+import { TabProvider } from "@/src/context/TabContext";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isInService = pathname.includes('/dashboard/Services/');
   const { data: session, status } = useSession();
-  const { availableServices, loading: servicesLoading } = useServices(
+  const { sO, loading: servicesLoading } = useServices(
     session?.user?.id,
     status
   );
 
-  const userServices = availableServices
-    .filter(service => service.userService?.is_active)
+  const userServices = sO
     .map(service => ({
       name: service.name,
       path: service.route || `/dashboard/services/${service.id}`,
@@ -46,7 +46,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       isInService={isInService}
       userServices={userServices}
     >
-      {children}
+      <TabProvider>
+        {children}
+      </TabProvider>
     </NavBar>    
   );
 }
