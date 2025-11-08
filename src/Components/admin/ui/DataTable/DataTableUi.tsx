@@ -13,24 +13,12 @@ import {
   SortingState,
   ColumnFiltersState,
 } from '@tanstack/react-table';
+import { ExtendedColumnDef } from '@/src/Types/table';
 
 interface TypeBadgeInfo {
   label: string;
   color: string;
 }
-
-interface ExtendedColumnMeta {
-  type?: 'text' | 'userName' | 'typeBadge' | 'date' | 'duration' | 'booleanBadge';
-  dataMap?: string;
-  typeData?: Record<string, TypeBadgeInfo>;
-  filterOptions?: Array<{ value: string; label: string }>;
-  filterType?: 'text' | 'select' | 'date' | 'duration';
-  sortable?: boolean;
-}
-
-type ExtendedColumnDef<TData> = ColumnDef<TData, any> & {
-  meta?: ExtendedColumnMeta;
-};
 
 interface DataWithId {
   id: number;  // ou string, selon ton cas

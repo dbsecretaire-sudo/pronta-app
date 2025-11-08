@@ -91,7 +91,7 @@ export default async function ResourcePage({ params }: ResourcePageProps) {
     <div className="space-y-6 p-6">
       <DataTableUi
         data={data}
-        columns={config.columns} // Utilise les colonnes définies dans resourcesConfig
+        columns={config.getColumns()} // Utilise les colonnes définies dans resourcesConfig
         resourceName={resource}
         createHref={`/admin/${resource}/new`}
         dataMaps={dataMaps}
