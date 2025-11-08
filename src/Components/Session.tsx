@@ -31,7 +31,7 @@ declare module "next-auth/jwt" {
   }
 }
 
-export interface CustomUser extends Omit<User, 'id' | "password_hash" | "role" | "payment_method" | "created_at" | "subscription" > {
+export interface CustomUser extends Omit<User, 'id' | "password_hash" | "role" | "payment_method" | "created_at" | "subscription" | "can_write" | "can_delete" | "service_ids"> {
   id: string; // Redéfini en string
   email: string;
   name: string;

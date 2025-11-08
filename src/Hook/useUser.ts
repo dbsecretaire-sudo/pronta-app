@@ -46,6 +46,9 @@ export function useUser() {
         phone: data.phone || '',
         company: data.company || '',
         role: data.role || 'user',
+        can_write: data.can_write || false,
+        can_delete: data.can_delete || false,
+        service_ids: data.service_ids || [],
       };
 
       setUserData(transformedData);

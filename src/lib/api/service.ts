@@ -1,6 +1,5 @@
-import { AvailableService, Service } from "@/src/Types/Services";
-import { UpdateUser } from "@/src/Types/Users";
-// import { UserService, UserServiceWithDetails } from '@/src/Types/UserServices';
+import { Service } from "@/src/Types/Services";
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export const fetchAllServices = async ():Promise<Service[]> => {
@@ -28,7 +27,7 @@ export const subscribeToService = async (userId: number, serviceId: number): Pro
 
 export const deactivateUserService = async (userId: number, serviceId: number): Promise<void> => {
   const response = await fetch(`${API_URL}/api/user/${userId}/${serviceId}/deactivate`, {
-    method: 'POST',
+    method: 'PUT',
     credentials: 'include',
   });
   if (!response.ok) {
@@ -39,7 +38,7 @@ export const deactivateUserService = async (userId: number, serviceId: number): 
 
 export const reactivateUserService = async (userId: number, serviceId: number): Promise<void> => {
   const response = await fetch(`${API_URL}/api/user/${userId}/${serviceId}/reactivate`, {
-    method: 'POST',
+    method: 'PUT',
     credentials: 'include',
   });
   if (!response.ok) {

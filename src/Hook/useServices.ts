@@ -52,7 +52,7 @@ export const useServices = (userId: string | undefined, status: string) => {
       );
 
       const sN = servicesWithStatus.filter(service => 
-        service.isSubscribed === false
+        service.isSubscribed === false && service.is_active === true
       );
 
       setSO(sO);

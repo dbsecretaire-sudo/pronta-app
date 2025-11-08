@@ -169,7 +169,10 @@ import { User } from "../Users";
       payment_method: dbUser.payment_method ? JSON.parse(dbUser.payment_method) : undefined,
       phone: dbUser.phone || undefined,
       company: dbUser.company || undefined,
-      role: dbUser.role
+      role: dbUser.role,
+      can_write: dbUser.can_write,
+      can_delete: dbUser.can_delete,
+      service_ids: dbUser.service_ids,
     };
   }
 
@@ -204,6 +207,7 @@ import { User } from "../Users";
         icon: row.service_icon,
         route: row.service_route,
         description: row.service_description,
+        is_active: row.service_isActive
       },
     };
   }
