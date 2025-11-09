@@ -47,7 +47,7 @@ export const useServices = (userId: string | undefined, status: string) => {
       const servicesWithStatus = allServices.map(service => {
         return {
           ...service,
-          isSubscribed: fetchedUser.service_ids.includes(service.id) || fetchedUser.service_ids !== null,
+          isSubscribed: fetchedUser.service_ids !== null && fetchedUser.service_ids.includes(service.id),
         };
       });
 console.log("servicesWithStatus: ", servicesWithStatus);
