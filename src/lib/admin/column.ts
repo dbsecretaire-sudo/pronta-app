@@ -24,6 +24,11 @@ export const getClientColumns = (): ExtendedColumnDef<Client>[] => [
     header: 'ID',
     meta: { sortable: true, filterType: 'text' },
   }),
+  clientColumnHelper.accessor('user_id', {
+    header: 'Client',
+    meta: { sortable: true, filterType: 'select', type: 'userName', dataMap: 'usersClients', },
+
+  }),
   clientColumnHelper.accessor('name', {
     header: 'Nom',
     meta: { sortable: true, filterType: 'text' },

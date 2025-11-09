@@ -48,7 +48,7 @@ export default async function ResourcePage({ params }: ResourcePageProps) {
           .map(([id, user]) => [Number(id), user])
       ),
       // Clients
-      clients: Object.fromEntries(
+      usersClients: Object.fromEntries(
         Object.entries(usersName)
           .filter(([id, _]) => usersRole[Number(id)]?.role === 'CLIENT')
           .map(([id, user]) => [Number(id), user])
@@ -78,7 +78,7 @@ export default async function ResourcePage({ params }: ResourcePageProps) {
         calendarEvents.map((event) => [event.id, event])
       ),
       // Clients pour les factures
-      invoiceClients: Object.fromEntries(
+      clients: Object.fromEntries(
         clients.map((client) => [client.id, client])
       ),
       // Appels

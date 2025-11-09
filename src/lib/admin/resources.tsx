@@ -1,6 +1,14 @@
 // src/lib/admin/resources.ts
 import { ExtendedColumnDef } from '@/src/Types/table';
-import { getClientColumns, getUserColumns, getCallsColumns, getInvoicesColumns, getServicesColumns, getCalendarColumns, getSubscriptionColumns } from './column'; // Importez les fonctions
+import { 
+  getClientColumns, 
+  getUserColumns, 
+  getCallsColumns, 
+  getInvoicesColumns, 
+  getServicesColumns, 
+  getCalendarColumns, 
+  getSubscriptionColumns 
+} from './column'; // Importez les fonctions
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -11,7 +19,7 @@ export type ResourceConfig<TData> = {
 
 export const resourcesConfig: Record<string, ResourceConfig<any>> = {
   clients: {
-    getColumns: getClientColumns, // Appelez la fonction pour obtenir les colonnes
+    getColumns: getClientColumns,
     fetchData: async () => {
       const res = await fetch(`${API_URL}/api/clients`);
       return res.json();

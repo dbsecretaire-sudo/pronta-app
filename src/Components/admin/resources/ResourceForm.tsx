@@ -43,7 +43,7 @@ export default function ResourceForm({ resource }: ResourceFormProps) {
               required
             >
               <option value="">Sélectionnez un utilisateur</option>
-              {users.sort((a, b) => a.id - b.id).map((user) => (
+              {users.filter((user) => user.role === "CLIENT").sort((a, b) => a.id - b.id).map((user) => (
                 <option key={user.id} value={user.id}>
                   {user.name} (ID: {user.id})
                 </option>
@@ -59,7 +59,7 @@ export default function ResourceForm({ resource }: ResourceFormProps) {
             <input type="email" id="email" name="email" className="w-full p-2 border rounded" required />
           </div>
           <div>
-            <label htmlFor="phone" className="block mb-1">Téléphone</label>
+            <label htmlFor="phone" className="block mb-1">Téléphone (min 5 caractères)</label>
             <input type="text" id="phone" name="phone" className="w-full p-2 border rounded" required />
           </div>
           <div className="space-y-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
@@ -112,7 +112,7 @@ export default function ResourceForm({ resource }: ResourceFormProps) {
                   type="text"
                   id="country"
                   name="country"
-                  className="w-full p-2 border rounded-md bg-gray-100 cursor-not-allowed"
+                  className="w-full p-2 border rounded-md bg-gray-100"
                   defaultValue="France"
                   required
                 />
