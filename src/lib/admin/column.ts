@@ -187,6 +187,10 @@ export const getServicesColumns = (): ExtendedColumnDef<Service>[] => [
         header: 'Unité',
         meta: { sortable: false, filterType: 'text',},
       }),
+      serviceColumnHelper.accessor('is_active', {
+        header: 'Actif',
+        meta: { sortable: false, filterType: 'text',},
+      }),
 ]
 
 export const getCalendarColumns = (): ExtendedColumnDef<CalendarEvent>[] => [
