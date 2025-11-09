@@ -14,7 +14,7 @@ export default function DashboardHome() {
 
   const subscribedServices = sO;
   const unSubscribedServices = sN;
-console.log("sO: ",sO, ", sN: ", sN,", s: ", s)
+
   if (loading) return <div className="p-8">Chargement...</div>;
 
   return (

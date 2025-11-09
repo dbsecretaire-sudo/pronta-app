@@ -465,8 +465,13 @@ export class UserModel {
   async addServiceToUser(userId: number, serviceId: number): Promise<void> {
     await pool.query(
       `UPDATE users
-      SET service_ids = array_append(service_ids, $1)
-      WHERE id = $2 AND NOT ($1 = ANY(service_ids))`,
+      SET service_ids =
+          CASE
+            WHEN service_ids IS NULL THEN ARRAY[1]
+            ELSE array_append(service_ids, 1)
+          END
+      WHERE id = 1
+      AND NOT (1 = ANY(COALESCE(service_ids, ARRAY[]::integer[])));`,
       [serviceId, userId]
     );
   }
