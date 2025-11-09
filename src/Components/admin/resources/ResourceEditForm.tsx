@@ -225,7 +225,7 @@ useEffect(() => {
                 required
               >
                 <option value="">Sélectionnez un utilisateur</option>
-                {users.map((user) => (
+                {users.sort((a, b) => a.id - b.id).map((user) => (
                   <option key={user.id} value={user.id}>
                     {user.name} (ID: {user.id})
                   </option>
