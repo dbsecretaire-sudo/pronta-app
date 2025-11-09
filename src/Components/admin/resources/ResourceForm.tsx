@@ -113,7 +113,7 @@ export default function ResourceForm({ resource }: ResourceFormProps) {
                   id="country"
                   name="country"
                   className="w-full p-2 border rounded-md bg-gray-100 cursor-not-allowed"
-                  placeholder="Ex: France"
+                  defaultValue="France"
                   required
                 />
               </div>
