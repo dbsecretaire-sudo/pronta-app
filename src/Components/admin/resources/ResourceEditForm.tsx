@@ -262,7 +262,7 @@ useEffect(() => {
                   type="text"
                   id="street"
                   name="address.street"
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   defaultValue={formData.address.street || ''}
                   onChange={handleChange}
                   required
@@ -277,7 +277,7 @@ useEffect(() => {
                     type="text"
                     id="postalCode"
                     name="address.postalCode"
-                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     defaultValue={formData.address.postalCode || ''}
                     onChange={handleChange}
                     required
@@ -289,7 +289,7 @@ useEffect(() => {
                     type="text"
                     id="city"
                     name="address.city"
-                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     defaultValue={formData.address.city || ''}
                     onChange={handleChange}
                     required
@@ -304,7 +304,7 @@ useEffect(() => {
                   type="text"
                   id="country"
                   name="address.country"
-                  className="w-full p-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
+                  className="w-full p-2 border rounded-md bg-gray-100 cursor-not-allowed"
                   defaultValue={formData.address.country || ''}
                   onChange={handleChange}
                   required

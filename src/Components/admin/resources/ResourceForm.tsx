@@ -73,7 +73,7 @@ export default function ResourceForm({ resource }: ResourceFormProps) {
                   type="text"
                   id="street"
                   name="street"
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Ex: 123 Rue de Paris"
                   required
                 />
@@ -87,7 +87,7 @@ export default function ResourceForm({ resource }: ResourceFormProps) {
                     type="text"
                     id="postalCode"
                     name="postalCode"
-                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Ex: 75000"
                     required
                   />
@@ -98,7 +98,7 @@ export default function ResourceForm({ resource }: ResourceFormProps) {
                     type="text"
                     id="city"
                     name="city"
-                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Ex: Paris"
                     required
                   />
@@ -112,7 +112,7 @@ export default function ResourceForm({ resource }: ResourceFormProps) {
                   type="text"
                   id="country"
                   name="country"
-                  className="w-full p-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
+                  className="w-full p-2 border rounded-md bg-gray-100 cursor-not-allowed"
                   placeholder="Ex: France"
                   required
                 />
