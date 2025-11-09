@@ -8,7 +8,7 @@ export async function PUT(
 { params }: { params: Promise<{ id: string; serviceId: string }> }
 ) {
 try {
-    const { id, serviceId } = await params; // ✅ Utilisez await pour obtenir les valeurs
+    const { id, serviceId } = await params; 
     await userService.reactivateUserService(Number(id), Number(serviceId));
     const safeResponse = {success: true};
     return NextResponse.json(safeResponse);

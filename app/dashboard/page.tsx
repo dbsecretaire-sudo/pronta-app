@@ -8,7 +8,7 @@ import { createService } from "@/src/lib/api";
 
 export default function DashboardHome() {
   const { data: session, status } = useSession();
-  const { s, sO, sN, loading, handleSubscribe, handleDeactivate, handleReactivate } = useServices(session?.user?.id, status);
+  const { sO, sN, loading, handleSubscribe, handleDeactivate, handleReactivate } = useServices(session?.user?.id, status);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
