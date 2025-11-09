@@ -50,13 +50,13 @@ export const useServices = (userId: string | undefined, status: string) => {
           isSubscribed: fetchedUser.service_ids.includes(service.id),
         };
       });
-
+console.log("servicesWithStatus: ", servicesWithStatus);
       const sO = servicesWithStatus.filter(service => 
         service.isSubscribed === true
       );
 
       const sN = servicesWithStatus.filter(service => 
-        service.isSubscribed === false && service.is_active === true
+        service.isSubscribed === false
       );
 
       setSO(sO);

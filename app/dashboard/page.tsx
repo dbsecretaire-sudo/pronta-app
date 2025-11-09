@@ -2,59 +2,15 @@
 import { useSession } from "next-auth/react";
 import { useServices } from '@/src/Hook/useServices';
 import { ServiceCard, AccountSummary } from '@/src/Modules/index';
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ServiceForm } from "@/src/Components";
-import { createService, fetchAllServices, fetchUser } from "@/src/lib/api";
-import { Service } from "@/src/Types/Services";
-import { User } from "@/src/Types/Users";
+import { createService } from "@/src/lib/api";
 
 export default function DashboardHome() {
   const { data: session, status } = useSession();
-  const { loading, handleSubscribe, handleDeactivate, handleReactivate } = useServices(session?.user?.id, status);
+  const { s, sO, sN, loading, handleSubscribe, handleDeactivate, handleReactivate } = useServices(session?.user?.id, status);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [sO, setSO] = useState<Service[]>([]);
-  const [sN, setSN] = useState<Service[]>([]);
-  const [s, setS] = useState<Service[]>([]);
-  const [user, setUser] = useState<User | null>(null);
-
-  
-  const fetchData = async () => {
-    const [fetchedUser, allServices] = await Promise.all([
-      fetchUser(Number(session?.user.id)),
-      fetchAllServices(),
-    ]);
-
-    setUser(fetchedUser);
-    setS(allServices);
-    const servicesWithStatus = allServices.map(service => {
-      return {
-        ...service,
-        isSubscribed: fetchedUser.service_ids.includes(service.id),
-      };
-    });
-
-    const sO = servicesWithStatus.filter(service => 
-      service.isSubscribed === true
-    );
-
-    const sN = servicesWithStatus.filter(service => 
-      service.isSubscribed === false && service.is_active === true
-    );
-
-    setSO(sO);
-    setSN(sN); 
-  }
-
-  useEffect(() => {
-    if (status === "loading" || status === "unauthenticated") {
-      return;
-    }
-    if (status === "authenticated" && session?.user.id) {
-      fetchData();
-    }
-  }, [status, session?.user.id]);
-
 
   const subscribedServices = sO;
   const unSubscribedServices = sN;
