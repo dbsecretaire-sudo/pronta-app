@@ -47,16 +47,16 @@ export const useServices = (userId: string | undefined, status: string) => {
       const servicesWithStatus = allServices.map(service => {
         return {
           ...service,
-          isSubscribed: fetchedUser.service_ids.includes(service.id),
+          isSubscribed: fetchedUser.service_ids.includes(service.id) || fetchedUser.service_ids === null,
         };
       });
 console.log("servicesWithStatus: ", servicesWithStatus);
       const sO = servicesWithStatus.filter(service => 
-        service.isSubscribed === true
+        service.isSubscribed === true && service.is_active === true
       );
 
       const sN = servicesWithStatus.filter(service => 
-        service.isSubscribed === false
+        service.isSubscribed === false && service.is_active === true
       );
 
       setSO(sO);
