@@ -418,7 +418,7 @@ export default function ResourceForm({ resource }: ResourceFormProps) {
             />
           </div>
           <div>
-            <label htmlFor="status" className="block mb-1">Status</label>
+            <label htmlFor="status" className="block mb-1">Statut</label>
             <select
               id="status"
               name="status"
@@ -568,9 +568,21 @@ export default function ResourceForm({ resource }: ResourceFormProps) {
                 ))}
             </select>
           </div>
-           <div>
+          <div>
             <label htmlFor="status" className="block mb-1">Statut</label>
-            <input type="text" id="status" name="status" className="w-full p-2 border rounded" required />
+            <select
+              id="status"
+              name="status"
+              className="w-full p-2 border rounded"
+              required
+            >
+              <option value="active">Actif</option>
+                <option value="paid">Payé</option>
+                <option value="overdue">En retard</option>
+                <option value="cancelled">Annulé</option>
+                <option value="pending">Suspendu</option>
+                <option value="expired">Expiré</option>
+            </select>
           </div>
           <div>
             <label htmlFor="start_date" className="block mb-1">Date de départ</label>
