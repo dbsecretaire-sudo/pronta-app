@@ -1,13 +1,15 @@
+import { Address, AddressSchema } from '@/src/lib/schemas/clients';
+
 export interface Client {
   id: number;
-  user_id?: number;
+  user_id: number;
   name: string;
   email: string;
   phone?: string;
-  address?: string;
+  address?: Address;
   company?: string;
-  created_at: Date;
-  updated_at: Date;
+  created_at: string;
+  updated_at?: string;
 }
 
 export type CreateClient = Omit<Client, "id" | "created_at" | "updated_at">;

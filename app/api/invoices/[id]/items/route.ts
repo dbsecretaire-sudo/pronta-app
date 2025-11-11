@@ -21,6 +21,22 @@ export async function POST(
   }
 }
 
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const invoiceItems = await invoiceService.getInvoiceItems(id);
+    return NextResponse.json(invoiceItems, { status: 201 });
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to get invoice item" },
+      { status: 500 }
+    );
+  }
+}
+
 export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }

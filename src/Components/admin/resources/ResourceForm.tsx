@@ -1,13 +1,13 @@
 // components/ResourceForm.tsx
 'use client';
-import { useActionState } from 'react';
+import { useActionState, useEffect, useState } from 'react';
 import { createResource } from '@/app/actions/admin';
-import { useEffect, useState } from 'react';
 import { fetchAllClients, fetchUsers } from '@/src/lib/api';
 import { User } from '@/src/Types/Users';
 import { Client } from '@/src/Types/Clients';
 import { useServices } from '@/src/Hook/useServices';
 import { useSession } from 'next-auth/react';
+import { TrashIcon } from '@heroicons/react/16/solid';
 
 interface ResourceFormProps {
   resource: string;
@@ -19,6 +19,42 @@ export default function ResourceForm({ resource }: ResourceFormProps) {
   const [clients, setClients] = useState<Client[]>([]);
   const { data, status } = useSession();
   const {s, sN} = useServices(data?.user.id, status);
+
+  const [items, setItems] = useState([
+    { description: '', quantity: 1, unit_price: 0, total: 0 }
+  ]);
+
+  // Fonctions pour gérer les items
+  const addItem = () => {
+    setItems([...items, { description: '', quantity: 1, unit_price: 0, total: 0 }]);
+  };
+
+  const removeItem = (index: number) => {
+    const newItems = [...items];
+    newItems.splice(index, 1);
+    setItems(newItems);
+  };
+
+  const updateItem = (index: number, field: string, value: string | number) => {
+    const newItems = [...items];
+    if (field === 'quantity' || field === 'unit_price') {
+      value = parseFloat(value.toString()) || 0;
+    }
+    newItems[index] = { ...newItems[index], [field]: value };
+    newItems[index].total = newItems[index].quantity * newItems[index].unit_price;
+    setItems(newItems);
+  };
+
+  // Met à jour le montant total quand les items changent
+  useEffect(() => {
+    if (resource === 'invoices') {
+      const totalAmount = items.reduce((sum, item) => sum + item.total, 0);
+      const amountInput = document.getElementById('amount') as HTMLInputElement;
+      if (amountInput) {
+        amountInput.value = totalAmount.toFixed(2);
+      }
+    }
+  }, [items, resource]);
 
   useEffect(() => {
     const loader = async () => {
@@ -181,14 +217,14 @@ export default function ResourceForm({ resource }: ResourceFormProps) {
             <input type="text" id="phone" name="phone" className="w-full p-2 border rounded" required />
           </div>
 
-          <div>
+          {/* <div>
             <label htmlFor="phoneNumber" className="block mb-1">Téléphone 2</label>
             <input type="text" id="phoneNumber" name="phoneNumber" className="w-full p-2 border rounded" required />
-          </div>
+          </div> */}
 
           <div>
-            <label htmlFor="contactName" className="block mb-1">Nom du contact</label>
-            <input type="text" id="contactName" name="contactName" className="w-full p-2 border rounded" required />
+            <label htmlFor="contact_name" className="block mb-1">Nom du contact</label>
+            <input type="text" id="contact_name" name="contact_name" className="w-full p-2 border rounded" required />
           </div>
 
           <div>
@@ -217,10 +253,18 @@ export default function ResourceForm({ resource }: ResourceFormProps) {
           </div>
 
           <div>
-            <label htmlFor="duration" className="block mb-1">Durée</label>
-            <input type="number" id="duration" name="duration" className="w-full p-2 border rounded" required />
+            <label htmlFor="duration" className="block mb-1">Durée (en secondes)</label>
+            <input 
+              type="string" 
+              id="duration" 
+              name="duration" 
+              className="w-full p-2 border rounded" 
+              placeholder="Ex: 03:20"
+              pattern="[0-5][0-9]:[0-5][0-9]" // Valide le format MM:SS
+              required 
+            />
           </div>
-
+          
         </>
       )}
 
@@ -325,8 +369,8 @@ export default function ResourceForm({ resource }: ResourceFormProps) {
               required
             >
               <option value="">Sélectionnez un utilisateur</option>
-              {/* Options pour les utilisateurs avec rôle ADMIN, SECRETARY ou SUPERVISOR */}
               {users
+                .filter(user => ['ADMIN', 'SECRETARY', 'SUPERVISOR'].includes(user.role))
                 .map(user => (
                   <option key={user.id} value={user.id}>
                     {user.name} ({user.email})
@@ -335,7 +379,7 @@ export default function ResourceForm({ resource }: ResourceFormProps) {
             </select>
           </div>
           <div>
-            <label htmlFor="client_id" className="block mb-1">Client</label>
+            <label htmlFor="client_id" className="block mb-1">Client représenté</label>
             <select
               id="client_id"
               name="client_id"
@@ -343,22 +387,35 @@ export default function ResourceForm({ resource }: ResourceFormProps) {
               required
             >
               <option value="">Sélectionnez un client</option>
-              {clients
-                //.filter(client => client.user_id === user_id) //valeur en fonction du champs précédent
-                .map((client: Client) => (
-                  <option key={client.id} value={client.id}>
-                    {client.name} ({client.email})
-                  </option>
-                ))}
+              {clients.map((client: Client) => (
+                <option key={client.id} value={client.id}>
+                  {client.name} ({client.email})
+                </option>
+              ))}
             </select>
           </div>
-          {/* <div>
-            <label htmlFor="client_name" className="block mb-1">Nom du client</label>
-            <input type="text" id="client_name" name="client_name" className="w-full p-2 border rounded" required />
-          </div> */}
           <div>
+            <label htmlFor="client_name" className="block mb-1">Nom à facturer</label>
+            <input type="text" id="client_name" name="client_name" className="w-full p-2 border rounded" required />
+          </div>
+         <div>
             <label htmlFor="amount" className="block mb-1">Montant (€)</label>
-            <input type="decimal" id="amount" name="amount" className="w-full p-2 border rounded" required />
+            {/* Champ visible (readOnly) */}
+            <input
+              type="number"
+              id="amount_display"
+              className="w-full p-2 border rounded"
+              step="0.01"
+              readOnly
+              value={items.reduce((sum, item) => sum + item.total, 0).toFixed(2)}
+            />
+            {/* Champ caché (pour la soumission) */}
+            <input
+              type="hidden"
+              id="amount"
+              name="amount"
+              value={items.reduce((sum, item) => sum + item.total, 0).toFixed(2)}
+            />
           </div>
           <div>
             <label htmlFor="status" className="block mb-1">Status</label>
@@ -380,6 +437,96 @@ export default function ResourceForm({ resource }: ResourceFormProps) {
             <label htmlFor="due_date" className="block mb-1">Date d'échéance</label>
             <input type="datetime-local" id="due_date" name="due_date" className="w-full p-2 border rounded" required />
           </div>
+
+          {/* Section des items de facture */}
+          <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <label className="block mb-3 font-medium text-gray-700">Items de la facture</label>
+            <div className="space-y-4">
+              {items.map((item, index) => (
+                <div key={index} className="p-4 border rounded-lg bg-white">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                      <label htmlFor={`items[${index}].description`} className="block mb-1 text-sm font-medium text-gray-700">Description*</label>
+                      <input
+                        type="text"
+                        id={`items[${index}].description`}
+                        name={`items[${index}].description`}
+                        value={item.description}
+                        onChange={(e) => updateItem(index, 'description', e.target.value)}
+                        className="w-full p-2 border rounded-md"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor={`items[${index}].quantity`} className="block mb-1 text-sm font-medium text-gray-700">Quantité*</label>
+                      <input
+                        type="number"
+                        id={`items[${index}].quantity`}
+                        name={`items[${index}].quantity`}
+                        value={item.quantity}
+                        onChange={(e) => updateItem(index, 'quantity', e.target.value)}
+                        className="w-full p-2 border rounded-md"
+                        min="1"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor={`items[${index}].unit_price`} className="block mb-1 text-sm font-medium text-gray-700">Prix unitaire (€)*</label>
+                      <input
+                        type="number"
+                        id={`items[${index}].unit_price`}
+                        name={`items[${index}].unit_price`}
+                        value={item.unit_price}
+                        onChange={(e) => updateItem(index, 'unit_price', e.target.value)}
+                        className="w-full p-2 border rounded-md"
+                        step="0.01"
+                        min="0"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor={`items[${index}].total`} className="block mb-1 text-sm font-medium text-gray-700">Total (€)</label>
+                      <input
+                        type="number"
+                        id={`items[${index}].total`}
+                        name={`items[${index}].total`}
+                        value={item.total.toFixed(2)}
+                        readOnly
+                        className="w-full p-2 border rounded-md bg-gray-100"
+                      />
+                    </div>
+                  </div>
+                  {index > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => removeItem(index)}
+                      className="mt-2 text-sm text-red-600 hover:text-red-900 flex items-center"
+                    >
+                      <TrashIcon className="h-4 w-4 mr-1" /> Supprimer
+                    </button>
+                  )}
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={addItem}
+                className="mt-3 px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              >
+                + Ajouter un item
+              </button>
+            </div>
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <div className="flex justify-between items-center">
+                <span className="font-medium text-gray-900">Total général</span>
+                <span className="font-semibold text-gray-900">
+                  {items.reduce((sum, item) => sum + item.total, 0).toFixed(2)} €
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Champ caché pour stocker les items */}
+          <input type="hidden" name="items" value={JSON.stringify(items)} />
         </>
       )}
 

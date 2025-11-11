@@ -1,3 +1,4 @@
+import { Address, AddressSchema } from "@/src/lib/schemas/clients";
 import { Client } from "@/src/Types/Clients";
 export type { Client } from "@/src/Types/Clients";
 
@@ -14,7 +15,7 @@ export interface ClientFormData {
   name: string;
   email: string;
   phone?: string;
-  address?: string;
+  address?: Address;
   company?: string;
 }
 

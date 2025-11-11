@@ -13,7 +13,7 @@ export const DateTimeSchema = z.union([
 ]);
 
 // Schéma pour un identifiant
-export const IdSchema = z.number().int().positive();
+export const IdSchema = z.string().transform((val) => parseInt(val));
 
 // =============================================
 // SCHÉMAS PRINCIPAUX
@@ -25,7 +25,7 @@ export const CalendarEventSchema = z.object({
   user_id: IdSchema,
   title: z.string().min(1).max(255),
   start_time: DateTimeSchema,
-  end_time: DateTimeSchema,
+  end_time: DateTimeSchema.optional(),
   description: z.string().max(1000).optional(),
   created_at: DateTimeSchema,
   updated_at: DateTimeSchema.optional()
@@ -36,14 +36,14 @@ export const CreateCalendarEventSchema = z.object({
   user_id: IdSchema,
   title: z.string().min(1).max(255),
   start_time: DateTimeSchema,
-  end_time: DateTimeSchema,
+  end_time: DateTimeSchema.optional(),
   description: z.string().max(1000).optional()
 });
 
 // Schéma pour la mise à jour d'un événement
 export const UpdateCalendarEventSchema = z.object({
   title: z.string().min(1).max(255).optional(),
-  start_time: DateTimeSchema.optional(),
+  start_time: DateTimeSchema,
   end_time: DateTimeSchema.optional(),
   description: z.string().max(1000).optional()
 }).partial();

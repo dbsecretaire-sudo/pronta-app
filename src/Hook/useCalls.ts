@@ -1,13 +1,14 @@
 // app/hooks/useCalls.ts
 import { useState, useEffect } from 'react';
-import { Call, CallFilter as CallFilterType } from "@/src/Types/Calls/index";
+import { CallFilter as CallFilterType } from "@/src/Types/Calls/index";
+import { Call } from "@/src/lib/schemas/calls";
 import { fetchCalendarEvents } from '../lib/api';
 
 const calculateCallStats = (calls: Call[]) => {
   // Convertir les dates en objets Date si nécessaire
   const callsWithDateObjects = calls.map(call => ({
     ...call,
-    date: call.date instanceof Date ? call.date : new Date(call.date)
+    date: call.date ? (call.date instanceof Date ? call.date : new Date(call.date)) : null
   }));
 
   // Calculer les statistiques pour aujourd'hui
@@ -15,9 +16,13 @@ const calculateCallStats = (calls: Call[]) => {
   today.setHours(0, 0, 0, 0); // Début de la journée
 
   const todayCalls = callsWithDateObjects.filter(call => {
-    const callDate = new Date(call.date);
-    callDate.setHours(0, 0, 0, 0);
-    return callDate.getTime() === today.getTime();
+    if (!call.date) return false; // On ignore si la date est null
+
+    const callDate = call.date instanceof Date ? call.date : new Date(call.date);
+    const callDateStartOfDay = new Date(callDate);
+    callDateStartOfDay.setHours(0, 0, 0, 0);
+
+    return callDateStartOfDay.getTime() === today.getTime();
   });
 
   const missedToday = todayCalls.filter(call => call.type === 'missed').length;

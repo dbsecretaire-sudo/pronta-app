@@ -42,6 +42,10 @@ export class InvoiceService {
     return this.invoiceModel.addInvoiceItem(item);
   }
 
+  async getInvoiceItems(id: string): Promise<InvoiceItem[]>{
+    return this.invoiceModel.getInvoiceItems(Number(id));
+  }
+
   async updateInvoice(id: number, invoice: Partial<Invoice>): Promise<Invoice> {
     return this.invoiceModel.updateInvoice(id, invoice);
   }

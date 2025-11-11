@@ -4,6 +4,6 @@ export const emptyClient: ClientFormData = {
   name: "",
   email: "",
   phone: "",
-  address: "",
+  address: undefined,
   company: "",
 };

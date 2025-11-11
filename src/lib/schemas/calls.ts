@@ -6,8 +6,24 @@ import { z } from 'zod';
 // =============================================
 
 // Schéma pour un identifiant
-export const IdSchema = z.number().int().positive();
+export const IdSchema = z.string().transform((val) => parseInt(val));
 
+export const DurationSchema = z.union([
+  z.string(), // Accepte une chaîne (ex: "90" ou "01:30:00")
+  z.number()  // Ou un nombre (ex: 90)
+])
+.transform((val) => {
+  if (typeof val === 'number') return val; // Déjà en secondes
+
+  // Si c'est une chaîne au format "HH:MM:SS"
+  if (val.includes(':')) {
+    const [hours, minutes, seconds] = val.split(':').map(Number);
+    return (hours * 3600) + (minutes * 60) + (seconds || 0);
+  }
+
+  // Si c'est une chaîne représentant un nombre (ex: "90")
+  return parseInt(val, 10);
+});
 // Schéma pour une date/heure (ISO string ou Date object)
 export const DateTimeSchema = z.union([
   z.string().datetime(),
@@ -36,7 +52,7 @@ export const CallSchema = z.object({
   type: CallTypeSchema,
   summary: z.string().max(1000).optional(),
   duration: z.number().int().positive().optional(),
-  phone_number: z.string().min(1).max(50),
+  phone_number: z.string().max(50).optional(),
   contact_name: z.string().min(1).max(255).optional(),
   client_id: IdSchema.optional(),
   created_at: DateTimeSchema,
@@ -52,7 +68,7 @@ export const CreateCallSchema = z.object({
   type: CallTypeSchema,
   summary: z.string().max(1000).optional(),
   duration: z.number().int().positive().optional(),
-  phone_number: z.string().min(1).max(50),
+  phone_number: z.string().max(50).optional(),
   contact_name: z.string().min(1).max(255).optional(),
   client_id: IdSchema.optional()
 });
@@ -65,7 +81,7 @@ export const UpdateCallSchema = z.object({
   type: CallTypeSchema.optional(),
   summary: z.string().max(1000).optional(),
   duration: z.number().int().positive().optional(),
-  phone_number: z.string().min(1).max(50).optional(),
+  phone_number: z.string().max(50).optional(),
   contact_name: z.string().min(1).max(255).optional(),
   client_id: IdSchema.optional()
 }).partial();

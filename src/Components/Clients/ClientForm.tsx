@@ -2,25 +2,13 @@
 import { useState, useEffect } from "react";
 import { ClientFormData, ClientFormProps, validateClientForm, FormInput } from "@/src/Components";
 import { emptyClient } from "@/src/Types/Clients/index";
+import { AddressSchema } from "@/src/lib/schemas/clients";
+import FormAddress from "../FormInput/FormAddress";
 
 const formFields = [
-  {
-    label: "Nom complet *",
-    name: "name",
-    type: "text",
-    required: true,
-  },
-  {
-    label: "Email *",
-    name: "email",
-    type: "email",
-    required: true,
-  },
-  {
-    label: "Téléphone",
-    name: "phone",
-    type: "tel",
-  },
+  { label: "Nom complet *",  name: "name",  type: "text",  required: true, },
+  { label: "Email *", name: "email", type: "email", required: true, },
+  { label: "Téléphone", name: "phone", type: "tel", },
 ];
 
 export default function ClientForm({
@@ -59,32 +47,52 @@ export default function ClientForm({
     }
   };
 
+const addressValues = formData.address
+  ? AddressSchema.parse(formData.address)
+  : {
+      street: "",
+      city: "",
+      state: "",
+      postalCode: "",
+      country: "",
+    };
+
+const addressErrors = typeof errors.address === 'object'
+  ? errors.address
+  : { street: "", city: "", state: "", postalCode: "", country: "" };
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {formFields.map((field) => (
-        <FormInput
-          key={field.name}
-          label={field.label}
-          name={field.name}
-          type={field.type}
-          value={formData[field.name as keyof ClientFormData] || ""}
-          onChange={handleChange}
-          error={errors[field.name]}
-          className="mb-4"
-        />
-      ))}
+      {/* Champs simples */}
+      {formFields.map((field) => {
+        const value = formData[field.name as keyof ClientFormData];
+        const safeValue = typeof value === 'string' || typeof value === 'number' ? value : '';
+        return (
+          <FormInput
+            key={field.name}
+            label={field.label}
+            name={field.name}
+            type={field.type}
+            value={safeValue}
+            onChange={handleChange}
+            error={errors[field.name]}
+            className="mb-4"
+          />
+        );
+      })}
 
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-1">Adresse</label>
-        <textarea
-          name="address"
-          value={formData.address || ""}
+      {/* Section Adresse */}
+      <div className="mb-4 p-4 border border-gray-200 rounded-lg">
+        <h3 className="text-sm font-medium text-gray-700 mb-2">Adresse</h3>
+        <FormAddress
+          label="Adresse"
+          value={addressValues}
           onChange={handleChange}
-          rows={3}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          errors={addressErrors}
         />
       </div>
 
+      {/* Champ Entreprise */}
       <FormInput
         label="Entreprise"
         name="company"
@@ -93,6 +101,7 @@ export default function ClientForm({
         className="mb-6"
       />
 
+      {/* Boutons */}
       <div className="flex justify-end space-x-4">
         <button
           type="button"
@@ -101,7 +110,6 @@ export default function ClientForm({
         >
           Annuler
         </button>
-
         <button
           type="submit"
           disabled={isLoading}

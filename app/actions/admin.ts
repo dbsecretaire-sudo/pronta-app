@@ -6,33 +6,14 @@ import { z, ZodError } from 'zod';
 
 // Schémas de validation
 import {
-  CreateClientSchema,
-  validateCreateClient
-} from "@/src/lib/schemas/clients";
-import {
-  CreateCallSchema,
-  validateCreateCall
-} from "@/src/lib/schemas/calls";
-import {
-  CreateServiceSchema,
-  validateCreateService
-} from "@/src/lib/schemas/services";
-import {
-  CreateCalendarEventSchema,
-  validateCreateCalendarEvent
-} from "@/src/lib/schemas/calendar";
-import {
-  CreateInvoiceSchema,
-  validateCreateInvoice
-} from "@/src/lib/schemas/invoices";
-import {
-  CreateSubscriptionSchema,
-  validateCreateSubscription
-} from "@/src/lib/schemas/subscription";
-import {
-  CreateUserSchema,
-  validateCreateUser
-} from "@/src/lib/schemas/users";
+  CreateClientSchema, validateCreateClient,
+  CreateCallSchema, validateCreateCall,
+  CreateServiceSchema, validateCreateService,
+  CreateCalendarEventSchema, validateCreateCalendarEvent,
+  CreateInvoiceSchema, validateCreateInvoice,
+  CreateSubscriptionSchema, validateCreateSubscription,
+  CreateUserSchema, validateCreateUser
+} from "@/src/lib/schemas";
 
 export type FormState = {
   error?: string;
@@ -46,7 +27,6 @@ export async function createResource(
 ): Promise<FormState> {
   try {
     const data = Object.fromEntries(formData.entries());
-
     // Validation selon la ressource
     let validatedData;
 
@@ -72,13 +52,47 @@ export async function createResource(
         validatedData = validateCreateClient(rawData);
 
     } else if (resource === 'calls') {
-      validatedData = validateCreateCall(data);
+
+      if (typeof data.date !== 'string') {
+        return { error: "La date est invalide" };
+      }
+
+      const rawData = {
+        ...data,
+        date: new Date(data.date).toISOString(),  // Conversion en ISO
+        duration: Number(data.duration),          // Conversion en number
+      };
+
+      validatedData = validateCreateCall(rawData);
     } else if (resource === 'services') {
       validatedData = validateCreateService(data);
     } else if (resource === 'calendar') {
-      validatedData = validateCreateCalendarEvent(data);
+      
+      if (typeof data.end_time !== 'string' || typeof data.start_time !== 'string') {
+        return { error: "La date est invalide" };
+      }
+
+      const rawData = {
+        ...data,
+        start_time: new Date(data.start_time).toISOString(),
+        end_time: new Date(data.end_time).toISOString(),
+      }
+
+      validatedData = validateCreateCalendarEvent(rawData);
     } else if (resource === 'invoices') {
-      validatedData = validateCreateInvoice(data);
+
+      if (typeof data.due_date !== 'string') {
+        return { error: "La date est invalide" };
+      }
+
+      const rawData = {
+        ...data,
+        items: typeof data.items === 'string' ? JSON.parse(data.items) : data.items,
+        due_date: new Date(data.due_date).toISOString(),  // Conversion en ISO
+      };
+
+      validatedData = validateCreateInvoice(rawData);
+
     } else if (resource === 'subscription') {
       validatedData = validateCreateSubscription(data);
     } else if (resource === 'users') {

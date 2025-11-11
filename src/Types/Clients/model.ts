@@ -1,5 +1,19 @@
 import { Client, CreateClient, ClientFormData, ClientFilter } from './type';
+// import interface Client {
+//   id: number;
+//   user_id: number;
+//   name: string;
+//   email: string;
+//   phone?: string;
+//   address?: typeof AddressSchema;
+//   company?: string;
+//   created_at: string;
+//   updated_at?: string;
+// }
+// import Client
 import pool from "@/src/lib/db";
+import { Address, AddressSchema, CreateClientSchema } from "@/src/lib/schemas/clients"; // Suppose que tu as un schéma Zod pour CreateClient
+import { z } from "zod";
 
 export class ClientModel {
   constructor(public data: Client) {}
@@ -9,20 +23,51 @@ export class ClientModel {
     return `${this.data.name} (${this.data.email})`;
   }
 
+  get address(): Address | undefined {
+    return this.data.address;
+  }
+  
+  set address(value: Address | null | undefined) {
+    this.data.address = value === null ? undefined : value;
+  }
+
+  // Méthode pour sérialiser l'adresse avant insertion en base
+  private serializeAddress(): string | null {
+    return this.data.address ? JSON.stringify(this.data.address) : null;
+  }
+
+  // Méthode pour désérialiser l'adresse après récupération de la base
+  private static deserializeAddress(address: string | null): Address | null {
+    return address ? JSON.parse(address) : null;
+  }
+
   //Méthode pour créer un nouveau client
   async createClient(client: CreateClient): Promise<Client> {
+    const serializedAddress = client.address ? JSON.stringify(client.address) : null;
     const res = await pool.query(
-        `INSERT INTO clients (user_id, name, email, phone, address, company)
-        VALUES ($1, $2, $3, $4, $5, $6)
-        RETURNING *`,
-        [client.user_id, client.name, client.email, client.phone, client.address, client.company]
+      `INSERT INTO clients (user_id, name, email, phone, address, company)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       RETURNING *`,
+      [client.user_id, client.name, client.email, client.phone, serializedAddress, client.company]
     );
-    return res.rows[0];
-  }   
+
+    // Désérialise l'adresse après récupération
+    const result = res.rows[0];
+    if (result.address) {
+      result.address = ClientModel.deserializeAddress(result.address);
+    }
+    return result;
+  }
 
   // Méthode pour Mettre à jour un client
-  async updateClient(id: number, client: Partial<Client>): Promise<Client> {
-    const entries = Object.entries(client).filter(([_, value]) => value !== undefined);
+async updateClient(id: number, client: Partial<Client>): Promise<Client> {
+  const serializedAddress = client.address ? JSON.stringify(client.address) : null;
+  const entries = Object.entries(client)
+    .filter(([_, value]) => value !== undefined)
+    .map(([key, value]) => [
+      key,
+      key === 'address' ? serializedAddress : value,
+    ]);
 
     if (entries.length === 0) {
         const res = await pool.query('SELECT * FROM clients WHERE id = $1', [id]);
@@ -41,9 +86,14 @@ export class ClientModel {
   }
 
   // Méthode pour valider les données avant création
-  static validate(input: CreateClient): boolean {
-    return !!input.name && !!input.email;
-  }
+    static validate(input: CreateClient): boolean {
+      try {
+        CreateClientSchema.parse(input);
+        return true;
+      } catch (error) {
+        return false;
+      }
+    }
 
   // Méthode pour créer une instance depuis les données brutes
   static fromData(data: Client): ClientModel {
@@ -73,6 +123,9 @@ export class ClientModel {
 
   //Méthode pour créer une instance depuis un formulaire
   static fromFormData(formData: ClientFormData, userId?: number): CreateClient {
+    if (userId === undefined) {
+      throw new Error("userId is required");
+    }
     return {
       ...formData,
       user_id: userId,
@@ -81,8 +134,12 @@ export class ClientModel {
 
   // Récupérer un client par son ID
   async getClientById(id: number): Promise<Client | null> {
-      const res = await pool.query('SELECT * FROM clients WHERE id = $1', [id]);
-      return res.rows[0] || null;
+    const res = await pool.query('SELECT * FROM clients WHERE id = $1', [id]);
+    const client = res.rows[0];
+    if (client?.address) {
+      client.address = ClientModel.deserializeAddress(client.address);
+    }
+    return client || null;
   }
 
   async searchClients(filters: ClientFilter): Promise<Client[]> {

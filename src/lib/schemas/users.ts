@@ -13,7 +13,7 @@ export const DateSchema = z.union([
 ]);
 
 // Schéma pour un identifiant
-export const IdSchema = z.number().int().positive();
+export const IdSchema = z.string().transform((val) => parseInt(val));
 
 // Schéma pour les rôles d'utilisateur
 export const RoleSchema = z.enum([
@@ -102,7 +102,7 @@ export const UserSchema = z.object({
 // Schéma pour la création d'un utilisateur
 export const CreateUserSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(8),
+  password: z.string().optional(),
   name: z.string().min(1),
   phone: z.string().optional(),
   company: z.string().optional(),

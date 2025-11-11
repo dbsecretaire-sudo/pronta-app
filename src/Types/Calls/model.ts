@@ -33,7 +33,7 @@ export class CallModel {
             `INSERT INTO calls (user_id, name, phone, date, type, summary, duration, phone_number, contact_name, client_id)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
             RETURNING *`,
-            [call.user_id, call.name, call.phone, call.date, call.type, call.summary, call.duration, call.phoneNumber, call.contactName, call.client_id]
+            [call.user_id, call.name, call.phone, call.date, call.type, call.summary, call.duration, call.phoneNumber, call.contact_name, call.client_id]
         );
         return res.rows[0];
     }

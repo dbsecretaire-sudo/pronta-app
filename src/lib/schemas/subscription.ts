@@ -42,14 +42,14 @@ export const ServiceSchema = z.object({
 // Schéma de base pour un abonnement
 export const SubscriptionSchema = z.object({
   id: IdSchema,
-  user_id: IdSchema,
+  user_id: IdSchema.optional(),
   service_id: IdSchema,
   status: SubscriptionStatusSchema,
   start_date: DateSchema,
-  end_date: DateSchema.nullable(),
-  next_payment_date: DateSchema.nullable(),
-  created_at: DateSchema,
-  updated_at: DateSchema
+  end_date: DateSchema.nullable().optional(),
+  next_payment_date: DateSchema.nullable().optional(),
+  created_at: DateSchema.optional(),
+  updated_at: DateSchema.optional()
 });
 
 // Schéma pour un abonnement avec son service associé
@@ -59,7 +59,7 @@ export const SubscriptionWithServiceSchema = SubscriptionSchema.extend({
 
 // Schéma pour la création d'un abonnement
 export const CreateSubscriptionSchema = z.object({
-  user_id: IdSchema,
+  user_id: IdSchema.optional(),
   service_id: IdSchema,
   status: SubscriptionStatusSchema.optional().default('active'),
   start_date: DateSchema.optional().default(() => new Date()),

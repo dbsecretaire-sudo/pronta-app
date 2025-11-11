@@ -4,9 +4,9 @@ import { PhoneIcon } from "@heroicons/react/24/outline";
 interface CallListProps {
   calls: Array<{
     id: number;
-    phoneNumber: string;
-    contactName: string | null;
-    date: Date | string;
+    phone?: string;
+    contact_name?: string | undefined;
+    date: string | Date | null;
     duration?: number;
     type: 'incoming' | 'outgoing' | 'missed';
   }>;
@@ -30,10 +30,10 @@ export function CallList({ calls, onCallClick }: CallListProps) {
         <tbody className="bg-white divide-y divide-gray-200">
           {calls.map((call) => (
             <tr key={call.id}>
-              <td className="px-6 py-4 whitespace-nowrap">{call.contactName || "Inconnu"}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{call.phoneNumber}</td>
+              <td className="px-6 py-4 whitespace-nowrap">{call.contact_name || "Inconnu"}</td>
+              <td className="px-6 py-4 whitespace-nowrap">{call.phone}</td>
               <td className="px-6 py-4 whitespace-nowrap">
-                {new Date(call.date).toLocaleString('fr-FR', {
+                {new Date(call.date!).toLocaleString('fr-FR', {
                   day: '2-digit',
                   month: '2-digit',
                   year: '2-digit',
@@ -60,7 +60,7 @@ export function CallList({ calls, onCallClick }: CallListProps) {
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 {onCallClick && (
                   <button
-                    onClick={() => onCallClick(call.phoneNumber)}
+                    onClick={() => onCallClick(call.phone!)}
                     className="text-blue-600 hover:text-blue-900"
                     title="Rappeler"
                   >

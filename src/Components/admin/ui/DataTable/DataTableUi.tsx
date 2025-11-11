@@ -77,6 +77,13 @@ export function DataTableUi<TData extends DataWithId>({
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
+  function formatDuration(seconds: number): string {
+    if (seconds === undefined || seconds === null) return "Non spécifié";
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  }
+
   const transformedColumns = columns.map(column => {
     const { meta } = column;
 
@@ -95,6 +102,8 @@ export function DataTableUi<TData extends DataWithId>({
               return <UserNameCell value={value} dataMaps={dataMaps} dataMapKey={meta.dataMap || ''} />;
             case 'typeBadge':
               return <TypeBadgeCell value={value} typeData={meta.typeData} />;
+            case 'duration':
+              return <span>{formatDuration(value)}</span>;
             default:
               return value;
           }
@@ -156,7 +165,7 @@ export function DataTableUi<TData extends DataWithId>({
                     value={(column.getFilterValue() as string) ?? ''}
                     onChange={(e) => column.setFilterValue(e.target.value)}
                   >
-                    <option value="">Tous</option>
+                    <option value="">{typeof column.columnDef.header === 'string'? `Tous les ${column.columnDef.header}`: 'Tous'}</option>
                     {meta.filterOptions?.map((option) => (
                       <option key={option.value} value={option.value}>{option.label}</option>
                     ))}

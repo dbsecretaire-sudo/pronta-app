@@ -28,7 +28,7 @@ export const resourcesConfig: Record<string, ResourceConfig<any>> = {
   calls: {
     getColumns: getCallsColumns,
     fetchData: async () => {
-      const res = await fetch(`${API_URL}/api/calls`);
+      const res = await fetch(`${API_URL}/api/calls/All`);
       return res.json();
     },
   },

@@ -18,7 +18,7 @@ const InfoLine = ({
   textSize = "text-sm"
 }: {
   icon: React.ComponentType<{ className: string }>;
-  value: string;
+  value: string ;
   color?: string;
   iconSize?: string;
   textSize?: string;
@@ -56,6 +56,24 @@ const CompactInfo = ({ client }: { client: ClientCardProps["client"] }) => (
     )}
   </>
 );
+
+const AddressLine = ({ address }: { address: ClientCardProps["client"]["address"] }) => {
+  const parts = [
+    address?.street,
+    address?.postalCode,
+    address?.city,
+    address?.state,
+    address?.country,
+  ].filter(Boolean);
+
+  return (
+    <div className="flex items-center">
+      <MapPinIcon className="h-4 w-4 mt-0.5 mr-1.5 text-green-500" />
+      <span className="text-sm">{parts.join(', ')}</span>
+    </div>
+  );
+};
+
 
 const ActionButtons = ({ onEdit, onDelete }: { onEdit?: () => void; onDelete?: () => void }) => (
   <div className="flex space-x-2">
@@ -128,14 +146,7 @@ const ClientCard: React.FC<ClientCardProps> = ({
               />
             )}
           </div>
-          {client.address && (
-            <InfoLine
-              icon={MapPinIcon}
-              value={client.address}
-              color="text-green-500"
-              iconSize="h-4 w-4 mt-0.5"
-            />
-          )}
+          {client.address && <AddressLine address={client.address} />}
         </>
       ) : (
         <div className="mt-2">

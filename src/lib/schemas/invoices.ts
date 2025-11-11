@@ -6,7 +6,9 @@ import { z } from 'zod';
 // =============================================
 
 // Schéma pour un identifiant
-export const IdSchema = z.number().int().positive();
+export const IdSchema = z.string().transform((val) => parseInt(val));
+
+export const AmountSchema = z.coerce.number().positive();
 
 // Schéma pour une date (ISO string ou Date object)
 export const DateSchema = z.union([
@@ -35,7 +37,6 @@ export const InvoiceItemSchema = z.object({
   description: z.string().min(1).max(500),
   quantity: z.number().int().positive(),
   unit_price: z.number().positive(),
-  total_price: z.number().positive().optional()
 });
 
 // Schéma pour la création d'un élément de facture
@@ -44,6 +45,7 @@ export const CreateInvoiceItemSchema = z.object({
   description: z.string().min(1).max(500),
   quantity: z.number().int().positive(),
   unit_price: z.number().positive()
+}).superRefine((data, ctx) => {
 });
 
 // Schéma pour une facture
@@ -52,7 +54,7 @@ export const InvoiceSchema = z.object({
   user_id: IdSchema,
   client_id: IdSchema,
   client_name: z.string().min(1).max(255),
-  amount: z.number().positive(),
+  amount: AmountSchema,
   status: InvoiceStatusSchema,
   due_date: DateSchema,
   created_at: DateSchema,
@@ -64,16 +66,23 @@ export const CreateInvoiceSchema = z.object({
   user_id: IdSchema,
   client_id: IdSchema,
   client_name: z.string().min(1).max(255),
-  amount: z.number().positive(),
+  amount: AmountSchema,
   status: InvoiceStatusSchema.optional().default('draft'),
-  due_date: DateSchema
+  due_date: DateSchema,
+  items: z.array(
+    z.object({
+      description: z.string().min(1),
+      quantity: z.number().int().positive(),
+      unit_price: z.coerce.number().positive(),
+    })
+  ).optional(),
 });
 
 // Schéma pour la mise à jour d'une facture
 export const UpdateInvoiceSchema = z.object({
   client_id: IdSchema.optional(),
   client_name: z.string().min(1).max(255).optional(),
-  amount: z.number().positive().optional(),
+  amount: AmountSchema.optional(),
   status: InvoiceStatusSchema.optional(),
   due_date: DateSchema.optional()
 }).partial();
@@ -211,7 +220,7 @@ export const InvoiceWithClientResponseSchema = InvoiceWithClientSchema;
 // =============================================
 
 // Schéma pour un formulaire de création de facture
-export const InvoiceFormSchema = CreateInvoiceSchema.extend({
+export const InvoiceFormSchema = CreateInvoiceSchema.safeExtend({
   due_date: z.union([
     z.string().datetime(),
     z.date()
@@ -241,7 +250,7 @@ export const UpdateInvoiceFormSchema = UpdateInvoiceSchema.extend({
 
 // Schéma pour un formulaire d'élément de facture
 export const InvoiceItemFormSchema = CreateInvoiceItemSchema
-  .extend({
+  .safeExtend({
     total_price: z.number().positive()
   })
   .superRefine((data, ctx) => {
@@ -466,14 +475,14 @@ export const exampleInvoice: Invoice = {
   updated_at: new Date().toISOString()
 };
 
-export const exampleCreateInvoice: CreateInvoice = {
-  user_id: 1,
-  client_id: 5,
-  client_name: "Entreprise XYZ",
-  amount: 199.99,
-  status: "draft",
-  due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // +30 jours
-};
+// export const exampleCreateInvoice: CreateInvoice = {
+//   user_id: 1,
+//   client_id: 5,
+//   client_name: "Entreprise XYZ",
+//   amount: 199.99,
+//   status: "draft",
+//   due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // +30 jours
+// };
 
 export const exampleInvoiceItem: InvoiceItem = {
   id: 1,
@@ -481,7 +490,6 @@ export const exampleInvoiceItem: InvoiceItem = {
   description: "Service de consultation - 10 heures",
   quantity: 10,
   unit_price: 19.99,
-  total_price: 199.90
 };
 
 export const exampleCreateInvoiceItem: CreateInvoiceItem = {
@@ -500,7 +508,6 @@ export const exampleInvoiceWithItems: InvoiceWithItems = {
       description: "Service de consultation - 10 heures",
       quantity: 10,
       unit_price: 19.99,
-      total_price: 199.90
     },
     {
       id: 2,
@@ -508,7 +515,6 @@ export const exampleInvoiceWithItems: InvoiceWithItems = {
       description: "Frais de déplacement",
       quantity: 1,
       unit_price: 50.00,
-      total_price: 50.00
     }
   ]
 };

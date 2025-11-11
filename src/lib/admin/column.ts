@@ -23,11 +23,11 @@ export const getClientColumns = (): ExtendedColumnDef<Client>[] => [
   clientColumnHelper.accessor('id', {
     header: 'ID',
     meta: { sortable: true, filterType: 'text' },
+    enableSorting: true,
   }),
   clientColumnHelper.accessor('user_id', {
     header: 'Client',
     meta: { sortable: true, filterType: 'select', type: 'userName', dataMap: 'usersClients', },
-
   }),
   clientColumnHelper.accessor('name', {
     header: 'Nom',
@@ -55,14 +55,15 @@ export const getCallsColumns = (): ExtendedColumnDef<Call>[] => [
     callColumnHelper.accessor('id', {
         header: 'ID',
         meta: { sortable: true, filterType: 'text', },
+        enableSorting: true,
     }),
     callColumnHelper.accessor('user_id', {
-        header: 'ID Utilisateur',
+        header: 'Utilisateurs',
         meta: { sortable: true, filterType: 'select', type: 'userName', dataMap: 'users', },
     }),
     callColumnHelper.accessor('client_id', {
-        header: 'ID Client',
-        meta: { sortable: true, filterType: 'select', type: 'userName', dataMap: 'clients', },
+        header: 'Clients',
+        meta: { sortable: true, filterType: 'select', type: 'userName', dataMap: 'users', },
     }),
     callColumnHelper.accessor('name', {
         header: 'Nom',
@@ -72,11 +73,11 @@ export const getCallsColumns = (): ExtendedColumnDef<Call>[] => [
         header: 'Téléphone',
         meta: { sortable: true, filterType: 'text', },
     }),
-    callColumnHelper.accessor('phoneNumber', {
-        header: 'Numéro de téléphone',
-        meta: { sortable: true, filterType: 'text', },
-    }),
-    callColumnHelper.accessor('contactName', {
+    // callColumnHelper.accessor('phoneNumber', {
+    //     header: 'Numéro de téléphone',
+    //     meta: { sortable: true, filterType: 'text', },
+    // }),
+    callColumnHelper.accessor('contact_name', {
         header: 'Nom du contact',
         meta: { sortable: true, filterType: 'text', },
     }),
@@ -85,7 +86,7 @@ export const getCallsColumns = (): ExtendedColumnDef<Call>[] => [
         meta: { sortable: true, filterType: 'date', type: 'date', },
     }),
     callColumnHelper.accessor('type', {
-        header: 'Type',
+        header: 'Types',
         meta: { sortable: true, filterType: 'select', type: 'typeBadge',
             typeData: {
                 incoming: { label: 'Entrant', color: 'green' },
@@ -113,13 +114,14 @@ export const getInvoicesColumns = (): ExtendedColumnDef<Invoice>[] => [
     invoiceColumnHelper.accessor('id', {
         header: 'ID',
         meta: { sortable: true, filterType: 'text', },
+        enableSorting: true,
       }),
       invoiceColumnHelper.accessor('user_id', {
-        header: 'ID Utilisateur',
+        header: 'Utilisateurs',
         meta: { sortable: true, filterType: 'select', type: 'userName', dataMap: 'users', },
       }),
       invoiceColumnHelper.accessor('client_id', {
-        header: 'ID Client',
+        header: 'Clients',
         meta: { sortable: true, filterType: 'select', type: 'userName', dataMap: 'clients', },
       }),
       invoiceColumnHelper.accessor('client_name', {
@@ -131,7 +133,7 @@ export const getInvoicesColumns = (): ExtendedColumnDef<Invoice>[] => [
         meta: { sortable: true, filterType: 'text', },
       }),
       invoiceColumnHelper.accessor('status', {
-        header: 'Statut',
+        header: 'Statuts',
         meta: { sortable: true, filterType: 'select', type: 'typeBadge',
           typeData: {
             draft: { label: 'Brouillon', color: 'gray' },
@@ -153,20 +155,21 @@ export const getInvoicesColumns = (): ExtendedColumnDef<Invoice>[] => [
         header: 'Date d\'échéance',
         meta: { sortable: true, filterType: 'date', type: 'date',},
       }),
-      invoiceColumnHelper.accessor('created_at', {
-        header: 'Créée le',
-        meta: { sortable: true, filterType: 'date', type: 'date', },
-      }),
-      invoiceColumnHelper.accessor('updated_at', {
-        header: 'Mise à jour le',
-        meta: { sortable: true, filterType: 'date', type: 'date', },
-      }),
+      // invoiceColumnHelper.accessor('created_at', {
+      //   header: 'Créée le',
+      //   meta: { sortable: true, filterType: 'date', type: 'date', },
+      // }),
+      // invoiceColumnHelper.accessor('updated_at', {
+      //   header: 'Mise à jour le',
+      //   meta: { sortable: true, filterType: 'date', type: 'date', },
+      // }),
 ]
 
 export const getServicesColumns = (): ExtendedColumnDef<Service>[] => [
     serviceColumnHelper.accessor('id', {
         header: 'ID',
         meta: { sortable: true, filterType: 'text', },
+        enableSorting: true,
       }),
       serviceColumnHelper.accessor('name', {
         header: 'Nom',
@@ -202,9 +205,10 @@ export const getCalendarColumns = (): ExtendedColumnDef<CalendarEvent>[] => [
     calendarColumnHelper.accessor('id', {
         header: 'ID',
         meta: { sortable: true, filterType: 'text', },
+        enableSorting: true,
     }),
     calendarColumnHelper.accessor('user_id', {
-        header: 'ID Utilisateur',
+        header: 'Utilisateurs',
         meta: { sortable: true, filterType: 'select', type: 'userName', dataMap: 'users', },
     }),
     calendarColumnHelper.accessor('title', {
@@ -229,17 +233,18 @@ export const getSubscriptionColumns = (): ExtendedColumnDef<Subscription>[] => [
     subscriptionColumnHelper.accessor('id', {
         header: 'ID',
         meta: { sortable: true, filterType: 'text', },
+        enableSorting: true,
     }),
     subscriptionColumnHelper.accessor('user_id', {
-        header: 'ID Utilisateur',
+        header: 'Utilisateurs',
         meta: { sortable: true, filterType: 'select', type: 'userName', dataMap: 'users', },
     }),
     subscriptionColumnHelper.accessor('service_id', {
-        header: 'ID Service',
+        header: 'Services',
         meta: { sortable: true,  filterType: 'select',  type: 'userName', dataMap: 'services', },
     }),
     subscriptionColumnHelper.accessor('status', {
-        header: 'Statut',
+        header: 'Statuts',
         meta: { sortable: false, filterType: 'text',},
     }),
     subscriptionColumnHelper.accessor('start_date', {
@@ -260,6 +265,7 @@ export const getUserColumns = (): ExtendedColumnDef<User>[] => [
     userColumnHelper.accessor('id', {
         header: 'ID',
         meta: { sortable: true, filterType: 'text', },
+        enableSorting: true,
     }),
     userColumnHelper.accessor('email', {
         header: 'Email',
@@ -278,7 +284,7 @@ export const getUserColumns = (): ExtendedColumnDef<User>[] => [
         meta: { sortable: true, filterType: 'text', },
     }),
     userColumnHelper.accessor('role', {
-        header: 'Rôle',
+        header: 'Rôles',
         meta: { sortable: true, filterType: 'select',  type: 'typeBadge',
           typeData: {
             ADMIN: { label: 'Administrateur', color: 'red' },

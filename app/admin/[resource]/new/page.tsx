@@ -5,7 +5,7 @@ export default async function NewResourcePage({ params }: { params: Promise<{ re
   const { resource } = await params;
 
   // Liste des ressources valides
-  const validResources = ['clients', 'calls', 'users', 'invoices', 'calendar', 'services', 'subscription'];
+  const validResources = ['clients', 'calls', 'users', 'invoices', 'calendar', 'services', 'subscriptions'];
 
   // Vérification de la validité de la ressource
   if (!validResources.includes(resource)) {
@@ -20,7 +20,7 @@ export default async function NewResourcePage({ params }: { params: Promise<{ re
     invoices: 'facture',
     calendar: 'événement de calendrier',
     services: 'service',
-    subscription: 'abonnement',
+    subscriptions: 'abonnement',
   };
 
   return (

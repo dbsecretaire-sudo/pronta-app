@@ -34,7 +34,7 @@ export async function POST(request: Request) {
 
     // Appel au service pour créer un nouvel abonnement
     const newSubscription = await subscriptionService.createUserSubscription(
-      processedData.user_id,
+      body.user_id,
       processedData
     );
 

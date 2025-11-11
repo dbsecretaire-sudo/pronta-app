@@ -8,12 +8,30 @@ import { useServices } from '@/src/Hook/useServices';
 import { useSession } from 'next-auth/react';
 import { User } from '@/src/Types/Users';
 import { fetchAllClients, fetchUsers } from '@/src/lib/api';
-import { Client, CreateClient, ClientFormData, Address } from "@/src/lib/schemas/clients";
+import { TrashIcon } from '@heroicons/react/16/solid';
+import { Invoice, CreateInvoice, InvoiceItem, CreateInvoiceSchema } from '@/src/lib/schemas/invoices';
+import { Client, CreateClient, ClientFormData, Address, CreateClientSchema } from "@/src/lib/schemas/clients";
+import { CreateUser, CreateUserSchema } from '@/src/lib/schemas/users';
+import { CreateCall, CreateCallSchema } from '@/src/lib/schemas/calls';
+import { CreateService, CreateServiceSchema } from '@/src/lib/schemas/services';
+import { CreateCalendarEvent, CreateCalendarEventSchema } from '@/src/lib/schemas/calendar';
+import { z } from "zod";
+import { CreateSubscription, CreateSubscriptionSchema } from '@/src/lib/schemas/subscription';
 
 interface ResourceEditFormProps {
   resourceName: string;
   id?: number;
 }
+
+type CreateResourceData =
+  | CreateClient
+  | CreateInvoice
+  | CreateUser
+  | CreateCall
+  | CreateService
+  | CreateCalendarEvent
+  | CreateSubscription
+  | Record<string, any>;
 
 export function ResourceEditForm({ resourceName, id }: ResourceEditFormProps) {
   const { data: session, status } = useSession();
@@ -21,9 +39,11 @@ export function ResourceEditForm({ resourceName, id }: ResourceEditFormProps) {
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [isLoading, setIsLoading] = useState(!!id);
   const [users, setUsers] = useState<User[]>([]);
+  const [clients, setClients] = useState<Client[]>([]);
   const router = useRouter();
-  
-useEffect(() => {
+  const [errors, setErrors] = useState<{ duration?: string }>({});
+
+  useEffect(() => {
     const initialize = async () => {
       try {
         // Charge les données initiales si c'est une édition
@@ -64,10 +84,12 @@ useEffect(() => {
         }
 
         // Charge les utilisateurs et clients
-        const [usersData] = await Promise.all([
+        const [usersData, clientsData] = await Promise.all([
           fetchUsers(),
+          fetchAllClients(),
         ]);
         setUsers(usersData);
+        setClients(clientsData);
       } catch (error) {
         console.error('Error initializing form:', error);
       } finally {
@@ -77,6 +99,34 @@ useEffect(() => {
 
     initialize();
   }, [resourceName, id, session?.user.id]);
+
+  useEffect(() => {
+    if (formData.duration !== undefined && formData.duration !== '') {
+      const durationStr = String(formData.duration);
+      if (!/^[0-5]?[0-9]:[0-5][0-9]$/.test(durationStr) &&
+          typeof formData.duration !== 'number') {
+        setErrors(prev => ({ ...prev, duration: 'Format MM:SS requis (ex: 03:20)' }));
+      } else {
+        setErrors(prev => ({ ...prev, duration: undefined }));
+      }
+    }
+  }, [formData.duration]);
+
+  function formatSecondsToMMSS(seconds: number | string | undefined): string {
+    if (!seconds) return '';
+    const numSeconds = typeof seconds === 'string' ? parseInt(seconds) : seconds;
+    if (isNaN(numSeconds)) return '';
+
+    const minutes = Math.floor(numSeconds / 60);
+    const remainingSeconds = numSeconds % 60;
+    return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+  }
+
+  // Convertit "MM:SS" en secondes (pour la soumission)
+  function parseMMSSToSeconds(mmss: string): number {
+    const [minutes, seconds] = mmss.split(':').map(Number);
+    return (minutes || 0) * 60 + (seconds || 0);
+  }
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -114,28 +164,224 @@ useEffect(() => {
         }
       }));
     }
+    // Gestion des décimales
+    else if (target.name === "amount" || target.name === "unit_price" ){
+      setFormData(prev => ({ ...prev, [name]: value === '' ? 0.00 : parseFloat(value) }));
+    }
+    // Gestion des durées
+    else  if (name === 'duration') {
+    // Si l'utilisateur saisit "3", on le transforme en "03:00" après 2 caractères
+      if (value.length === 2 && !value.includes(':') && !isNaN(Number(value))) {
+        const minutes = value.padStart(2, '0');
+        setFormData(prev => ({
+          ...prev,
+          duration: parseMMSSToSeconds(`${minutes}:00`),
+        }));
+        return;
+      }
+
+      // Sinon, mise à jour normale
+      setFormData(prev => ({
+        ...prev,
+        [name]: value.includes(':')
+          ? parseMMSSToSeconds(value)
+          : value, // Garde la string si incomplète
+      }));
+    }
     // Cas standard (text, email, etc.)
     else {
       setFormData(prev => ({ ...prev, [name]: value }));
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      // Prépare les données à envoyer
-      const dataToSend: CreateClient = {
-        user_id: Number(formData.user_id),
+  const handleItemChange = (index: number, field: string, value: any) => {
+    const newItems = [...formData.items];
+    newItems[index] = { ...newItems[index], [field]: value };
+
+    // Recalcule le total de l'item
+    if (field === 'quantity' || field === 'unit_price') {
+      newItems[index].total = newItems[index].quantity * newItems[index].unit_price;
+    }
+
+    // Met à jour le state
+    setFormData({
+      ...formData,
+      items: newItems,
+      amount: newItems.reduce((sum, item) => sum + (item.total || 0), 0) // Recalcule le montant total
+    });
+  };
+
+// Fonction pour ajouter un nouvel item
+const addItem = () => {
+  setFormData({
+    ...formData,
+    items: [
+      ...formData.items,
+      { description: '', quantity: 1, unit_price: 0, total: 0 }
+    ]
+  });
+};
+
+// Fonction pour supprimer un item
+const removeItem = (index: number) => {
+  const newItems = [...formData.items];
+  newItems.splice(index, 1);
+  setFormData({
+    ...formData,
+    items: newItems,
+    amount: newItems.reduce((sum, item) => sum + (item.total || 0), 0) // Recalcule le montant total
+  });
+};
+
+const getCreateSchema = (resourceName: string) => {
+  switch (resourceName) {
+    case 'clients':
+      return CreateClientSchema;
+    case 'invoices':
+      return CreateInvoiceSchema;
+    case 'users':
+      return CreateUserSchema;
+    case 'calls':
+      return CreateCallSchema;
+    case 'services' :
+      return CreateServiceSchema;
+    case 'calendar' :
+      return CreateCalendarEventSchema;
+    case 'subscriptions' :
+      return CreateSubscriptionSchema
+    default:
+      throw new Error(`No schema defined for resource: ${resourceName}`);
+  }
+};
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  try {
+    // 1. Obtiens le schéma correspondant (si tu utilises Zod)
+    const createSchema = getCreateSchema(resourceName);
+
+    // 2. Prépare les données selon le type de ressource
+    let dataToSend: CreateResourceData = {};
+
+    // Clients
+    if (resourceName === 'clients') {
+      dataToSend = {
+        user_id: formData.user_id.toString(),
         name: formData.name || '',
         email: formData.email || '',
         phone: formData.phone || undefined,
         address: formData.address || undefined,
-        company: formData.company || undefined
+        company: formData.company || undefined,
       };
+      console.log(dataToSend)
+    }
+    // Factures
+    else if (resourceName === 'invoices') {
+      // Valide et formate la date
+      const dueDate = formData.due_date ?
+        new Date(formData.due_date).toISOString() :
+        new Date().toISOString();
 
-      if (id) {
-        await updateResource(resourceName, id, dataToSend);
-      } else {
+      // Calcule le montant total
+      const totalAmount = formData.items?.reduce(
+        (sum: number, item: any) => sum + (item.quantity * item.unit_price),
+        0
+      ) || 0;
+
+      dataToSend = {
+        user_id: formData.user_id.toString(),
+        client_id: formData.client_id.toString(),
+        client_name: formData.client_name || '',
+        amount: totalAmount.toString(),
+        status: formData.status || 'draft',
+        due_date: dueDate,
+        items: formData.items || [],
+      };
+      console.log("dataToSend, ", dataToSend);
+    }
+    // Utilisateurs
+    else if (resourceName === 'users') {
+      dataToSend = {
+        email: formData.email || '',
+        name: formData.name || '',
+        phone: formData.phone || undefined,
+        company: formData.company || undefined,
+        role: formData.role || '',
+        can_write: Boolean(formData.can_write),
+        can_delete: Boolean(formData.can_delete),
+        billing_address: formData.billing_address || '',
+        payment_method: formData.payment_method || '',
+        service_ids: formData.service_ids || [],
+      };
+    }
+    // Appels
+    else if (resourceName === 'calls') {
+      dataToSend = {
+        user_id: formData.user_id.toString(),
+        name: formData.name || '',
+        phone: formData.phone || '',
+        phone_number: formData.phone_number || formData.phone || '', // Utilise phone_number ou phone
+        date: formData.date ? new Date(formData.date).toISOString() : new Date().toISOString(),
+        type: formData.type || '',
+        summary: formData.summary || '',
+        duration: formData.duration,
+        contact_name: formData.contact_name || '',
+        client_id: formData.client_id.toString(),
+      };
+      console.log(dataToSend)
+    }
+    // Services
+    else if (resourceName === 'services'){
+      dataToSend = {
+        name: formData.name,
+        description: formData.description,
+        route: formData.route,
+        icon: formData.icon,
+        price: formData.price,
+        unit: formData.unit,
+        is_active: formData.is_active,
+      }
+    }
+    // Calendar
+    else if (resourceName === 'calendar'){
+      dataToSend = {
+        user_id : formData.user_id.toString(),
+        title:  formData.title,
+        start_time: formData.start_time ? new Date(formData.start_time).toISOString() : new Date().toISOString(),
+        end_time: formData.end_time ? new Date(formData.end_time).toISOString() : new Date().toISOString(),
+        description: formData.description,
+      }
+    }
+    // Subscriptions
+    else if (resourceName === 'subscriptions') {
+      dataToSend = {
+        user_id: Number(formData.user_id),
+        service_id: Number(formData.service_id),
+        status: formData.status,
+        start_date: formData.start_date,
+        end_date: formData.end_date,
+        next_payment_date: formData.next_payment_date,
+      }
+    }
+    // Autres ressources
+    else {
+      dataToSend = { ...formData };
+    }
+
+    // 3. Valide les données avec Zod (si tu utilises la validation)
+    if (createSchema) {
+      const validatedData = createSchema.parse(dataToSend);
+      dataToSend = validatedData;
+    }
+
+    // 4. Soumets les données
+    if (id) {
+      // Mise à jour
+      await updateResource(resourceName, id, dataToSend);
+    } else {
+      // Création
+      if (resourceName === 'clients') {
+        // Pour les clients, utilise FormData
         const formDataToSend = new FormData();
         Object.entries(dataToSend).forEach(([key, value]) => {
           if (value !== undefined && value !== null) {
@@ -147,13 +393,24 @@ useEffect(() => {
           }
         });
         await createResource(resourceName, undefined, formDataToSend);
-      }
-      router.push(`/admin/${resourceName}`);
-      router.refresh();
-    } catch (error) {
-      console.error('Error saving resource:', error);
+      } 
+    }
+
+    // 5. Redirige après succès
+    router.push(`/admin/${resourceName}`);
+    router.refresh();
+  } catch (error) {
+    console.error('Erreur lors de la soumission:', error);
+
+    // Affiche une erreur à l'utilisateur
+    if (error instanceof Error) {
+      alert(error.message);
+    } else {
+      alert('Une erreur est survenue');
     }
   }
+};
+
 
   const renderInputField = (key: string, value: any) => {
     // Déterminez le type de champ en fonction de la valeur
@@ -221,7 +478,8 @@ useEffect(() => {
                 id="user_id"
                 name="user_id"
                 className="w-full p-2 border rounded"
-                defaultValue={formData.user_id || ''}
+                defaultValue={formData.user_id || ''}  // Convertir en chaîne
+                onChange={handleChange}
                 required
               >
                 <option value="">Sélectionnez un utilisateur</option>
@@ -330,17 +588,121 @@ useEffect(() => {
         return (
           <>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Numéro de téléphone</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Utilisateur</label>
+              <select
+                name="user_id"
+                defaultValue={formData.user_id || ''}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+                required
+              >
+                <option value="">Sélectionnez un utilisateur</option>
+                {users
+                  .filter(user => ['ADMIN', 'SECRETARY', 'SUPERVISOR'].includes(user.role))
+                  .map(user => (
+                    <option key={user.id} value={user.id}>
+                      {user.name} ({user.email})
+                    </option>
+                  ))}
+              </select>
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Client</label>
+              <select
+                name="client_id"
+                defaultValue={formData.client_id || ''}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+                required
+              >
+                <option value="">Sélectionnez un client</option>
+                {users
+                  .filter(user => ['CLIENT'].includes(user.role))
+                  .map(user => (
+                    <option key={user.id} value={user.id}>
+                      {user.name} ({user.email})
+                    </option>
+                  ))}
+              </select>
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Nom</label>
               <input
                 type="text"
-                name="phoneNumber"
-                defaultValue={formData.phoneNumber || ''}
+                name="name"
+                defaultValue={formData.name || ''}
                 onChange={handleChange}
                 className="w-full p-2 border rounded"
                 required
               />
             </div>
-            {/* Autres champs spécifiques aux appels */}
+            <div>
+              <label htmlFor="phone" className="block mb-1">Numéro de téléphone</label>
+              <input type="text" id="phone" name="phone" className="w-full p-2 border rounded" defaultValue={formData.phone || ''} onChange={handleChange} required />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Nom du contact</label>
+              <input
+                type="text"
+                name="contact_name"
+                defaultValue={formData.contact_name || ''}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+              <input
+                type="datetime-local"
+                name="date"
+                defaultValue={formData.date ? new Date(formData.date).toISOString().slice(0, 16) : ''}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="type" className="block mb-1">Type</label>
+              <select
+                id="type"
+                name="type"
+                className="w-full p-2 border rounded"
+                defaultValue={formData.type || ''}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Sélectionnez un type</option>
+                <option value="incoming">Entrant</option>
+                <option value="outgoing">Sortant</option>
+                <option value="missed">Manqué</option>
+              </select>
+            </div>
+            <div>
+              <label htmlFor="summary" className="block mb-1">Résumé</label>
+              <input type="text" id="summary" name="summary" className="w-full p-2 border rounded" defaultValue={formData.summary || ''} onChange={handleChange} required />
+            </div>
+            <div>
+              <label htmlFor="duration" className="block mb-1">
+                Durée <span className="text-gray-500 text-xs">(format MM:SS, ex: 03:20 pour 3 minutes et 20 secondes)</span>
+              </label>
+              <input
+                type="text"
+                id="duration"
+                name="duration"
+                className={`w-full p-2 border rounded ${errors.duration ? 'border-red-500' : ''}`}
+                defaultValue={formatSecondsToMMSS(formData.duration)} // Affiche au format MM:SS
+                onChange={handleChange}
+                placeholder="Ex: 03:20"
+                pattern="^[0-9]{1,2}(:[0-5][0-9])?$"
+                required
+              />
+              {errors.duration && (
+                <p className="mt-1 text-sm text-red-600">
+                  Format invalide. Utilisez MM:SS (ex: 03:20).
+                </p>
+              )}
+            </div>
           </>
         );
 
@@ -431,9 +793,462 @@ useEffect(() => {
               </select>
             </div>
 
-          {/* Autres champs pour les utilisateurs */}
         </>
       );
+
+      case 'invoices':
+        return (
+          <>
+            {/* Champ Utilisateur */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Utilisateur</label>
+              <select
+                name="user_id"
+                defaultValue={formData.user_id || ''}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+                required
+              >
+                <option value="">Sélectionnez un utilisateur</option>
+                {users
+                  .filter(user => ['ADMIN', 'SECRETARY', 'SUPERVISOR'].includes(user.role))
+                  .map(user => (
+                    <option key={user.id} value={user.id}>
+                      {user.name} ({user.email})
+                    </option>
+                  ))}
+              </select>
+            </div>
+
+            {/* Champ Client */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Client</label>
+              <select
+                name="client_id"
+                defaultValue={formData.client_id || ''}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+                required
+              >
+                <option value="">Sélectionnez un client</option>
+                {clients.map(client => (
+                  <option key={client.id} value={client.id}>
+                    {client.name} ({client.email})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Champ Nom du client */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Nom du client</label>
+              <input
+                type="text"
+                name="client_name"
+                defaultValue={formData.client_name || ''}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+                required
+              />
+            </div>
+
+            {/* Champ Montant */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Montant (€)</label>
+              <input
+                type="number"
+                name="amount"
+                step="0.01"
+                value={formData.amount || 0}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+                required
+                readOnly // Le montant est calculé automatiquement
+              />
+            </div>
+
+            {/* Champ Statut */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Statut</label>
+              <select
+                name="status"
+                defaultValue={formData.status || ''}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+                required
+              >
+                <option value="">Sélectionnez un statut</option>
+                <option value="draft">Brouillon</option>
+                <option value="sent">Envoyée</option>
+                <option value="paid">Payée</option>
+                <option value="cancelled">Annulée</option>
+                <option value="overdue">En retard</option>
+              </select>
+            </div>
+
+            {/* Champ Date d'échéance */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Date d'échéance</label>
+              <input
+                type="datetime-local"
+                name="due_date"
+                defaultValue={formData.due_date ? new Date(formData.due_date).toISOString().slice(0, 16) : ''}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+                required
+              />
+            </div>
+
+            {/* Section des items de facture */}
+            <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <label className="block text-sm font-medium text-gray-700 mb-3">Items de la facture</label>
+
+              {/* Vérifie que formData.items existe et est un tableau */}
+              {formData.items?.length > 0 ? (
+                formData.items.map((item: InvoiceItem, index: number) => (
+                  <div key={item.id || index} className="p-4 mb-4 border rounded-lg bg-white">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      {/* Description */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                        <input
+                          type="text"
+                          name={`items[${index}].description`}
+                          value={item.description || ''}
+                          onChange={(e) => handleItemChange(index, 'description', e.target.value)}
+                          className="w-full p-2 border rounded"
+                          required
+                        />
+                      </div>
+
+                      {/* Quantité */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Quantité</label>
+                        <input
+                          type="number"
+                          name={`items[${index}].quantity`}
+                          value={item.quantity || 1}
+                          onChange={(e) => handleItemChange(index, 'quantity', parseInt(e.target.value) || 1)}
+                          className="w-full p-2 border rounded"
+                          min="1"
+                          required
+                        />
+                      </div>
+
+                      {/* Prix unitaire */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Prix unitaire (€)</label>
+                        <input
+                          type="number"
+                          name={`items[${index}].unit_price`}
+                          step="0.01"
+                          value={item.unit_price || 0}
+                          onChange={(e) => handleItemChange(index, 'unit_price', parseFloat(e.target.value) || 0)}
+                          className="w-full p-2 border rounded"
+                          min="0"
+                          required
+                        />
+                      </div>
+
+                      {/* Total (calculé automatiquement) */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Total (€)</label>
+                        <input
+                          type="number"
+                          name={`items[${index}].total`}
+                          step="0.01"
+                          value={(item.quantity || 1) * (item.unit_price || 0)}
+                          readOnly
+                          className="w-full p-2 border rounded bg-gray-100"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Bouton pour supprimer l'item */}
+                    <button
+                      type="button"
+                      onClick={() => removeItem(index)}
+                      className="mt-2 text-sm text-red-600 hover:text-red-900 flex items-center"
+                    >
+                      <TrashIcon className="h-4 w-4 mr-1" /> Supprimer
+                    </button>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500">Aucun item trouvé.</p>
+              )}
+
+              {/* Bouton pour ajouter un nouvel item */}
+              <button
+                type="button"
+                onClick={addItem}
+                className="mt-3 px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700"
+              >
+                + Ajouter un item
+              </button>
+            </div>
+
+            {/* Champ caché pour les items (pour la soumission) */}
+            <input
+              type="hidden"
+              name="items"
+              value={JSON.stringify(formData.items || [])}
+            />
+          </>
+        );
+   
+      case 'services':
+        return (
+          <>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Nom</label>
+              <input
+                type="text"
+                name="name"
+                defaultValue={formData.name || ''}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              <input
+                type="text"
+                name="description"
+                defaultValue={formData.description || ''}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Route</label>
+              <input
+                type="text"
+                name="route"
+                defaultValue={formData.route || ''}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Icon</label>
+              <input
+                type="text"
+                name="icon"
+                defaultValue={formData.icon || ''}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Prix</label>
+              <input
+                type="number"
+                name="price"
+                defaultValue={formData.price || ''}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="unit" className="block mb-1">Unité</label>
+              <select
+                id="unit"
+                name="unit"
+                className="w-full p-2 border rounded"
+                defaultValue={formData.unit || ''}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Sélectionnez une unité</option>
+                <option value="appel">Appel</option>
+                <option value="heure">Heure</option>
+                <option value="jour">Jour</option>
+                <option value="semaine">Semaine</option>
+                <option value="mois">Mois</option>
+                <option value="année">Année</option>
+                <option value="projet">Projet</option>
+              </select>
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                <input
+                  type="checkbox"
+                  name="is_active"
+                  checked={Boolean(formData.is_active)}
+                  onChange={handleChange}
+                  className="mr-2 h-4 w-4 text-blue-600"
+                />
+                Actif
+              </label>
+            </div>
+          </>
+        );
+
+      case 'calendar':
+        return (
+          <>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Client</label>
+              <select
+                name="user_id"
+                defaultValue={formData.user_id || ''}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+                required
+              >
+                <option value="">Sélectionnez un client</option>
+                {users
+                  // .filter(user => ['CLIENT'].includes(user.role))
+                  .map(user => (
+                    <option key={user.id} value={user.id}>
+                      {user.name} ({user.email})
+                    </option>
+                  ))}
+              </select>
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Titre</label>
+              <input
+                type="text"
+                name="title"
+                defaultValue={formData.title || ''}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Date de début</label>
+              <input
+                type="datetime-local"
+                name="start_time"
+                defaultValue={formData.start_time ? new Date(formData.start_time).toISOString().slice(0, 16) : ''}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Date de fin</label>
+              <input
+                type="datetime-local"
+                name="end_time"
+                defaultValue={formData.end_time ? new Date(formData.end_time).toISOString().slice(0, 16) : ''}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              <input
+                type="text"
+                name="description"
+                defaultValue={formData.description || ''}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+                required
+              />
+            </div>
+          </>
+        );
+
+      case 'subscriptions' :
+        return (
+          <>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Client</label>
+              <select
+                name="user_id"
+                defaultValue={formData.user_id || ''}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+                required
+              >
+                <option value="">Sélectionnez un client</option>
+                {users
+                  .map(user => (
+                    <option key={user.id} value={user.id}>
+                      {user.name} ({user.email})
+                    </option>
+                  ))}
+              </select>
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Service</label>
+              <select
+                name="service_id"
+                defaultValue={formData.service_id || ''}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+                required
+              >
+                <option value="">Sélectionnez un service</option>
+                {s.map((service) => (
+                  <option key={service.id} value={service.id}>
+                    {service.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label htmlFor="status" className="block mb-1">Statut</label>
+              <select
+                id="status"
+                name="status"
+                className="w-full p-2 border rounded"
+                defaultValue={formData.status || ''}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Sélectionnez un statut</option>
+                <option value="active">Actif</option>
+                <option value="cancelled">Annulé</option>
+                <option value="paused">Suspendu</option>
+                <option value="expired">Expiré</option>
+              </select>
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Date de début</label>
+              <input
+                type="datetime-local"
+                name="start_date"
+                defaultValue={formData.start_date ? new Date(formData.start_date).toISOString().slice(0, 16) : ''}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Date de fin</label>
+              <input
+                type="datetime-local"
+                name="end_date"
+                defaultValue={formData.end_date ? new Date(formData.end_date).toISOString().slice(0, 16) : ''}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Date du prochain paiement</label>
+              <input
+                type="datetime-local"
+                name="next_payment_date"
+                defaultValue={formData.next_payment_date ? new Date(formData.next_payment_date).toISOString().slice(0, 16) : ''}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+                required
+              />
+            </div>
+          </>
+        );
 
       default:
         return (

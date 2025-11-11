@@ -6,7 +6,7 @@ import { z } from 'zod';
 // =============================================
 
 // Schéma pour un identifiant
-export const IdSchema = z.number().int().positive();
+export const IdSchema = z.string().transform((val) => parseInt(val));
 
 // Schéma pour un prix
 export const PriceSchema = z.string().transform((val) => parseFloat(val));

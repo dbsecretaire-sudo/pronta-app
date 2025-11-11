@@ -10,28 +10,67 @@ export async function fetchResourceItem(resource: string, id: number) {
 }
 
 export async function updateResource(resource: string, id: number | undefined, data: any) {
-  const url = `${API_URL}/api/admin/${resource}`;
-  const method = id ? 'PUT' : 'POST';
-  const body = JSON.stringify(id ? { id, ...data } : data);
-console.log(body);
-  const response = await fetch(url, {
-    method,
-    headers: { 'Content-Type': 'application/json' },
-    body,
-  });
+  let url: string;
+  let method: 'POST' | 'PUT';
 
-  if (!response.ok) throw new Error('Failed to update resource');
-  return response.json();
+  if (id) {
+    method = 'PUT';
+    url = `${API_URL}/api/admin/${resource}/${id}`;
+  } else {
+    method = 'POST';
+    url = `${API_URL}/api/admin/${resource}`;
+  }
+
+  try {
+    const response = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(id ? { id, ...data } : data),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return { success: false, ...errorData };
+    }
+
+    return { success: true, data: await response.json() };
+
+  } catch (error: any) {
+    return {
+      success: false,
+      error: 'network_error',
+      message: error.message || 'Erreur réseau',
+    };
+  }
 }
-
 
 export async function getResourceById(resourceName: string, id: number) {
   // Appel à votre API ou base de données
-  const response = await fetch(`/api/admin/${resourceName}/${id}`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch resource');
+  if(resourceName === 'invoices'){
+    const [invoiceResponse, itemsResponse] = await Promise.all([
+      fetch(`/api/admin/invoices/${id}`),
+      fetch(`/api/invoices/${id}/items`), // Endpoint dédié aux items
+    ]);
+
+    if (!invoiceResponse.ok || !itemsResponse.ok) {
+      throw new Error('Failed to fetch invoice or items');
+    }
+
+    const invoiceData = await invoiceResponse.json();
+    const itemsData = await itemsResponse.json();
+
+    // Fusionne les données
+    return {
+      ...invoiceData,
+      items: itemsData, // Ajoute les items à la facture
+    };
+  } else {
+     const response = await fetch(`/api/admin/${resourceName}/${id}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch resource');
+    }
+    return response.json();
   }
-  return response.json();
 }
 
 export async function fetchResource(resource: string) {
