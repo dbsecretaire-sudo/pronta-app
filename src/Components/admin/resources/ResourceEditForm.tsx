@@ -1209,8 +1209,10 @@ const handleSubmit = async (e: React.FormEvent) => {
               >
                 <option value="">Sélectionnez un statut</option>
                 <option value="active">Actif</option>
+                <option value="paid">Payé</option>
+                <option value="overdue">En retard</option>
                 <option value="cancelled">Annulé</option>
-                <option value="paused">Suspendu</option>
+                <option value="pending">Suspendu</option>
                 <option value="expired">Expiré</option>
               </select>
             </div>

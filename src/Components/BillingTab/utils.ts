@@ -21,7 +21,7 @@ export const getStatusLabel = (status?: string) => {
     case 'paid': return 'Payé';
     case 'overdue': return 'En retard';
     case 'cancelled': return 'Annulé';
-    case 'pending': return 'En attente';
+    case 'pending': return 'Suspendu';
     default: return 'Inconnu';
   }
 };
