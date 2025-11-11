@@ -19,8 +19,10 @@ export const IdSchema = z.number().int().positive();
 export const SubscriptionStatusSchema = z.enum([
   'active',
   'cancelled',
-  'paused',
-  'expired'
+  'expired',
+  'paid',
+  'overdue',
+  'pending'
 ]);
 
 // =============================================

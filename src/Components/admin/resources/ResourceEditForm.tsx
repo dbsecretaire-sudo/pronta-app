@@ -297,7 +297,6 @@ const handleSubmit = async (e: React.FormEvent) => {
         due_date: dueDate,
         items: formData.items || [],
       };
-      console.log("dataToSend, ", dataToSend);
     }
     // Utilisateurs
     else if (resourceName === 'users') {
@@ -328,7 +327,6 @@ const handleSubmit = async (e: React.FormEvent) => {
         contact_name: formData.contact_name || '',
         client_id: formData.client_id.toString(),
       };
-      console.log(dataToSend)
     }
     // Services
     else if (resourceName === 'services'){
@@ -1213,7 +1211,6 @@ const handleSubmit = async (e: React.FormEvent) => {
                 <option value="overdue">En retard</option>
                 <option value="cancelled">Annulé</option>
                 <option value="pending">Suspendu</option>
-                <option value="expired">Expiré</option>
               </select>
             </div>
             <div className="mb-4">
