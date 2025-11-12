@@ -3,16 +3,16 @@ import { useState } from "react";
 import { useUser } from "@/src/Hook/useUser";
 import { useSubscription } from "./useSubscriptions";
 import { useTab } from '@/src/context/TabContext';
-import { useAuth } from "../context/AuthContext";
 import { useServices } from "./useServices";
+import { useSession } from "next-auth/react";
 
 export function useAccount() {
-  const { session, status } = useAuth();
+  const { data: session, status } = useSession();
   const { userData, loading, error, mutate } = useUser();
   const { activeTab, setActiveTab } = useTab();
   const [isUpdating, setIsUpdating] = useState(false); 
-  const { sO } = useServices(session.user.id, status);
-  const { subscriptionServices } = useSubscription(session.user.id, sO);
+  const { sO } = useServices(session?.user.id, status);
+  const { subscriptionServices } = useSubscription(session?.user.id, sO);
 
   // Fonction générique pour les mises à jour
   const updateUser = async <T extends object>( updatedData: T, successMessage: string, errorMessage: string ) => {

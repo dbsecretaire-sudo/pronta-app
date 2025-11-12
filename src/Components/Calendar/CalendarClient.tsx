@@ -2,11 +2,11 @@
 "use client"; // <-- Marqué comme Client Component
 
 import { Calendar } from "@/src/Components";
-import { useAuth } from "@/src/context/AuthContext";
 import { useCalendar } from "@/src/Hook/useCalendar";
+import { useSession } from "next-auth/react";
 
 export function CalendarClient() {
-  const { session, status } = useAuth();
+  const { data:session, status } = useSession();
   const { calendarEvents } = useCalendar(session?.user.id);
 
   if (status === "loading") {
