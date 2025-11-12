@@ -22,7 +22,7 @@ export { CallList } from "./Calls/CallList";
 export { default as CallStats } from "./Calls/CallStats";
 export type { Call, CallFilterProps, CallStatsProps } from "./Calls/types";
 export { formatDuration, formatDate } from "./Calls/utils";
-export { default as Calendar } from "./Calendar";
+export { default as Calendar } from "./Calendar/Calendar";
 export { AccountTabs } from "./AccountTabs";
 export { ProfileTab } from './ProfileTab';
 export { Tabs } from './Tabs';

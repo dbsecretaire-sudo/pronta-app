@@ -1,12 +1,19 @@
 "use client";
 import { useSession } from "next-auth/react";
 import { CallStats, CallList, CallFilter, Calendar } from "@/src/Components";
+import { CallFilter as CallFilterType } from "@/src/lib/schemas/calls";
 import { useCalls } from "@/src/Hook/useCalls";
 import { Tabs } from "@/src/Components"; // À créer ou utiliser une lib comme @radix-ui/react-tabs
+import { useState } from "react";
 
 export default function ProntaCallsDashboard() {
   const { data: session } = useSession();
-  const { calls, stats, calendarEvents, loading, filter, handleFilterChange } = useCalls(session?.user?.id);
+  const [filter, setFilter] = useState<CallFilterType>({
+      userId: 0,
+      byName: "",
+      byPhone: "",
+    });
+  const { calls, stats, calendarEvents, loading} = useCalls(session?.user?.id);
   
   const tabs = [
     {
@@ -16,7 +23,7 @@ export default function ProntaCallsDashboard() {
         <div className="bg-white p-6 rounded-lg shadow">
           <CallFilter
             userId={filter.userId}
-            onFilterChange={handleFilterChange}
+            onFilterChange={setFilter}
             />
           <CallList calls={calls} />
         </div>

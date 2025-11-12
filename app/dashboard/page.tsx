@@ -5,10 +5,12 @@ import { ServiceCard, AccountSummary } from '@/src/Modules/index';
 import { useState } from "react";
 import { ServiceForm } from "@/src/Components";
 import { createService } from "@/src/lib/api";
+import { useSubscription } from "@/src/Hook/useSubscriptions";
 
 export default function DashboardHome() {
   const { data: session, status } = useSession();
-  const { sO, sN, loading, handleSubscribe, handleDeactivate, handleReactivate } = useServices(session?.user?.id, status);
+  const { s, sO, sN, loading, handleSubscribe, handleDeactivate, handleReactivate } = useServices(session?.user?.id, status);
+  const { subscriptionServices } = useSubscription(session?.user.id, sO)
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -16,7 +18,7 @@ export default function DashboardHome() {
   const unSubscribedServices = sN;
 
   if (loading) return <div className="p-8">Chargement...</div>;
-
+console.log("subscriptions: ", subscriptionServices)
   return (
     <div className="p-8 max-w-7xl mx-auto">
       <h1 className="text-2xl font-bold mb-8">Tableau de bord</h1>
@@ -32,6 +34,7 @@ export default function DashboardHome() {
                 service={service}
                 isSubscribed={true}
                 onDeactivate={handleDeactivate}
+                subscription={subscriptionServices.find(sub => sub.service_id === service.id)}
               />
             ))}
           </div>

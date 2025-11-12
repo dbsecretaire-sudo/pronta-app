@@ -37,6 +37,7 @@ export const InvoiceItemSchema = z.object({
   description: z.string().min(1).max(500),
   quantity: z.number().int().positive(),
   unit_price: z.number().positive(),
+  total: z.number().positive().optional(),
 });
 
 // Schéma pour la création d'un élément de facture

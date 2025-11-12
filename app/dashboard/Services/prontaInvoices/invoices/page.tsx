@@ -1,7 +1,7 @@
 // app/components/InvoicesList.tsx
 "use client";
 import Link from "next/link";
-import { useFetchInvoices } from "@/src/Hook/useFetchInvoices";
+import { useFetchInvoices } from "@/src/Hook/useInvoices";
 import { InvoiceRow } from "@/src/Modules/index";
 
 export default function InvoicesList() {

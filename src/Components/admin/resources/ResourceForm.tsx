@@ -1,24 +1,28 @@
 // components/ResourceForm.tsx
 'use client';
-import { useActionState, useEffect, useState } from 'react';
-import { createResource } from '@/app/actions/admin';
+import { useActionState, useEffect, useState, useTransition, ChangeEvent } from 'react';
+import { createResource, FormState } from '@/app/actions/admin';
+import { useClients } from '@/src/Hook/useClients';
+import { useUser } from '@/src/Hook/useUser';
 import { fetchAllClients, fetchUsers } from '@/src/lib/api';
-import { User } from '@/src/Types/Users';
-import { Client } from '@/src/Types/Clients';
+import { User } from '@/src/lib/schemas';
+import { Client } from '@/src/lib/schemas';
 import { useServices } from '@/src/Hook/useServices';
 import { useSession } from 'next-auth/react';
 import { TrashIcon } from '@heroicons/react/16/solid';
 
-interface ResourceFormProps {
-  resource: string;
-}
-
-export default function ResourceForm({ resource }: ResourceFormProps) {
-  const [state, formAction] = useActionState( createResource.bind(null, resource), {});
+export default function ResourceForm({ resource }: {resource: string}) {
+  // const [state, formAction] = useActionState( createResource.bind(null, resource), {});
+  const [state, formAction] = useActionState( (prevState: FormState, formData: FormData) => createResource(resource, prevState, formData), { success: undefined, error: undefined} as FormState);
   const [users, setUsers] = useState<User[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const { data, status } = useSession();
   const {s, sN} = useServices(data?.user.id, status);
+  const [ paymentMethod, setPaymentMethod ] = useState<string>('');
+
+  const handlePaymentMethodChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    setPaymentMethod(e.target.value);
+  };
 
   const [items, setItems] = useState([
     { description: '', quantity: 1, unit_price: 0, total: 0 }
@@ -68,6 +72,12 @@ export default function ResourceForm({ resource }: ResourceFormProps) {
 
   return (
     <form action={formAction} className="space-y-4">
+      {state.success === false && (
+        <p className="text-red-500">{state.error}</p> // ✅ Affiche l'erreur
+      )}
+      {state.success === true && (
+        <p className="text-green-500">Ressource créée avec succès !</p>
+      )}
       {resource === 'clients' && (
         <>
           <div>
@@ -600,86 +610,216 @@ export default function ResourceForm({ resource }: ResourceFormProps) {
       )}
 
       {resource === 'users' && (
-        <>
+  <>
+    <div>
+      <label htmlFor="password" className="block mb-1">Mot de passe</label>
+      <input
+        type="password"
+        id="password"
+        name="password"
+        className="w-full p-2 border rounded"
+        required
+      />
+    </div>
+
+    {/* Champ Email */}
+    <div>
+      <label htmlFor="email" className="block mb-1">Email</label>
+      <input
+        type="email"
+        id="email"
+        name="email"
+        className="w-full p-2 border rounded"
+        required
+      />
+    </div>
+
+    {/* Champ Nom */}
+    <div>
+      <label htmlFor="name" className="block mb-1">Nom</label>
+      <input
+        type="text"
+        id="name"
+        name="name"
+        className="w-full p-2 border rounded"
+        required
+      />
+    </div>
+
+    {/* Champ Rôle */}
+    <div>
+      <label htmlFor="role" className="block mb-1">Rôle</label>
+      <select
+        id="role"
+        name="role"
+        className="w-full p-2 border rounded"
+        required
+      >
+        <option value="">Sélectionnez un rôle</option>
+        <option value="ADMIN">Administrateur</option>
+        <option value="SECRETARY">Secrétaire</option>
+        <option value="CLIENT">Client</option>
+        <option value="MODERATOR">Modérateur</option>
+        <option value="SUPERVISOR">Superviseur</option>
+      </select>
+    </div>
+
+    {/* Adresse de facturation (objet imbriqué) */}
+    <div className="space-y-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+      <h3 className="text-lg font-semibold text-blue-800">Adresse de facturation</h3>
+      <div className="space-y-3">
+        {/* Rue */}
+        <div>
+          <label htmlFor="street" className="block mb-1">Rue*</label>
+          <input
+            type="text"
+            id="street"
+            name="street"
+            className="w-full p-2 border rounded"
+            required
+          />
+        </div>
+        {/* Code postal + Ville */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
-            <label htmlFor="email" className="block mb-1">Email</label>
-            <input type="text" id="email" name="email" className="w-full p-2 border rounded" required />
-          </div>
-          <div>
-            <label htmlFor="name" className="block mb-1">Nom</label>
-            <input type="text" id="name" name="name" className="w-full p-2 border rounded" required />
-          </div>
-          <div>
-            <label htmlFor="phone" className="block mb-1">Téléphone</label>
-            <input type="text" id="phone" name="phone" className="w-full p-2 border rounded" required />
-          </div>
-          <div>
-            <label htmlFor="company" className="block mb-1">Companie</label>
-            <input type="text" id="company" name="company" className="w-full p-2 border rounded" required />
-          </div>
-          <div>
-            <label htmlFor="role" className="block mb-1">Role</label>
-            <select
-              id="role"
-              name="role"
+            <label htmlFor="postalCode" className="block mb-1">Code postal*</label>
+            <input
+              type="text"
+              id="postalCode"
+              name="postalCode"
               className="w-full p-2 border rounded"
               required
-            >
-              <option value="">Sélectionnez un role</option>
-              <option value="ADMIN">Administrateur</option>
-              <option value="SECRETARY">Secrétaire</option>
-              <option value="CLIENT">Client</option>
-              <option value="SUPERVISOR">Superviseur</option>
-            </select>
+            />
           </div>
           <div>
-            <label htmlFor="billing_address" className="block mb-1">Adresse de facturation</label>
-            <input type="text" id="billing_address" name="billing_address" className="w-full p-2 border rounded" required />
-          </div>{/* JSON object: street, city, state, postal_code, country */}
-          <div>
-            <label htmlFor="payment_method" className="block mb-1">Méthode de paiement</label>
-            <select
-              id="payment_method"
-              name="payment_method"
+            <label htmlFor="city" className="block mb-1">Ville*</label>
+            <input
+              type="text"
+              id="city"
+              name="city"
               className="w-full p-2 border rounded"
               required
-            >
-              <option value="">Sélectionnez un type</option>
-              <option value="credit_card">Carte de crédit</option>
-              {/* card_number, card_last_four, card_brand (PaymentMethodDetails) */}
-              <option value="paypal">Paypal</option>
-              {/* paypal_email (PaymentMethodDetails) */}
-              <option value="bank_transfer">Virement bancaire</option>
-            </select>
-          </div>{/* JSON object */}
-          <div>
-            <label htmlFor="can_write" className="block mb-1">Peut écrire</label>
-            <input type="text" id="can_write" name="can_write" className="w-full p-2 border rounded" required />
-          </div>{/* Boolean oui ou non  */}
-          <div>
-            <label htmlFor="can_delete" className="block mb-1">Peut supprimer</label>
-            <input type="text" id="can_delete" name="can_delete" className="w-full p-2 border rounded" required />
-          </div>{/* Boolean oui ou non  */}
-          <div>
-            <label htmlFor="service_id" className="block mb-1">Service(s) lié(s)</label>
-            <select
-              id="service_id"
-              name="service_id"
-              className="w-full p-2 border rounded"
-              multiple
-              required
-            >
-              <option value="">Sélectionnez un/des service(s)</option>
-              {/* Options pour les utilisateurs avec rôle ADMIN, SECRETARY ou SUPERVISOR */}
-              {s.map(service => (
-                <option key={service.id} value={service.id}>
-                  {service.name}
-                </option>
-              ))}
-            </select>
+            />
           </div>
-        </>
+        </div>
+        {/* Pays */}
+        <div>
+          <label htmlFor="country" className="block mb-1">Pays*</label>
+          <input
+            type="text"
+            id="country"
+            name="country"
+            className="w-full p-2 border rounded"
+            required
+          />
+        </div>
+      </div>
+    </div>
+
+      {/* Méthode de paiement */}
+      <div>
+        <label htmlFor="type" className="block mb-1">Méthode de paiement</label>
+        <select
+          id="type"
+          name="type"
+          value={paymentMethod}
+          onChange={handlePaymentMethodChange}
+          className="w-full p-2 border rounded"
+          required
+        >
+          <option value="">Sélectionnez un type</option>
+          <option value="credit_card">Carte de crédit</option>
+          <option value="paypal">Paypal</option>
+          <option value="bank_transfer">Virement bancaire</option>
+        </select>
+      </div>
+
+      {/* Sous-champs pour la carte de crédit */}
+      {paymentMethod === 'credit_card' && (
+        <div className="mt-2">
+          <label htmlFor="card_number" className="block mb-1">Numéro de carte</label>
+          <input
+            type="text"
+            id="card_number"
+            name="card_number"
+            className="w-full p-2 border rounded"
+            placeholder="1234 5678 9012 3456"
+          />
+          <label htmlFor="card_last_four" className="block mb-1">4 derniers chiffres</label>
+          <input
+            type="text"
+            id="card_last_four"
+            name="card_last_four"
+            className="w-full p-2 border rounded"
+            placeholder="3456"
+          />
+          <label htmlFor="card_brand" className="block mb-1">Marque de la carte</label>
+          <input
+            type="text"
+            id="card_brand"
+            name="card_brand"
+            className="w-full p-2 border rounded"
+            placeholder="Visa, Mastercard, etc."
+          />
+        </div>
       )}
+
+      {/* Sous-champs pour PayPal */}
+      {paymentMethod === 'paypal' && (
+        <div className="mt-2">
+          <label htmlFor="paypal_email" className="block mb-1">Email PayPal</label>
+          <input
+            type="email"
+            id="paypal_email"
+            name="paypal_email"
+            className="w-full p-2 border rounded"
+            placeholder="votre@email.com"
+          />
+        </div>
+      )}
+
+      {/* Champs booléens */}
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          <input
+            type="checkbox"
+            name="can_write"
+            className="mr-2 h-4 w-4 text-blue-600"
+          />
+          Peut écrire
+        </label>
+      </div>
+
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          <input
+            type="checkbox"
+            name="can_delete"
+            className="mr-2 h-4 w-4 text-blue-600"
+          />
+          Peut supprimer
+        </label>
+      </div>
+
+      {/* Services liés */}
+      <div>
+        <label htmlFor="service_ids" className="block mb-1">Service(s) lié(s)</label>
+        <select
+          id="service_ids"
+          name="service_ids[]"
+          className="w-full p-2 border rounded"
+          multiple
+          required
+        >
+          {s.map(service => (
+            <option key={service.id} value={service.id}>
+              {service.name}
+            </option>
+          ))}
+        </select>
+      </div>
+    </>
+)}
 
       <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
         Créer

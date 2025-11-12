@@ -1,13 +1,14 @@
 "use client";
 import { useState, useEffect } from "react";
 import { CallList, CallFilter } from "@/src/Components";
-import { fetchCalls } from "@/src/lib/api";
-import { CallFilter as CallFilterType } from "@/src/Types/Calls/index";
+import { CallFilter as CallFilterType } from "@/src/lib/schemas/calls";
 import { PhoneIcon } from "@heroicons/react/24/outline";
 import { CallModal } from "@/src/Components";
+import { useCalls } from "@/src/Hook/useCalls";
+import { useSession } from "next-auth/react";
 
 export default function Calls() {
-  const [calls, setCalls] = useState([]);
+  const { data: session, status } = useSession();
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<CallFilterType>({
     userId: 0,
@@ -15,6 +16,7 @@ export default function Calls() {
     byPhone: "",
   });
   const [isCallModalOpen, setIsCallModalOpen] = useState(false);
+  const { calls } = useCalls(session?.user.id, filter);
 
   const initiateZoiperCall = (phoneNumber: string) => {
     if (window.ZoiperAPI) {
@@ -24,22 +26,6 @@ export default function Calls() {
       window.location.href = `tel:${phoneNumber}`;
     }
   };
-
-  useEffect(() => {
-    const loadCalls = async () => {
-      setLoading(true);
-      try {
-        const data = await fetchCalls(filter);
-        setCalls(data);
-      } catch (error) {
-        console.error("Erreur lors du chargement des appels:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadCalls();
-  }, [filter]);
 
   return (
     <div className="p-6">

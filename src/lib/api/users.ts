@@ -1,5 +1,5 @@
-import { Role, User } from "@/src/Types/Users";
-
+import { Role } from "@/src/Types/Users";
+import { User } from '@/src/lib/schemas'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -79,8 +79,14 @@ export const fetchUsersForAdmin = async () => {
 
 }
 
-export const fetchUsersName = async () => {
+export const fetchUsersName = async () : Promise<Record<number, User>> => {
     const res = await fetch(`${API_URL}/api/user/name`, {credentials : 'include'});
+    if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+    return res.json();
+}
+
+export const getUserById = async (userId: number) : Promise<User> => {
+    const res = await fetch(`${API_URL}/api/user/${userId}`, {credentials : 'include'});
     if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
     return res.json();
 }

@@ -4,8 +4,6 @@ import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useServices } from '@/src/Hook/useServices';
 import { NavBar } from "@/src/Components";
-import { fetchUserServices } from "@/src/lib/api";
-import { useCallback } from "react";
 import { TabProvider } from "@/src/context/TabContext";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {

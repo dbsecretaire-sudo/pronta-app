@@ -3,7 +3,7 @@ import { Calendar as BigCalendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "moment/locale/fr";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { CalendarEvent } from "@/src/Types/Calendar/index";
+import { CalendarEvent } from "@/src/lib/schemas/calendar";
 
 // Configurer moment en français
 moment.locale("fr");

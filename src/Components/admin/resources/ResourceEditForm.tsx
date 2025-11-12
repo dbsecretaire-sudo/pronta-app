@@ -6,12 +6,12 @@ import { useRouter } from 'next/navigation';
 import { updateResource, getResourceById, createResource } from '@/src/lib/admin/api';
 import { useServices } from '@/src/Hook/useServices';
 import { useSession } from 'next-auth/react';
-import { User } from '@/src/Types/Users';
+import { User } from '@/src/lib/schemas/users';
 import { fetchAllClients, fetchUsers } from '@/src/lib/api';
 import { TrashIcon } from '@heroicons/react/16/solid';
 import { Invoice, CreateInvoice, InvoiceItem, CreateInvoiceSchema } from '@/src/lib/schemas/invoices';
 import { Client, CreateClient, ClientFormData, Address, CreateClientSchema } from "@/src/lib/schemas/clients";
-import { CreateUser, CreateUserSchema } from '@/src/lib/schemas/users';
+import { CreateUser, CreateUserSchema, PaymentMethod } from '@/src/lib/schemas/users';
 import { CreateCall, CreateCallSchema } from '@/src/lib/schemas/calls';
 import { CreateService, CreateServiceSchema } from '@/src/lib/schemas/services';
 import { CreateCalendarEvent, CreateCalendarEventSchema } from '@/src/lib/schemas/calendar';
@@ -44,61 +44,68 @@ export function ResourceEditForm({ resourceName, id }: ResourceEditFormProps) {
   const [errors, setErrors] = useState<{ duration?: string }>({});
 
   useEffect(() => {
-    const initialize = async () => {
-      try {
-        // Charge les données initiales si c'est une édition
-        if (id) {
-          const data = await getResourceById(resourceName, id);
-          // Normalise les données pour l'adresse
-          const normalizedData = {
-            ...data,
-            address: data.address ? (
-              typeof data.address === 'string' ?
-                JSON.parse(data.address) :
-                data.address
-            ) : {
-              street: '',
-              city: '',
-              postalCode: '',
-              country: 'France'
-            }
-          };
-          setFormData(normalizedData);
-        } else {
-          // Valeurs par défaut pour la création
-          const defaults: Record<string, Partial<ClientFormData>> = {
-            clients: {
-              name: '',
-              email: '',
-              phone: '',
-              company: '',
-              address: {
-                street: '',
-                city: '',
-                postalCode: '',
-                country: 'France'
+  const initialize = async () => {
+    try {
+      if (id) {
+        const data = await getResourceById(resourceName, id);
+        const normalizedData = {
+          ...data,
+          address: data.address ?
+            (typeof data.address === 'string' ? JSON.parse(data.address) : data.address) :
+            { street: '', city: '', postalCode: '', country: 'France' },
+          billing_address: data.billing_address ?
+            (typeof data.billing_address === 'string' ? JSON.parse(data.billing_address) : data.billing_address) :
+            { street: '', city: '', postalCode: '', country: 'France' },
+          payment_method: data.payment_method ?
+            (typeof data.payment_method === 'string' ? JSON.parse(data.payment_method) : data.payment_method) :
+            {
+              type: "", // Type par défaut
+              details: {
+                card_number: "",
+                card_last_four: "",
+                card_brand: "",
+                paypal_email: "",
               }
-            }
-          };
-          setFormData(defaults[resourceName] || {});
-        }
-
-        // Charge les utilisateurs et clients
-        const [usersData, clientsData] = await Promise.all([
-          fetchUsers(),
-          fetchAllClients(),
-        ]);
-        setUsers(usersData);
-        setClients(clientsData);
-      } catch (error) {
-        console.error('Error initializing form:', error);
-      } finally {
-        setIsLoading(false);
+            },
+        };
+        setFormData(normalizedData);
+      } else {
+        // Valeurs par défaut pour la création
+        const defaults: Record<string, any> = {
+          clients: {
+            name: '',email: '',phone: '',company: '',address: {street: '',city: '',postalCode: '',country: 'France'}
+          },
+          users: {email: '',name: '',role: '',can_write: false,can_delete: false,
+            billing_address: {street: '',city: '',postalCode: '',country: 'France'},
+            payment_method: {type: "",
+              details: {
+                card_number: "",
+                card_last_four: "",
+                card_brand: "",
+                paypal_email: "",
+              }
+            },
+            service_ids: [],
+          },
+          // Ajoutez d'autres ressources si nécessaire
+        };
+        setFormData(defaults[resourceName] || {});
       }
-    };
-
-    initialize();
-  }, [resourceName, id, session?.user.id]);
+      // Charge les utilisateurs et clients
+      const [usersData, clientsData] = await Promise.all([
+        fetchUsers(),
+        fetchAllClients(),
+      ]);
+      setUsers(usersData);
+      setClients(clientsData);
+    } catch (error) {
+      console.error('Error initializing form:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  initialize();
+}, [resourceName, id, session?.user.id]);
 
   useEffect(() => {
     if (formData.duration !== undefined && formData.duration !== '') {
@@ -188,6 +195,41 @@ export function ResourceEditForm({ resourceName, id }: ResourceEditFormProps) {
           : value, // Garde la string si incomplète
       }));
     }
+    // Gestion des champs d'adresse (ex: address.street)
+    else if (name.startsWith('billing_address.')) {
+      const fieldName = name.split('.')[1];
+      setFormData(prev => ({
+        ...prev,
+        billing_address: {
+          ...prev.billing_address,
+          [fieldName]: value
+        }
+      }));
+    }
+    //Gestion des modes de paiements
+    else if (name === "payment_method.type") {
+      setFormData(prev => ({
+        ...prev,
+        payment_method: {
+          ...prev.payment_method,
+          type: value
+        }
+      }));
+    }
+
+  else if (name.startsWith('payment_method.details.')) {
+    const fieldName = name.split('.')[2]; // Ex: "card_number"
+    setFormData(prev => ({
+      ...prev,
+      payment_method: {
+        ...prev.payment_method,
+        details: {
+          ...prev.payment_method.details,
+          [fieldName]: value, // Met à jour le sous-champ spécifique
+        }
+      }
+    }));
+  }
     // Cas standard (text, email, etc.)
     else {
       setFormData(prev => ({ ...prev, [name]: value }));
@@ -273,7 +315,6 @@ const handleSubmit = async (e: React.FormEvent) => {
         address: formData.address || undefined,
         company: formData.company || undefined,
       };
-      console.log(dataToSend)
     }
     // Factures
     else if (resourceName === 'invoices') {
@@ -303,8 +344,6 @@ const handleSubmit = async (e: React.FormEvent) => {
       dataToSend = {
         email: formData.email || '',
         name: formData.name || '',
-        phone: formData.phone || undefined,
-        company: formData.company || undefined,
         role: formData.role || '',
         can_write: Boolean(formData.can_write),
         can_delete: Boolean(formData.can_delete),
@@ -465,8 +504,10 @@ const handleSubmit = async (e: React.FormEvent) => {
     if (isLoading) {
       return <div>Chargement...</div>;
     }
-
+console.log(formData);
+console.log(formData.payment_method.type);
     switch (resourceName) {
+      
       case 'clients':
         return (
           <>
@@ -730,7 +771,6 @@ const handleSubmit = async (e: React.FormEvent) => {
                 required
               />
             </div>
-
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">Rôle</label>
               <select
@@ -743,10 +783,155 @@ const handleSubmit = async (e: React.FormEvent) => {
                 <option value="ADMIN">Administrateur</option>
                 <option value="SECRETARY">Secrétaire</option>
                 <option value="CLIENT">Client</option>
+                <option value="MODERATOR">Modérateur</option>
                 <option value="SUPERVISOR">Superviseur</option>
               </select>
             </div>
+            <div className="space-y-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <h3 className="text-lg font-semibold text-blue-800">Adresse de facturation</h3>
 
+            <div className="space-y-3">
+              {/* Rue */}
+              <div>
+                <label htmlFor="street" className="block mb-1 text-sm font-medium text-gray-700">Rue*</label>
+                <input
+                  type="text"
+                  id="street"
+                  name="billing_address.street"
+                  className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  defaultValue={formData.billing_address.street || ''}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              {/* Code postal + Ville */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label htmlFor="postalCode" className="block mb-1 text-sm font-medium text-gray-700">Code postal*</label>
+                  <input
+                    type="text"
+                    id="postalCode"
+                    name="billing_address.postalCode"
+                    className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    defaultValue={formData.billing_address.postalCode || ''}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="city" className="block mb-1 text-sm font-medium text-gray-700">Ville*</label>
+                  <input
+                    type="text"
+                    id="city"
+                    name="billing_address.city"
+                    className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    defaultValue={formData.billing_address.city || ''}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Pays */}
+              <div>
+                <label htmlFor="country" className="block mb-1 text-sm font-medium text-gray-700">Pays*</label>
+                <input
+                  type="text"
+                  id="country"
+                  name="billing_address.country"
+                  className="w-full p-2 border rounded-md bg-gray-100 cursor-not-allowed"
+                  defaultValue={formData.billing_address.country || ''}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Champ caché pour stocker l'objet complet */}
+            <input
+              type="hidden"
+              name="billing_address"
+              value={formData.billing_address ? JSON.stringify(formData.billing_address) : ''}
+            />
+          </div>
+
+            <div>
+              <label htmlFor="payment_method.type" className="block mb-1">Méthode de paiement</label>
+              <select
+                id="payment_method.type"
+                name="payment_method.type"
+                value={formData?.payment_method?.type || ""}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+                required
+              >
+                <option value="">Sélectionnez un type</option>
+                <option value="credit_card">Carte de crédit</option>
+                <option value="paypal">Paypal</option>
+                <option value="bank_transfer">Virement bancaire</option>
+                <option value="other">Autre</option>
+              </select>
+            </div>
+
+            {/* Sous-champs pour la carte de crédit */}
+            {formData.payment_method.type === "credit_card" && (
+              <div className="mt-2">
+                <label htmlFor="payment_method.details.card_number" className="block mb-1">Numéro de carte</label>
+                <input
+                  type="text"
+                  id="payment_method.details.card_number"
+                  name="payment_method.details.card_number"
+                  defaultValue={formData.payment_method?.details?.card_number || ""}
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded"
+                  placeholder="1234 5678 9012 3456"
+                />
+                <label htmlFor="payment_method.details.card_last_four" className="block mb-1">4 derniers chiffres</label>
+                <input
+                  type="text"
+                  id="payment_method.details.card_last_four"
+                  name="payment_method.details.card_last_four"
+                  defaultValue={formData.payment_method?.details?.card_last_four || ""}
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded"
+                  placeholder="3456"
+                />
+                <label htmlFor="payment_method.details.card_brand" className="block mb-1">Marque de la carte</label>
+                <input
+                  type="text"
+                  id="payment_method.details.card_brand"
+                  name="payment_method.details.card_brand"
+                  defaultValue={formData.payment_method?.details?.card_brand || ""}
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded"
+                  placeholder="Visa, Mastercard, etc."
+                />
+              </div>
+            )}
+
+            {/* Sous-champs pour PayPal */}
+            {formData.payment_method.type === "paypal" && (
+              <div className="mt-2">
+                <label htmlFor="payment_method.details.paypal_email" className="block mb-1">Email PayPal</label>
+                <input
+                  type="email"
+                  id="payment_method.details.paypal_email"
+                  name="payment_method.details.paypal_email"
+                  defaultValue={formData.payment_method?.details?.paypal_email || ""}
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded"
+                  placeholder="votre@email.com"
+                />
+              </div>
+            )}
+
+            {/* Champ caché pour stocker l'objet complet */}
+            <input
+              type="hidden"
+              name="payment_method"
+              value={formData.payment_method ? JSON.stringify(formData.payment_method) : ''}
+            />
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 <input
@@ -759,7 +944,6 @@ const handleSubmit = async (e: React.FormEvent) => {
                 Peut écrire
               </label>
             </div>
-
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 <input

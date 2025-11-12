@@ -14,6 +14,7 @@ export const DateSchema = z.union([
 
 // Schéma pour un identifiant
 export const IdSchema = z.string().transform((val) => parseInt(val));
+export const IdsSchema = z.number().int().positive();
 
 // Schéma pour les rôles d'utilisateur
 export const RoleSchema = z.enum([
@@ -37,7 +38,9 @@ export const BillingAddressSchema = z.object({
 export const PaymentMethodSchema = z.object({
   type: z.enum(['credit_card', 'paypal', 'bank_transfer', 'other']),
   details: z.record(z.string(), z.unknown()).optional()
-}).partial();
+});
+
+export const PaymentMethodTypeSchema = z.enum(['credit_card', 'paypal', 'bank_transfer', 'other']);
 
 // Schéma pour les détails de carte de crédit
 export const CreditCardDetailsSchema = z.object({
@@ -45,6 +48,10 @@ export const CreditCardDetailsSchema = z.object({
   brand: z.string().min(1),
   expiry_month: z.string().length(2).optional(),
   expiry_year: z.string().length(4).optional()
+}).partial();
+
+export const PaypalSchema = z.object({
+  paypal_email: z.string().min(1),
 }).partial();
 
 // =============================================
@@ -57,13 +64,11 @@ export const UserSchema = z.object({
   email: z.string().email(),
   password_hash: z.string().min(8),
   name: z.string().min(1),
-  phone: z.string().optional(),
-  company: z.string().optional(),
   role: RoleSchema,
   can_write: z.boolean().default(false),
   can_delete: z.boolean().default(false),
   created_at: DateSchema,
-  updated_at: DateSchema,
+  updated_at: DateSchema.optional(),
   billing_address: z.preprocess(
     (val) => {
       if (typeof val === 'string') {
@@ -92,11 +97,12 @@ export const UserSchema = z.object({
       type: z.enum(['credit_card', 'paypal', 'bank_transfer', 'other']),
       details: z.union([
         CreditCardDetailsSchema,
+        PaypalSchema,
         z.record(z.string(), z.unknown())
       ]).optional()
     }).optional()
   ),
-  service_ids: z.array(IdSchema).optional()
+  service_ids: z.array(IdsSchema).optional()
 });
 
 // Schéma pour la création d'un utilisateur
@@ -104,8 +110,6 @@ export const CreateUserSchema = z.object({
   email: z.string().email(),
   password: z.string().optional(),
   name: z.string().min(1),
-  phone: z.string().optional(),
-  company: z.string().optional(),
   role: RoleSchema.optional().default('CLIENT'),
   can_write: z.boolean().optional().default(false),
   can_delete: z.boolean().optional().default(false),
@@ -114,18 +118,17 @@ export const CreateUserSchema = z.object({
     type: z.enum(['credit_card', 'paypal', 'bank_transfer', 'other']),
     details: z.union([
       CreditCardDetailsSchema,
+      PaypalSchema,
       z.record(z.string(), z.unknown())
     ]).optional()
   }).optional(),
-  service_ids: z.array(IdSchema).optional()
+  service_ids: z.array(IdsSchema).optional()
 });
 
 // Schéma pour la mise à jour d'un utilisateur
 export const UpdateUserSchema = z.object({
   email: z.string().email().optional(),
   name: z.string().min(1).optional(),
-  phone: z.string().optional(),
-  company: z.string().optional(),
   role: RoleSchema.optional(),
   can_write: z.boolean().optional(),
   can_delete: z.boolean().optional(),
@@ -134,10 +137,11 @@ export const UpdateUserSchema = z.object({
     type: z.enum(['credit_card', 'paypal', 'bank_transfer', 'other']),
     details: z.union([
       CreditCardDetailsSchema,
+      PaypalSchema,
       z.record(z.string(), z.unknown())
     ]).optional()
   }).optional(),
-  service_ids: z.array(IdSchema).optional()
+  service_ids: z.array(IdsSchema).optional()
 }).partial();
 
 // Schéma pour un utilisateur avec ses abonnements
@@ -183,9 +187,11 @@ export type UpdateUser = z.infer<typeof UpdateUserSchema>;
 export type UserWithSubscriptions = z.infer<typeof UserWithSubscriptionsSchema>;
 export type UserWithServices = z.infer<typeof UserWithServicesSchema>;
 export type Role = z.infer<typeof RoleSchema>;
+export type PaymentMethodType = z.infer<typeof PaymentMethodTypeSchema>;
 export type BillingAddress = z.infer<typeof BillingAddressSchema>;
 export type PaymentMethod = z.infer<typeof PaymentMethodSchema>;
 export type CreditCardDetails = z.infer<typeof CreditCardDetailsSchema>;
+export type Paypal = z.infer<typeof PaypalSchema>;
 
 // =============================================
 // VALIDATEURS
@@ -362,8 +368,6 @@ export const exampleUser: User = {
   email: 'user@example.com',
   password_hash: '$2a$10$N9qo8uLOickgx2ZMRZoMy.MrUQYt7YZz3zJZOZ5sZJ8J0l0Z5sZJ8',
   name: 'Jean Dupont',
-  phone: '+33123456789',
-  company: 'Entreprise XYZ',
   role: 'CLIENT',
   can_write: false,
   can_delete: false,
@@ -391,8 +395,6 @@ export const exampleCreateUser: CreateUser = {
   email: 'new.user@example.com',
   password: 'securePassword123!',
   name: 'Nouvel Utilisateur',
-  phone: '+33612345678',
-  company: 'Nouvelle Entreprise',
   role: 'CLIENT',
   can_write: false,
   can_delete: false,

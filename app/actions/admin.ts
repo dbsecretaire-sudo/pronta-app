@@ -6,25 +6,59 @@ import { z, ZodError } from 'zod';
 
 // Schémas de validation
 import {
-  CreateClientSchema, validateCreateClient,
-  CreateCallSchema, validateCreateCall,
-  CreateServiceSchema, validateCreateService,
-  CreateCalendarEventSchema, validateCreateCalendarEvent,
-  CreateInvoiceSchema, validateCreateInvoice,
-  CreateSubscriptionSchema, validateCreateSubscription,
-  CreateUserSchema, validateCreateUser
+  CreateClient, CreateClientSchema, validateCreateClient,
+  CreateCall, CreateCallSchema, validateCreateCall,
+  CreateService, CreateServiceSchema, validateCreateService,
+  CreateCalendarEvent, CreateCalendarEventSchema, validateCreateCalendarEvent,
+  CreateInvoice, CreateInvoiceSchema, validateCreateInvoice,
+  CreateSubscription, CreateSubscriptionSchema, validateCreateSubscription,
+  CreateUser, CreateUserSchema, validateCreateUser
 } from "@/src/lib/schemas";
+
+export type CreateResourceData =
+  | CreateClient
+  | CreateInvoice
+  | CreateUser
+  | CreateCall
+  | CreateService
+  | CreateCalendarEvent
+  | CreateSubscription
+  | Record<string, any>;
 
 export type FormState = {
   error?: string;
   success?: boolean;
+  data?: any;
 };
+
+export const getCreateSchema = async (resourceName: string) => {
+    switch (resourceName) {
+      case 'clients':
+        return CreateClientSchema;
+      case 'invoices':
+        return CreateInvoiceSchema;
+      case 'users':
+        return CreateUserSchema;
+      case 'calls':
+        return CreateCallSchema;
+      case 'services' :
+        return CreateServiceSchema;
+      case 'calendar' :
+        return CreateCalendarEventSchema;
+      case 'subscriptions' :
+        return CreateSubscriptionSchema
+      default:
+        throw new Error(`No schema defined for resource: ${resourceName}`);
+    }
+  };
+
 
 export async function createResource(
   resource: string,
   prevState: FormState,
   formData: FormData
 ): Promise<FormState> {
+
   try {
     const data = Object.fromEntries(formData.entries());
     // Validation selon la ressource
@@ -96,26 +130,50 @@ export async function createResource(
     } else if (resource === 'subscription') {
       validatedData = validateCreateSubscription(data);
     } else if (resource === 'users') {
-      validatedData = validateCreateUser(data);
+
+      const serviceIds = formData.getAll('service_ids[]');
+      const serviceIdsArray = serviceIds.map((id) => parseInt(id as string, 10));
+
+      const rawData = {
+          password: formData.get('password'),
+          email: formData.get('email'),
+          name: formData.get('name'),
+          role: formData.get('role'),
+          can_write: formData.get('can_write') !== null,
+          can_delete: formData.get('can_delete') !== null,
+          // Construis manuellement l'objet address
+          billing_address: {
+            street: formData.get('street'),
+            city: formData.get('city'),
+            postalCode: formData.get('postalCode'),
+            country: formData.get('country') || 'France',
+          },
+          payment_method:{
+            type: formData.get('type'),
+            details: {
+              card_last_four: formData.get('card_last_four'),
+              card_number: formData.get('card_number'),
+              card_brand: formData.get('card_brand'),
+              paypal_email: formData.get('paypal_email'),
+            }
+          },
+          service_ids: serviceIdsArray,
+        };
+
+      validatedData = validateCreateUser(rawData);
     } else {
       return { error: "Ressource non supportée" };
     }
     // Appel à ta fonction updateResource
-    await updateResource(resource, undefined, validatedData);
-
-    // Redirection après succès
-    redirect(`/admin/${resource}`);
-  } catch (error) {
-  if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
-    throw error; // Relance pour la redirection
+    const result = await updateResource(resource, undefined, validatedData);
+    if(result.success === true){
+      redirect(`/admin/${resource}`);
+    };
+    return result;
+  } catch (error: any) {
+    if (error?.digest?.includes('NEXT_REDIRECT')) {
+      throw error; // Re-lancez l'erreur de redirection pour qu'elle soit gérée par Next.js
+    }
+    return { error: error.message || "Une erreur est survenue" };
   }
-  console.error("Erreur complète dans createResource:", error);
-  if (error instanceof ZodError) {
-    return { error: error.issues[0].message };
-  } else if (error instanceof Error) {
-    return { error: error.message || "Échec de la création de la ressource" };
-  } else {
-    return { error: "Échec de la création de la ressource" };
-  }
-}
 }

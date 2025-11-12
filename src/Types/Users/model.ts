@@ -106,17 +106,17 @@ export class UserModel {
   async getAllUsers(): Promise<User[]> {
     let query = "SELECT * FROM users";
     const res = await pool.query(query);
-
+    return res.rows;
     // Pour chaque utilisateur, récupérer ses abonnements
-    const usersWithSubscriptions = await Promise.all(
-      res.rows.map(async (row) => {
-        const user = this.mapDbUserToUser(row);
-        const subscriptions = await this.getUserSubscriptions(user.id);
-        return { ...user, subscriptions };
-      })
-    );
+    // const usersWithSubscriptions = await Promise.all(
+    //   res.rows.map(async (row) => {
+    //     const user = this.mapDbUserToUser(row);
+    //     const subscriptions = await this.getUserSubscriptions(user.id);
+    //     return { ...user, subscriptions };
+    //   })
+    // );
 
-    return usersWithSubscriptions;
+    // return usersWithSubscriptions;
   }
 
   async getUserById(id: number): Promise<User> {

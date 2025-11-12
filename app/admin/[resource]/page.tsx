@@ -26,7 +26,6 @@ export default async function ResourcePage({ params }: ResourcePageProps) {
     fetchAllSubscriptions(),
     fetchInvoices(),
     fetchCalendar(),
-    // fetchAllUserServices(),
     fetchAllClients(),
     fetchAllCalls(), 
     fetchUsers(),
@@ -80,10 +79,6 @@ const invoicesWithItems = invoices.map(invoice => ({
       subscriptions: Object.fromEntries(
         subscriptions.map((sub) => [sub.id, sub])
       ),
-      // // Services utilisateurs (clé composite)
-      // userServices: Object.fromEntries(
-      //   userServices.map((us) => [`${us.user_id}-${us.service_id}`, us])
-      // ),
       // Factures
       invoices: Object.fromEntries(
         invoicesWithItems.map((invoice) => [invoice.id, invoice])

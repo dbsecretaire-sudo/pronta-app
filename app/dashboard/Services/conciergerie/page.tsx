@@ -2,11 +2,18 @@
 "use client";
 import { useSession } from "next-auth/react";
 import { CallStats, CallList, CallFilter } from "@/src/Components";
+import { CallFilter as CallFilterType } from "@/src/lib/schemas/calls";
 import { useCalls } from "@/src/Hook/useCalls";
+import { useState } from "react";
 
 export default function ConciergerieDashboard() {
   const { data: session } = useSession();
-  const { calls, stats, loading, filter, handleFilterChange } = useCalls(session?.user?.id);
+    const [filter, setFilter] = useState<CallFilterType>({
+      userId: 0,
+      byName: "",
+      byPhone: "",
+    });
+  const { calls, stats, loading } = useCalls(session?.user?.id);
 
   if (loading) {
     return (
@@ -24,7 +31,7 @@ export default function ConciergerieDashboard() {
         <h2 className="text-xl font-semibold mb-4">Appels récents</h2>
         <CallFilter
           userId={filter.userId}
-          onFilterChange={handleFilterChange}
+          onFilterChange={setFilter}
         />
         <CallList calls={calls} />
       </div>

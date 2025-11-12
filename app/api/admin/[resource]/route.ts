@@ -1,5 +1,14 @@
 import { NextResponse } from 'next/server';
 import pool from '@/src/lib/db';
+import bcrypt from 'bcryptjs';
+
+interface PostgreSQLError extends Error {
+  code: string;
+  detail: string;
+  severity?: string;
+  table?: string;
+  constraint?: string;
+}
 
 //app/api/admin/[resource]/route.ts
 export async function POST(
@@ -77,7 +86,41 @@ export async function POST(
       `;
       const result = await pool.query(query, values);
       return NextResponse.json(result.rows[0]);
-    } else {
+    } else if (resource === "users") {
+  // Vérifiez que le mot de passe est fourni
+  if (!data.password) {
+    return NextResponse.json(
+      { success: false, error: "Le mot de passe est obligatoire pour créer un utilisateur" },
+      { status: 400 }
+    );
+  }
+
+  // Hachez le mot de passe
+  const password_hash = await bcrypt.hash(data.password, 10);
+
+  // Construisez l'objet utilisateur sans le mot de passe en clair
+  const { password, ...rest } = data;
+  const userData = {
+    ...rest,
+    password_hash,
+    billing_address: data.billing_address ? JSON.stringify(data.billing_address) : null,
+    payment_method: data.payment_method ? JSON.stringify(data.payment_method) : null,
+  };
+
+  // Préparez la requête SQL
+  const fields = Object.keys(userData).join(', ');
+  const placeholders = Object.keys(userData).map((_, i) => `$${i + 1}`).join(', ');
+  const values = Object.values(userData);
+
+  // Exécutez la requête
+  const query = `
+    INSERT INTO users (${fields})
+    VALUES (${placeholders})
+    RETURNING *
+  `;
+  const result = await pool.query(query, values);
+  return NextResponse.json(result.rows[0]);
+} else {
       // Logique générique pour les autres ressources
       const fields = Object.keys(data).join(', ');
       const placeholders = Object.keys(data).map((_, i) => `$${i + 1}`).join(', ');
@@ -91,10 +134,11 @@ export async function POST(
       return NextResponse.json(result.rows[0]);
     }
   } catch (error) {
-    console.error("Erreur détaillée:", error);
-    return NextResponse.json(
-      { error: 'Failed to create', details: error instanceof Error ? error.message : String(error) },
-      { status: 500 }
+    const pgError = error as PostgreSQLError;
+    console.error(error);
+    return new Response(
+      JSON.stringify({ success: false, error: error instanceof Error ? pgError.detail : "Erreur Serveur" }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
     );
   }
 }

@@ -4,7 +4,7 @@ export interface Subscription {
   id: number;
   user_id?: number;
   service_id: number;
-  status: string;
+  status: "active" | "cancelled" | "expired" | "paid" | "overdue" | "pending";
   start_date: Date;
   end_date?: Date;
   next_payment_date?: Date | string | null;

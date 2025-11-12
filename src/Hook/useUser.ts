@@ -1,14 +1,32 @@
 // src/Hooks/useUser.ts
+'use client';
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { User } from "@/src/Types/Users";
+import { User } from "@/src/lib/schemas";
+import { fetchUsers, fetchUsersName, fetchUsersRole, getUserById } from "../lib/api";
 
-export function useUser() {
+export type UserNameRecord = Record<number, {id: number, name: string}>;
+
+export function useUser(userId?: number) {
   const { data: session } = useSession();
   const [userData, setUserData] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [ users, setUsers ] = useState<User[]>([]);
+  const [ usersRole, setUsersRole ] = useState<User[]>([]);
+  const [ usersName, setUsersName ] = useState<UserNameRecord>({});
+  const [ user, setUser ] = useState<User>();
 
+  if(userId){
+    useEffect(()=> {
+      const findUserById = async () => {
+        const getUser = await getUserById(userId);
+        setUser(getUser);
+      }
+      findUserById();
+    }, [])
+  }
+  
   // Fonction pour rafraîchir les données
   const mutate = async () => {
     if (!session?.user?.id) return;
@@ -30,7 +48,7 @@ export function useUser() {
           street: data.billing_address.street || '',
           city: data.billing_address.city || '',
           state: data.billing_address.state || '',
-          postal_code: data.billing_address.postal_code || 0,
+          postalCode: data.billing_address.postal_code || 0,
           country: data.billing_address.country || ''
         } : undefined,
         payment_method: data.payment_method ? {
@@ -41,10 +59,10 @@ export function useUser() {
             card_brand: data.payment_method.details?.card_brand || '',
             paypal_email: data.payment_method.details?.paypal_email || '',
           },
-          is_default: data.payment_method.is_default || false
+          // default: data.payment_method.is_default || false
         } : undefined,
-        phone: data.phone || '',
-        company: data.company || '',
+        // phone: data.phone || '',
+        // company: data.company || '',
         role: data.role || 'user',
         can_write: data.can_write || false,
         can_delete: data.can_delete || false,
@@ -71,5 +89,24 @@ export function useUser() {
     }
   }, [session?.user?.id]);
 
-  return { userData, loading, error, mutate };
+  useEffect(() => {
+    const fetch = async () => {
+      try {
+        const AllUsers = await fetchUsers();
+        const AllUsersName = await fetchUsersName();
+        const AllUsersRole = await fetchUsersRole();
+        setUsers(AllUsers);
+        setUsersName(AllUsersName);
+        setUsersRole(AllUsersRole);
+      } catch(error) {
+        console.error("Erreur lors de la récupération des users:", error);
+        setUsers([]);
+        setUsersName([]);
+        setUsersRole([]);
+      }
+    };
+    fetch();
+  }, [])
+
+  return { users, usersName, usersRole, userData, loading, error, mutate, user };
 }

@@ -1,4 +1,4 @@
-import { Service } from "@/src/Types/Services";
+import { Service } from "@/src/lib/schemas/services";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 

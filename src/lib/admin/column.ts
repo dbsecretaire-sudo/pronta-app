@@ -275,14 +275,6 @@ export const getUserColumns = (): ExtendedColumnDef<User>[] => [
         header: 'Nom',
         meta: { sortable: true, filterType: 'text',},
     }),
-    userColumnHelper.accessor('phone', {
-        header: 'Téléphone',
-        meta: { sortable: true, filterType: 'text', },
-    }),
-    userColumnHelper.accessor('company', {
-        header: 'Entreprise',
-        meta: { sortable: true, filterType: 'text', },
-    }),
     userColumnHelper.accessor('role', {
         header: 'Rôles',
         meta: { sortable: true, filterType: 'select',  type: 'typeBadge',
@@ -300,17 +292,13 @@ export const getUserColumns = (): ExtendedColumnDef<User>[] => [
           ],
         },
     }),
-    userColumnHelper.accessor('created_at', {
-        header: 'Créé le',
-        meta: { sortable: true,  filterType: 'date', type: 'date',},
-    }),
     userColumnHelper.accessor('billing_address', {
         header: 'Adresse de facturation',
-        meta: { sortable: false, filterType: 'text', },
+        meta: { sortable: true, filterType: 'text', },
     }),
     userColumnHelper.accessor('payment_method', {
         header: 'Moyen de paiement',
-        meta: { sortable: false, filterType: 'text', },
+        meta: { sortable: true, filterType: 'text', },
     }),
     userColumnHelper.accessor('can_write', {
         header: 'Peut écrire',

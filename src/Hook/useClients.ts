@@ -1,6 +1,7 @@
 // app/hooks/useClients.ts
+'use client';
 import { useState, useEffect } from 'react';
-import { Client } from '@/src/Types/Clients/index';
+import { Client } from '@/src/lib/schemas/clients';
 
 export const useClients = () => {
   const [clients, setClients] = useState<Client[]>([]);

@@ -1,42 +1,25 @@
 // src/hooks/useAccount.ts
+import { useState } from "react";
 import { useUser } from "@/src/Hook/useUser";
-import { useEffect, useState } from "react";
-import { Role, User } from "@/src/Types/Users";
-import { fetchUserSubscriptions } from "../lib/api";
+import { useSubscription } from "./useSubscriptions";
 import { useTab } from '@/src/context/TabContext';
+import { useAuth } from "../context/AuthContext";
+import { useServices } from "./useServices";
 
 export function useAccount() {
+  const { session, status } = useAuth();
   const { userData, loading, error, mutate } = useUser();
   const { activeTab, setActiveTab } = useTab();
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [subscriptions, setSubscriptions] = useState([]);
+  const [isUpdating, setIsUpdating] = useState(false); 
+  const { sO } = useServices(session.user.id, status);
+  const { subscriptionServices } = useSubscription(session.user.id, sO);
 
-
-  useEffect(() => {
-    if (userData?.id) {
-      const loadSubscriptions = async () => {
-        try {
-          const data = await fetchUserSubscriptions(userData.id);
-          setSubscriptions(data);
-        } catch (error) {
-          console.log("Erreur lors de la récupération des souscriptions: ", error);
-        }
-      };
-      loadSubscriptions();
-    }
-  }, [userData?.id]);
-
-  // Mise à jour du profil utilisateur (sans toucher aux abonnements)
-  const handleProfileUpdate = async (updatedData: {
-    email: string;
-    name: string;
-  }) => {
-    if(!userData?.id) {
-      console.error('User data is not available');
-      return { success: false, message: "Utilisateur non trouvé" };
-    }
+  // Fonction générique pour les mises à jour
+  const updateUser = async <T extends object>( updatedData: T, successMessage: string, errorMessage: string ) => {
+    if (!userData?.id) { return { success: false, message: "Utilisateur non trouvé" };    }
 
     setIsUpdating(true);
+
     try {
       const response = await fetch(`/api/user/${userData.id}`, {
         method: "PUT",
@@ -47,20 +30,28 @@ export function useAccount() {
       });
 
       if (!response.ok) {
-        throw new Error("Échec de la mise à jour du profil");
+        throw new Error(errorMessage);
       }
 
       await mutate();
-      return { success: true, message: "Profil mis à jour avec succès !" };
+      return { success: true, message: successMessage };
     } catch (error) {
-      console.error("Erreur lors de la mise à jour:", error);
-      return { success: false, message: "Erreur lors de la mise à jour du profil" };
+      console.error("Erreur:", error);
+      return { success: false, message: errorMessage };
     } finally {
       setIsUpdating(false);
     }
   };
 
-  // Mise à jour des informations de facturation (sans toucher aux abonnements)
+  // Mise à jour du profil
+  const handleProfileUpdate = async (updatedData: { email: string; name: string }) =>
+    updateUser(
+      updatedData,
+      "Profil mis à jour avec succès !",
+      "Échec de la mise à jour du profil"
+    );
+
+  // Mise à jour des informations de facturation
   const handleBillingUpdate = async (updatedData: {
     billing_address?: {
       street?: string;
@@ -79,35 +70,12 @@ export function useAccount() {
       };
       is_default?: boolean;
     };
-  }) => {
-    if (!userData?.id) {
-      console.error('User data is not available');
-      return { success: false, message: "Utilisateur non trouvé" };
-    }
-
-    setIsUpdating(true);
-    try {
-      const response = await fetch(`/api/user/${userData.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedData),
-      });
-
-      if (!response.ok) {
-        throw new Error("Échec de la mise à jour des informations de facturation");
-      }
-
-      await mutate();
-      return { success: true, message: "Informations de facturation mises à jour !" };
-    } catch (error) {
-      console.error("Erreur:", error);
-      return { success: false, message: "Erreur lors de la mise à jour" };
-    } finally {
-      setIsUpdating(false);
-    }
-  };
+  }) =>
+    updateUser(
+      updatedData,
+      "Informations de facturation mises à jour !",
+      "Échec de la mise à jour des informations de facturation"
+    );
 
   return {
     userData,
@@ -118,6 +86,6 @@ export function useAccount() {
     isUpdating,
     handleProfileUpdate,
     handleBillingUpdate,
-    subscriptions,
+    subscriptionServices,
   };
 }

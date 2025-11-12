@@ -1,6 +1,7 @@
 // src/Hook/useServices.ts
+'use client';
 import { useState, useEffect } from 'react';
-import { Service } from '@/src/Types/Services';
+import { Service } from '@/src/lib/schemas/services';
 import { User } from '../Types/Users';
 import {
   fetchUser,

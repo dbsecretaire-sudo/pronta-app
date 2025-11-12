@@ -27,7 +27,7 @@ export const CalendarEventSchema = z.object({
   start_time: DateTimeSchema,
   end_time: DateTimeSchema.optional(),
   description: z.string().max(1000).optional(),
-  created_at: DateTimeSchema,
+  created_at: DateTimeSchema.optional(),
   updated_at: DateTimeSchema.optional()
 });
 

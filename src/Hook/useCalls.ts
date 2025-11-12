@@ -1,8 +1,10 @@
 // app/hooks/useCalls.ts
-import { useState, useEffect } from 'react';
-import { CallFilter as CallFilterType } from "@/src/Types/Calls/index";
-import { Call } from "@/src/lib/schemas/calls";
+'use client';
+import { useState, useEffect, useCallback } from 'react';
+import { Call,  CallFilter as CallFilterType } from "@/src/lib/schemas/calls";
+
 import { fetchCalendarEvents } from '../lib/api';
+import { useCalendar } from './useCalendar';
 
 const calculateCallStats = (calls: Call[]) => {
   // Convertir les dates en objets Date si nécessaire
@@ -41,7 +43,8 @@ const calculateCallStats = (calls: Call[]) => {
   };
 };
 
-export const useCalls = (userId: string | undefined) => {
+export const useCalls = (userId: string | undefined, initialFilter?:CallFilterType) => {
+  const [filter, setFilter] = useState<Omit<CallFilterType, 'userId'>>(initialFilter || {});
   const [calls, setCalls] = useState<Call[]>([]);
   const [stats, setStats] = useState({
     totalToday: 0,
@@ -50,13 +53,8 @@ export const useCalls = (userId: string | undefined) => {
     answeredToday: 0,
     missedRate: 0
   });
-  const [filter, setFilter] = useState<CallFilterType>({
-    userId: userId ? Number(userId) : 0,
-    byName: "",
-    byPhone: "",
-  });
   const [loading, setLoading] = useState(true);
-  const [calendarEvents, setCalendarEvents] = useState([]);
+  const { calendarEvents } = useCalendar(userId)
 
   useEffect(() => {
     const loadData = async () => {
@@ -68,11 +66,13 @@ export const useCalls = (userId: string | undefined) => {
       try {
         setLoading(true);
 
+        // Construire l'URL avec les paramètres de filtre
+        const params = new URLSearchParams();
+        if (filter?.byName) params.append('byName', filter.byName);
+        if (filter?.byPhone) params.append('byPhone', filter.byPhone);
+
         // Charger les appels et le calendrier en parallèle
-        const [callsResponse, calendarData] = await Promise.all([
-          fetch(`/api/calls?userId=${userId}&byName=${filter.byName}&byPhone=${filter.byPhone}`),
-          fetchCalendarEvents(Number(userId))
-        ]);
+        const [callsResponse] = await Promise.all([fetch(`/api/calls?userId=${userId}&${params.toString()}`)]);
 
         if (!callsResponse.ok) {
           throw new Error("Erreur lors de la récupération des appels");
@@ -80,10 +80,9 @@ export const useCalls = (userId: string | undefined) => {
 
         const callsData: Call[] = await callsResponse.json();
 
-        // Mettre à jour les appels et calculer les statistiques
         setCalls(callsData);
         setStats(calculateCallStats(callsData));
-        setCalendarEvents(calendarData);
+
       } catch (error) {
         console.error("Erreur lors du chargement des données:", error);
       } finally {
@@ -92,11 +91,11 @@ export const useCalls = (userId: string | undefined) => {
     };
 
     loadData();
-  }, [userId, filter.byName, filter.byPhone]); // Note: filter.userId n'est pas inclus car il dépend de userId
+  }, [userId, filter?.byName, filter?.byPhone]); // Note: filter.userId n'est pas inclus car il dépend de userId
 
-  const handleFilterChange = (newFilters: Partial<CallFilterType>) => {
+  const handleFilterChange = useCallback((newFilters: Partial<CallFilterType>) => {
     setFilter(prev => ({ ...prev, ...newFilters }));
-  };
+  }, []);
 
   return { calls, stats, calendarEvents, loading, filter, handleFilterChange };
 };

@@ -2,22 +2,14 @@
 "use client";
 import Link from 'next/link';
 import { useAccount } from '@/src/Hook/useAccount';
-import { Subscription, SubscriptionWithService } from '@/src/Types/Subscription';
+import { Subscription, SubscriptionWithService } from '@/src/lib/schemas/subscription';
 import { useTab } from '@/src/context/TabContext';
 import { useRouter } from 'next/navigation';
-import { Service } from '@/src/Types/Services';
-import { PaymentMethodType } from '@/src/Types/Users';
+import { Service } from '@/src/lib/schemas/services';
+import { PaymentMethod } from '@/src/lib/schemas/users';
 
-interface AccountProps {
-  sN: Service[];
-  sO: Service[];
-}
-
-export const AccountSummary = ({
-  sN,
-  sO,
-}: AccountProps) => {
-  const { userData, subscriptions, loading, error } = useAccount();
+export const AccountSummary = ({sN, sO}: {sN: Service[], sO: Service[]}) => {
+  const { userData, subscriptionServices, loading, error } = useAccount();
   const { setActiveTab } = useTab();
   const router = useRouter();
 
@@ -48,29 +40,21 @@ export const AccountSummary = ({
     // Vérifie que `type` est défini et est une clé valide
     if (!type) return "Moyen de paiement inconnu";
 
-    // Déclare un type pour les clés possibles
-
-
     // Vérifie que `type` est une clé valide
-    const paymentMethods: Record<PaymentMethodType, string> = {
-      credit_card: `•••• ${details?.card_last_four || ''} (${details?.card_brand || 'Carte'})`,
-      paypal: `PayPal (${details?.paypal_email || 'email manquant'})`,
+    const paymentMethods: Record<PaymentMethod["type"], string> = {
+      credit_card: `•••• ${(details as PaymentMethod["details"])?.card_last_four || ''} (${(details as PaymentMethod["details"])?.brand || 'Carte'})`,
+      paypal: `PayPal (${(details as PaymentMethod["details"])?.paypal_email || 'email manquant'})`,
       bank_transfer: "Virement bancaire",
+      other: "Autre",
     };
 
     // Utilise un type guard pour vérifier que `type` est une clé valide
     if (type in paymentMethods) {
-      return paymentMethods[type as PaymentMethodType];
+      return paymentMethods[type as PaymentMethod["type"]];
     }
 
     return "Moyen de paiement inconnu";
   };
-
-  // Trouve les abonnements actifs
-  const activeSubscriptions: SubscriptionWithService[] = subscriptions?.filter(
-    (sub: SubscriptionWithService) =>
-      sO.some((service: { id: number; }) => service.id === sub.service_id)
-  ) || [];
 
   if (loading) {
     return (
@@ -119,7 +103,7 @@ export const AccountSummary = ({
         <div>
           <p className="text-gray-500 text-sm">Abonnements actifs</p>
           <p className="font-medium">
-            {activeSubscriptions.length} abonnement{activeSubscriptions.length > 1 ? 's' : ''}
+            {subscriptionServices.length} abonnement{subscriptionServices.length > 1 ? 's' : ''}
           </p>
         </div>
 
@@ -127,9 +111,9 @@ export const AccountSummary = ({
         <div>
           <p className="text-gray-500 text-sm">Prochain paiement</p>
           <p className="font-medium">
-            {activeSubscriptions.length > 0
+            {subscriptionServices.length > 0
               ? formatDate(
-                activeSubscriptions
+                subscriptionServices
                   .map(sub => sub.next_payment_date)
                   .filter((date): date is string | Date => date !== null && date !== undefined) // Filtre les null/undefined
                   .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())[0]
@@ -146,11 +130,11 @@ export const AccountSummary = ({
       </div>
 
       {/* Liste des abonnements actifs */}
-      {activeSubscriptions.length > 0 && (
+      {subscriptionServices.length > 0 && (
         <div className="mt-6">
           <h3 className="text-sm font-medium text-gray-700 mb-3">Mes abonnements</h3>
           <div className="space-y-3">
-            {activeSubscriptions.map((subscription) => (
+            {subscriptionServices.map((subscription) => (
               <div key={subscription.id} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
                 <div className="flex justify-between items-start">
                   <div>

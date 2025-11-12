@@ -3,6 +3,8 @@
 
 import { useState, useEffect } from 'react';
 import { Invoice, InvoiceFilter, InvoiceStatus } from '@/src/Types/Invoices';
+import { fetchInvoiceItems } from '../lib/api';
+import { InvoiceItem, InvoiceWithItems } from '../lib/schemas/invoices';
 
 export const useInvoices = (userId: string | undefined) => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -16,6 +18,8 @@ export const useInvoices = (userId: string | undefined) => {
   const [filter, setFilter] = useState<InvoiceFilter>({
     userId: userId ? parseInt(userId, 10) : undefined,
   });
+  const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([])
+  const [invoicesWithItems, setInvoicesWithItems] = useState<InvoiceWithItems[]>([])
 
   useEffect(() => {
     const loadInvoices = async () => {
@@ -79,5 +83,58 @@ export const useInvoices = (userId: string | undefined) => {
     setFilter({ ...filter, ...newFilters });
   };
 
-  return { invoices, stats, loading, error, handleFilterChange };
+  useEffect(() => {
+    const fetchInvoiceItem = async () => {
+      try {
+        const allItems = await fetchInvoiceItems();
+
+        const itemsArray = Array.isArray(invoiceItems) ? invoiceItems : [];
+        const itemsByInvoiceId = itemsArray.reduce((acc, item) => {
+          if (!acc[item.invoice_id]) {
+            acc[item.invoice_id] = [];
+          }
+          acc[item.invoice_id].push(item);
+          return acc;
+        }, {} as Record<number, any[]>);
+
+        // 2. Associe les items à chaque facture
+        const invoicesWithI = invoices.map(invoice => ({
+          ...invoice,
+          items: itemsByInvoiceId[invoice.id] || [], // Items de cette facture
+        }));
+
+        setInvoicesWithItems(invoicesWithI);
+        setInvoiceItems(allItems);
+      } catch (error) {
+        console.error('Erreur lors de la récupération des lignes de factures', error)
+      }
+      
+    }
+
+    fetchInvoiceItem();
+  }, [])
+
+  return { invoices, invoiceItems, invoicesWithItems, stats, loading, error, handleFilterChange };
+};
+
+export const useFetchInvoices = () => {
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchInvoices = async () => {
+      try {
+        const res = await fetch('/api/invoices');
+        const data = await res.json();
+        setInvoices(data);
+      } catch (error) {
+        console.error("Erreur:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchInvoices();
+  }, []);
+
+  return { invoices, loading };
 };

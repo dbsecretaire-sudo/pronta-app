@@ -14,6 +14,7 @@ import {
   ColumnFiltersState,
 } from '@tanstack/react-table';
 import { ExtendedColumnDef } from '@/src/Types/table';
+import { useSession } from 'next-auth/react';
 
 interface TypeBadgeInfo {
   label: string;
@@ -74,6 +75,7 @@ export function DataTableUi<TData extends DataWithId>({
   onDelete,
   dataMaps = {},
 }: DataTableProps<TData>) {
+  const { data: session, status } = useSession(); 
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 

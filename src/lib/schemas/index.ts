@@ -5,3 +5,10 @@ export { CreateCalendarEventSchema, validateCreateCalendarEvent, } from "./calen
 export { CreateInvoiceSchema, validateCreateInvoice, } from "./invoices";
 export { CreateSubscriptionSchema, validateCreateSubscription, } from "./subscription";
 export { CreateUserSchema, validateCreateUser } from "./users";
+export type { CreateClient, Client } from './clients';
+export type { CreateCall, Call } from './calls';
+export type { CreateService, Service } from './services';
+export type { CreateCalendarEvent, CalendarEvent } from './calendar';
+export type { CreateInvoice, Invoice, CreateInvoiceItem, InvoiceItem } from "./invoices";
+export type { CreateSubscription, Subscription } from './subscription';
+export type { CreateUser, User } from './users';

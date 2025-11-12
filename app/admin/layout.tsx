@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import { getRoleByUserId } from "@/src/lib/api";
+import { AuthProvider } from "@/src/context/AuthContext";
 
 export default async function AdminLayout({
   children,
@@ -21,8 +22,16 @@ export default async function AdminLayout({
   }
 
   return (
+    
     <div className="flex h-screen bg-gray-50">
-      <main className="flex-1 p-8">{children}</main>
+      <main className="flex-1 p-8">
+        <AuthProvider initialSession={session}>
+          {children}
+        </AuthProvider>
+      </main>
     </div>
+
+    
+    
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { SubscriptionWithService } from "@/src/Types/Subscription";
+import { SubscriptionWithService } from "@/src/lib/schemas/subscription";
 import { getStatusLabel, getStatusStyle } from "./utils";
 
 export const SubscriptionInfo = ({ subscriptions }: { subscriptions: SubscriptionWithService }) => {

@@ -1,4 +1,5 @@
 import { resourcesConfig } from './resources';
+import { FormState } from '@/app/actions/admin';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -9,7 +10,7 @@ export async function fetchResourceItem(resource: string, id: number) {
   return response.json();
 }
 
-export async function updateResource(resource: string, id: number | undefined, data: any) {
+export async function updateResource(resource: string, id: number | undefined, data: any): Promise<FormState> {
   let url: string;
   let method: 'POST' | 'PUT';
 
@@ -22,25 +23,17 @@ export async function updateResource(resource: string, id: number | undefined, d
   }
 
   try {
-    const response = await fetch(url, {
-      method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(id ? { id, ...data } : data),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      return { success: false, ...errorData };
+    const response = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(id ? { id, ...data } : data), });
+    if(!response.ok){
+        const errorData = await response.json();
+        return { success: false, error: errorData.error || response.statusText };
+    } else {
+      return { success: true, data: {} };
     }
 
-    return { success: true, data: await response.json() };
-
   } catch (error: any) {
-    return {
-      success: false,
-      error: 'network_error',
-      message: error.message || 'Erreur réseau',
-    };
+    console.error("Erreur serveur:", error); 
+    return { success: false, error: error.message };
   }
 }
 
@@ -81,6 +74,7 @@ export async function fetchResource(resource: string) {
 }
 
 export async function createResource(resource: string, prevState: any, formData: FormData) {
+  console.log('Hello createResource from src/lib/admin/api.ts (S1)');
   const data = Object.fromEntries(formData.entries());
   const response = await fetch(`/api/admin/${resource}`, {
     method: 'POST',
