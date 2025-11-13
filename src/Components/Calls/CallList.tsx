@@ -13,7 +13,10 @@ interface CallListProps {
   onCallClick?: (phoneNumber: string) => void;
 }
 
-export function CallList({ calls, onCallClick }: CallListProps) {
+export function CallList({ 
+  calls, 
+  // onCallClick 
+}: CallListProps) {
   return (
     <div className="bg-white rounded-lg shadow">
       <table className="min-w-full divide-y divide-gray-200">
@@ -58,7 +61,7 @@ export function CallList({ calls, onCallClick }: CallListProps) {
                 </span>
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                {onCallClick && (
+                {/* {onCallClick && (
                   <button
                     onClick={() => onCallClick(call.phone!)}
                     className="text-blue-600 hover:text-blue-900"
@@ -66,7 +69,7 @@ export function CallList({ calls, onCallClick }: CallListProps) {
                   >
                     <PhoneIcon className="h-5 w-5" />
                   </button>
-                )}
+                )} */}
               </td>
             </tr>
           ))}

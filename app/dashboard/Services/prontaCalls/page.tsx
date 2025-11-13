@@ -8,13 +8,8 @@ import { useState } from "react";
 
 export default function ProntaCallsDashboard() {
   const { data: session } = useSession();
-  const [filter, setFilter] = useState<CallFilterType>({
-      userId: 0,
-      byName: "",
-      byPhone: "",
-    });
-  const { calls, stats, calendarEvents, loading} = useCalls(session?.user?.id);
-  
+  const { calls, stats, calendarEvents, loading, handleFilterChange } = useCalls(session?.user?.id);
+
   const tabs = [
     {
       id: "calls",
@@ -22,12 +17,12 @@ export default function ProntaCallsDashboard() {
       content: (
         <div className="bg-white p-6 rounded-lg shadow">
           <CallFilter
-            userId={filter.userId}
-            onFilterChange={setFilter}
-            />
+            userId={Number(session?.user.id)}
+            onFilterChange={handleFilterChange}
+          />
           <CallList calls={calls} />
         </div>
-      )
+      ),
     },
     {
       id: "calendar",
@@ -40,20 +35,12 @@ export default function ProntaCallsDashboard() {
     }
   ];
 
-  if (loading) {
-    return (
-      <div className="p-8 max-w-7xl mx-auto">
-        <p>Chargement des données...</p>
-      </div>
-    );
-  }
+   if (loading) return <div className="p-8 max-w-7xl mx-auto">Chargement...</div>;
 
   return (
     <div className="p-8 max-w-7xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">Pronta Calls - Tableau de bord</h1>
-
       <CallStats {...stats} />
-
       <div className="mt-8">
         <Tabs tabs={tabs} defaultTab="calls" />
       </div>

@@ -9,23 +9,23 @@ import { useSession } from "next-auth/react";
 
 export default function Calls() {
   const { data: session, status } = useSession();
-  const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<CallFilterType>({
-    userId: 0,
-    byName: "",
-    byPhone: "",
-  });
+  // const [loading, setLoading] = useState(true);
+  // const [filter, setFilter] = useState<CallFilterType>({
+  //   userId: 0,
+  //   byName: "",
+  //   byPhone: "",
+  // });
   const [isCallModalOpen, setIsCallModalOpen] = useState(false);
-  const { calls } = useCalls(session?.user.id, filter);
+  const { calls, loading, filter, handleFilterChange } = useCalls(session?.user?.id);
 
-  const initiateZoiperCall = (phoneNumber: string) => {
-    if (window.ZoiperAPI) {
-      window.ZoiperAPI.call(phoneNumber);
-    } else {
-      console.warn("Zoiper API non disponible, utilisation du fallback tel:");
-      window.location.href = `tel:${phoneNumber}`;
-    }
-  };
+  // const initiateZoiperCall = (phoneNumber: string) => {
+  //   if (window.ZoiperAPI) {
+  //     window.ZoiperAPI.call(phoneNumber);
+  //   } else {
+  //     console.warn("Zoiper API non disponible, utilisation du fallback tel:");
+  //     window.location.href = `tel:${phoneNumber}`;
+  //   }
+  // };
 
   return (
     <div className="p-6">
@@ -43,8 +43,8 @@ export default function Calls() {
 
       <div className="bg-white rounded-lg shadow p-6 mb-6">
         <CallFilter
-          onFilterChange={setFilter}
-          userId={filter.userId}
+          onFilterChange={handleFilterChange}
+          userId={Number(session?.user?.id)}
         />
       </div>
 
@@ -55,7 +55,7 @@ export default function Calls() {
       ) : calls.length > 0 ? (
         <CallList
           calls={calls}
-          onCallClick={initiateZoiperCall}
+          // onCallClick={initiateZoiperCall}
         />
       ) : (
         <div className="text-center py-8 bg-white rounded-lg shadow">
@@ -66,7 +66,7 @@ export default function Calls() {
       <CallModal
         isOpen={isCallModalOpen}
         onClose={() => setIsCallModalOpen(false)}
-        onCall={initiateZoiperCall}
+        // onCall={initiateZoiperCall}
       />
     </div>
   );

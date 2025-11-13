@@ -10,8 +10,10 @@ export default function CallFilter({ onFilterChange, userId }: CallFilterProps) 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Incluez userId dans les filtres transmis
+      console.log("Submit triggered!", { userId, byName, byPhone }); // Debug
+
     onFilterChange({
-      userId,          // Ajoutez userId
+      // userId,         
       byName,
       byPhone,
     });
@@ -33,7 +35,7 @@ export default function CallFilter({ onFilterChange, userId }: CallFilterProps) 
         onChange={(e) => setByPhone(e.target.value)}
         className="p-2 border rounded"
       />
-      <button type="submit" className="bg-blue-500 text-white p-2 rounded">
+      <button type="submit" className="bg-blue-500 text-white p-2 rounded cursor-pointer">
         Filtrer
       </button>
     </form>

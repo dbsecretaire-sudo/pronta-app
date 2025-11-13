@@ -43,8 +43,8 @@ const calculateCallStats = (calls: Call[]) => {
   };
 };
 
-export const useCalls = (userId: string | undefined, initialFilter?:CallFilterType) => {
-  const [filter, setFilter] = useState<Omit<CallFilterType, 'userId'>>(initialFilter || {});
+export const useCalls = (userId: string | undefined, initialFilter: Omit<CallFilterType, 'userId'> = {}) => {
+  const [filter, setFilter] = useState<Omit<CallFilterType, 'userId'>>(initialFilter);
   const [calls, setCalls] = useState<Call[]>([]);
   const [stats, setStats] = useState({
     totalToday: 0,
@@ -57,41 +57,31 @@ export const useCalls = (userId: string | undefined, initialFilter?:CallFilterTy
   const { calendarEvents } = useCalendar(userId)
 
   useEffect(() => {
-    const loadData = async () => {
-      if (!userId) {
-        setLoading(false);
-        return;
-      }
+  const loadData = async () => {
+    if (!userId) {
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (filter.byName) params.append('byName', filter.byName);
+      if (filter.byPhone) params.append('byPhone', filter.byPhone);
 
-      try {
-        setLoading(true);
+      const response = await fetch(`/api/calls?userId=${userId}&${params.toString()}`);
+      if (!response.ok) throw new Error("Erreur lors de la récupération des appels");
+      const callsData: Call[] = await response.json();
+      setCalls(callsData);
+      setStats(calculateCallStats(callsData));
+    } catch (error) {
+      console.error("Erreur:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        // Construire l'URL avec les paramètres de filtre
-        const params = new URLSearchParams();
-        if (filter?.byName) params.append('byName', filter.byName);
-        if (filter?.byPhone) params.append('byPhone', filter.byPhone);
-
-        // Charger les appels et le calendrier en parallèle
-        const [callsResponse] = await Promise.all([fetch(`/api/calls?userId=${userId}&${params.toString()}`)]);
-
-        if (!callsResponse.ok) {
-          throw new Error("Erreur lors de la récupération des appels");
-        }
-
-        const callsData: Call[] = await callsResponse.json();
-
-        setCalls(callsData);
-        setStats(calculateCallStats(callsData));
-
-      } catch (error) {
-        console.error("Erreur lors du chargement des données:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadData();
-  }, [userId, filter?.byName, filter?.byPhone]); // Note: filter.userId n'est pas inclus car il dépend de userId
+  loadData();
+}, [userId, filter.byName, filter.byPhone]);
 
   const handleFilterChange = useCallback((newFilters: Partial<CallFilterType>) => {
     setFilter(prev => ({ ...prev, ...newFilters }));

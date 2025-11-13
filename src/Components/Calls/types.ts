@@ -1,8 +1,8 @@
 export type { Call } from "@/src/Types/Calls/index";
-import { CallFilter } from "@/src/Types/Calls/index";
+import { CallFilter } from "@/src/lib/schemas/calls";
 
 export interface CallFilterProps {
-  onFilterChange: (filters: CallFilter) => void;  // Utilise CallFilter complet
+  onFilterChange: (filters: Omit<CallFilter, 'userId'>) => void;
   userId: number;
 }
 

@@ -7,10 +7,14 @@ import { Button } from "@/src/Components";
 interface CallModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onCall: (phoneNumber: string) => void;
+  // onCall: (phoneNumber: string) => void;
 }
 
-export function CallModal({ isOpen, onClose, onCall }: CallModalProps) {
+export function CallModal({ 
+  isOpen, 
+  onClose, 
+  // onCall 
+}: CallModalProps) {
   const [phoneNumber, setPhoneNumber] = useState("");
 
   if (!isOpen) return null;
@@ -18,7 +22,7 @@ export function CallModal({ isOpen, onClose, onCall }: CallModalProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (phoneNumber) {
-      onCall(phoneNumber);
+      // onCall(phoneNumber);
       onClose();
     }
   };

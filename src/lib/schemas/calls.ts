@@ -114,9 +114,9 @@ export const CallFilterSchema = z.object({
   userId: IdSchema,
   byName: z.string().min(1).optional(),
   byPhone: z.string().min(1).optional(),
-  startDate: DateTimeSchema.optional(),
-  endDate: DateTimeSchema.optional(),
-  type: CallTypeSchema.optional()
+  // startDate: DateTimeSchema.optional(),
+  // endDate: DateTimeSchema.optional(),
+  // type: CallTypeSchema.optional()
 });
 
 // =============================================
@@ -325,20 +325,20 @@ export const generateCallFilterQuery = (filter: CallFilter): { query: string, pa
     params.push(`%${filter.byPhone}%`);
   }
 
-  if (filter.startDate) {
-    query += ` AND date >= $${params.length + 1}`;
-    params.push(formatDateTimeForDB(filter.startDate));
-  }
+  // if (filter.startDate) {
+  //   query += ` AND date >= $${params.length + 1}`;
+  //   params.push(formatDateTimeForDB(filter.startDate));
+  // }
 
-  if (filter.endDate) {
-    query += ` AND date <= $${params.length + 1}`;
-    params.push(formatDateTimeForDB(filter.endDate));
-  }
+  // if (filter.endDate) {
+  //   query += ` AND date <= $${params.length + 1}`;
+  //   params.push(formatDateTimeForDB(filter.endDate));
+  // }
 
-  if (filter.type) {
-    query += ` AND type = $${params.length + 1}`;
-    params.push(filter.type);
-  }
+  // if (filter.type) {
+  //   query += ` AND type = $${params.length + 1}`;
+  //   params.push(filter.type);
+  // }
 
   query += ' ORDER BY date DESC';
 
@@ -401,7 +401,7 @@ export const exampleCallFilter: CallFilter = {
   userId: 1,
   byName: "Client",
   byPhone: "33123",
-  startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // -7 jours
-  endDate: new Date(),
-  type: "incoming"
+  // startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // -7 jours
+  // endDate: new Date(),
+  // type: "incoming"
 };
