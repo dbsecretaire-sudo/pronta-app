@@ -13,7 +13,7 @@ export default function CallFilter({ onFilterChange, userId }: CallFilterProps) 
       console.log("Submit triggered!", { userId, byName, byPhone }); // Debug
 
     onFilterChange({
-      // userId,         
+      userId,         
       byName,
       byPhone,
     });
