@@ -10,21 +10,22 @@ import { createService } from "@/src/lib/api";
 import { useSubscription } from "@/src/Hook/useSubscriptions";
 
 export default function DashboardHome() {
+    const { data: session, status } = useSession();
   const router = useRouter();
-  const { data: session, status } = useSession();
   const { s, sO, sN, loading, handleSubscribe, handleDeactivate, handleReactivate } = useServices(session?.user?.id, status);
   const { subscriptionServices } = useSubscription(session?.user.id, sO);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Redirection si non authentifié
+    // Redirection si non authentifié
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push('/login');
     }
   }, [status, router]);
 
-  if (status === "loading" || loading) {
+  // Affichage d'un loader pendant le chargement
+  if (status === "loading") {
     return <div className="p-8">Chargement...</div>;
   }
 
