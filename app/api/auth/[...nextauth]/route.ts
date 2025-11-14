@@ -4,6 +4,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import pool from "@/src/lib/db";
 import { compare } from "bcryptjs";
 import { CustomUser} from "@/src/Components";
+const DOMAIN = process.env.DOMAIN;
 
 export const authOptions: import("next-auth").NextAuthOptions = {
   providers: [
@@ -77,7 +78,7 @@ export const authOptions: import("next-auth").NextAuthOptions = {
         sameSite: "lax",
         path: "/",
         secure: process.env.NODE_ENV === "production", // ✅ Doit être true en production
-        domain: process.env.NODE_ENV === "production" ? ".pronta.corsica" : undefined,
+        domain: process.env.NODE_ENV === "production" ? `${DOMAIN}` : undefined,
       },
     },
   },

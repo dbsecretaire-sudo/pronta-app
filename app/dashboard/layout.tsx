@@ -1,13 +1,15 @@
-// src/app/dashboard/layout.tsx
 "use client";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useServices } from '@/src/Hook/useServices';
 import { NavBar } from "@/src/Components";
 import { TabProvider } from "@/src/context/TabContext";
+import { useEffect } from "react";
+import Cookies from "js-cookie";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const isInService = pathname.includes('/dashboard/Services/');
   const { data: session, status } = useSession();
   const { sO, loading: servicesLoading } = useServices(
@@ -15,12 +17,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     status
   );
 
-  const userServices = sO
-    .map(service => ({
-      name: service.name,
-      path: service.route || `/dashboard/services/${service.id}`,
-      icon: service.icon || "🔧"
-    }));
+  // Vérifier le cookie next-auth.session-token
+  useEffect(() => {
+    const sessionToken = Cookies.get('next-auth.session-token');
+    if (!sessionToken && status !== "loading") {
+      router.push('/login');
+    }
+  }, [status, router]);
+
+  const userServices = sO.map(service => ({
+    name: service.name,
+    path: service.route || `/dashboard/services/${service.id}`,
+    icon: service.icon || "🔧"
+  }));
 
   if (status === "loading" || servicesLoading) {
     return (
@@ -47,6 +56,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <TabProvider>
         {children}
       </TabProvider>
-    </NavBar>    
+    </NavBar>
   );
 }

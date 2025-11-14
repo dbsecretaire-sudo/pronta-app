@@ -1,4 +1,5 @@
-import { Subscription, SubscriptionWithService } from "@/src/Types/Subscription";
+import { SubscriptionWithService } from "@/src/Types/Subscription";
+import { Subscription } from "../schemas";
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export const updateUserSubscription = async (
@@ -44,19 +45,19 @@ export async function getSubscriptionByService(userId: number, service_id: numbe
 export async function createSubscription(subscriptionData: {
   user_id: number;
   service_id: number;
-  start_date: Date;
-  end_date: Date;
-  next_payment_date: Date;
-  status: string;
+  start_date: string | Date | null | undefined;
+  end_date: string | Date | null | undefined;
+  next_payment_date: string | Date | null | undefined;
+  status: string | Date | null | undefined;
 }): Promise<void> {
   const response = await fetch(`/api/subscription`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       ...subscriptionData,
-      start_date: subscriptionData.start_date.toISOString(),
-      end_date: subscriptionData.end_date.toISOString(),
-      next_payment_date: subscriptionData.next_payment_date.toISOString(),
+      start_date: subscriptionData?.start_date?.toString(),
+      end_date: subscriptionData?.end_date?.toString(),
+      next_payment_date: subscriptionData?.next_payment_date?.toString(),
     }),
   });
   if (!response.ok) throw new Error("Failed to create subscription");

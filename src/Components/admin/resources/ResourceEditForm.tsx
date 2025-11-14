@@ -6,8 +6,8 @@ import { useRouter } from 'next/navigation';
 import { updateResource, getResourceById, createResource } from '@/src/lib/admin/api';
 import { useServices } from '@/src/Hook/useServices';
 import { useSession } from 'next-auth/react';
-import { User } from '@/src/lib/schemas/users';
-import { fetchAllClients, fetchUsers } from '@/src/lib/api';
+import { User, UserWithSubscriptions } from '@/src/lib/schemas/users';
+import { createSubscription, fetchAllClients, fetchUsers, getSubscriptionByService, updateUserSubscription } from '@/src/lib/api';
 import { TrashIcon } from '@heroicons/react/16/solid';
 import { Invoice, CreateInvoice, InvoiceItem, CreateInvoiceSchema } from '@/src/lib/schemas/invoices';
 import { Client, CreateClient, ClientFormData, Address, CreateClientSchema } from "@/src/lib/schemas/clients";
@@ -339,17 +339,52 @@ const handleSubmit = async (e: React.FormEvent) => {
         items: formData.items || [],
       };
     }
-    // Utilisateurs
-    else if (resourceName === 'users') {
+      // Utilisateurs
+    if (resourceName === 'users') {
+      // Récupère les services cochés
+      const selectedServiceIds = Array.from((e.currentTarget as HTMLFormElement).elements)
+        .filter((el) => (el as HTMLInputElement).name === 'service_ids' && (el as HTMLInputElement).checked)
+        .map((el) => parseInt((el as HTMLInputElement).value, 10));
+
+      // Pour chaque service coché, vérifie s'il existe déjà une subscription
+      const updatedSubscriptions = await Promise.all(
+        selectedServiceIds.map(async (serviceId) => {
+          const existingSubscription = await getSubscriptionByService(formData.id, serviceId);
+          if (existingSubscription) {
+            // Met à jour la subscription existante
+            return await updateUserSubscription(existingSubscription.id, {
+              user_id: formData.id,
+              service_id: serviceId,
+              status: formData.user_subscriptions?.find((sub: { service_id: number; }) => sub.service_id === serviceId)?.status || 'active',
+              start_date: formData.user_subscriptions?.find((sub: { service_id: number; }) => sub.service_id === serviceId)?.start_date || new Date().toISOString().split('T')[0],
+              end_date: formData.user_subscriptions?.find((sub: { service_id: number; }) => sub.service_id === serviceId)?.end_date || '2025-12-31',
+              next_payment_date: formData.user_subscriptions?.find((sub: { service_id: number; }) => sub.service_id === serviceId)?.next_payment_date || '2025-11-01',
+            });
+          } else {
+            // Crée une nouvelle subscription
+            return await createSubscription({
+              user_id: formData.id,
+              service_id: serviceId,
+              status: 'active',
+              start_date: new Date().toISOString().split('T')[0], //ici j'attend une date
+              end_date: '2025-12-31',//ici j'attend une date
+              next_payment_date: '2025-11-01',//ici j'attend une date
+            });
+          }
+        })
+      );
+
+      // Prépare les données à envoyer
       dataToSend = {
         email: formData.email || '',
         name: formData.name || '',
         role: formData.role || '',
         can_write: Boolean(formData.can_write),
         can_delete: Boolean(formData.can_delete),
-        billing_address: formData.billing_address || '',
-        payment_method: formData.payment_method || '',
-        service_ids: formData.service_ids || [],
+        billing_address: typeof formData.billing_address === 'string' ? JSON.parse(formData.billing_address) : formData.billing_address,
+        payment_method: typeof formData.payment_method === 'string' ? JSON.parse(formData.payment_method) : formData.payment_method,
+        service_ids: selectedServiceIds, // Utilise les IDs des services cochés
+        user_subscriptions: updatedSubscriptions, // Ajoute les subscriptions mises à jour/créées
       };
     }
     // Appels
@@ -504,8 +539,7 @@ const handleSubmit = async (e: React.FormEvent) => {
     if (isLoading) {
       return <div>Chargement...</div>;
     }
-console.log(formData);
-console.log(formData.payment_method.type);
+
     switch (resourceName) {
       
       case 'clients':
@@ -959,22 +993,25 @@ console.log(formData.payment_method.type);
 
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">Services liés</label>
-              <select
-                name="service_ids[]"
-                multiple
-                defaultValue={formData.service_ids || []}
-                onChange={handleChange}
-                className="w-full p-2 border rounded"
-              >
-                {/* Les options seront ajoutées dynamiquement */}
+              <div className="space-y-2">
                 {s.map((service) => (
-                  <option key={service.id} value={service.id}>
-                    {service.name}
-                  </option>
+                  <div key={service.id} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id={`service_${service.id}`}
+                      name="service_ids"
+                      value={service.id}
+                      checked={formData.service_ids?.includes(service.id) || false}
+                      onChange={handleChange}
+                      className="h-4 w-4 text-blue-600"
+                    />
+                    <label htmlFor={`service_${service.id}`} className="ml-2 text-sm text-gray-700">
+                      {service.name}
+                    </label>
+                  </div>
                 ))}
-              </select>
+              </div>
             </div>
-
         </>
       );
 
