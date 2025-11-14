@@ -1,5 +1,6 @@
+// src/app/dashboard/layout.tsx
 "use client";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useServices } from '@/src/Hook/useServices';
 import { NavBar } from "@/src/Components";
@@ -7,18 +8,20 @@ import { TabProvider } from "@/src/context/TabContext";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const router = useRouter();
   const isInService = pathname.includes('/dashboard/Services/');
   const { data: session, status } = useSession();
-  const { sO, loading: servicesLoading } = useServices(session?.user?.id, status);
+  const { sO, loading: servicesLoading } = useServices(
+    session?.user?.id,
+    status
+  );
 
-  // Redirige si non authentifié
-  if (status === "unauthenticated") {
-    router.push('/login');
-    return null;
-  }
+  const userServices = sO
+    .map(service => ({
+      name: service.name,
+      path: service.route || `/dashboard/services/${service.id}`,
+      icon: service.icon || "🔧"
+    }));
 
-  // Affiche un loader pendant le chargement
   if (status === "loading" || servicesLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -30,11 +33,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     );
   }
 
-  const userServices = sO.map(service => ({
-    name: service.name,
-    path: service.route || `/dashboard/services/${service.id}`,
-    icon: service.icon || "🔧"
-  }));
+  if (status === "unauthenticated") {
+    return null;
+  }
 
   return (
     <NavBar
@@ -46,6 +47,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <TabProvider>
         {children}
       </TabProvider>
-    </NavBar>
+    </NavBar>    
   );
 }
