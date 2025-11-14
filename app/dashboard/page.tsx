@@ -18,7 +18,7 @@ export default function DashboardHome() {
   const unSubscribedServices = sN;
 
   if (loading) return <div className="p-8">Chargement...</div>;
-console.log("subscriptions: ", subscriptionServices)
+
   return (
     <div className="p-8 max-w-7xl mx-auto">
       <h1 className="text-2xl font-bold mb-8">Tableau de bord</h1>
