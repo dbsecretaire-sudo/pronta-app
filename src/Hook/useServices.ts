@@ -64,20 +64,16 @@ export const useServices = (userId: string | undefined, status: string) => {
       setSN(unSubscribedServices);
     } catch (error) {
       setError("Impossible de charger les services.");
-      console.error("Erreur lors de la récupération des services:", error);
     } finally {
       setLoading(false);
     }
   }, [userId]);
 
   useEffect(() => {
-    console.log("useEffect triggered with:", { status, userId });
 
     if (status === "authenticated" && userId && !isNaN(Number(userId))) {
-      console.log("Fetching data...");
       fetchData();
     } else {
-      console.log("Skipping fetch, setting loading to false");
       setLoading(false);
     }
   }, [status, userId, fetchData]);
@@ -112,7 +108,6 @@ export const useServices = (userId: string | undefined, status: string) => {
       await reactivateUserService(Number(userId), service.id);
       await refreshServices();
     } catch (error) {
-      console.error("Erreur lors de l'abonnement:", error);
       setError(error instanceof Error ? error.message : "Échec de l'abonnement au service.");
     }
   };
@@ -138,7 +133,6 @@ export const useServices = (userId: string | undefined, status: string) => {
       await reactivateUserService(Number(userId), service.id);
       await refreshServices();
     } catch (error) {
-      console.error("Erreur lors de la réactivation:", error);
       let errorMessage = "Échec de la réactivation.";
       if (error instanceof Error) {
         errorMessage = error.message;

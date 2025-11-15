@@ -74,7 +74,6 @@ export const useCalls = (userId: string | undefined, initialFilter: Omit<CallFil
       setCalls(callsData);
       setStats(calculateCallStats(callsData));
     } catch (error) {
-      console.error("Erreur:", error);
     } finally {
       setLoading(false);
     }

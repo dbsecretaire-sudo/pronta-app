@@ -19,7 +19,6 @@ export const createClient = async (clientData: typeof emptyClient) => {
 
     return response.json();
   } catch (error) {
-    console.error("Erreur lors de la création du client:", error);
     throw error;
   }
 };

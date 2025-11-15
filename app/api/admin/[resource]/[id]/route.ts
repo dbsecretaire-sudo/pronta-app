@@ -123,7 +123,6 @@ export async function PUT(
       return NextResponse.json(result.rows[0]);
     }
   } catch (error) {
-    console.error("Erreur détaillée:", error);
     return NextResponse.json(
       {
         error: 'Failed to update',

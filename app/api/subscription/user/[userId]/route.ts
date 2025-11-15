@@ -26,7 +26,6 @@ export async function GET(
 
     return NextResponse.json(subscriptions);
   } catch (error) {
-    console.error("Erreur dans GET /api/subscription/[userId]:", error);
     return NextResponse.json(
       { error: "Échec de la récupération des abonnements" },
       { status: 500 }

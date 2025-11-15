@@ -110,7 +110,6 @@ export function ResourceEditForm({ resourceName, id }: ResourceEditFormProps) {
       setUsers(usersData);
       setClients(clientsData);
     } catch (error) {
-      console.error('Error initializing form:', error);
     } finally {
       setIsLoading(false);
     }
@@ -483,7 +482,6 @@ const handleSubmit = async (e: React.FormEvent) => {
     router.push(`/admin/${resourceName}`);
     router.refresh();
   } catch (error) {
-    console.error('Erreur lors de la soumission:', error);
 
     // Affiche une erreur à l'utilisateur
     if (error instanceof Error) {

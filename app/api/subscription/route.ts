@@ -40,7 +40,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json(newSubscription, { status: 201 });
   } catch (error) {
-    console.error("Error creating user subscription:", error);
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -66,7 +65,6 @@ export async function GET() {
     const subscriptions = await subscriptionService.getAllSubscriptions();
     return NextResponse.json(subscriptions);
   } catch (error) {
-    console.error("Error fetching subscriptions:", error);
     return NextResponse.json(
       {
         error: error instanceof Error

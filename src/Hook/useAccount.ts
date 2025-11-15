@@ -45,7 +45,6 @@ export function useAccount() {
       await mutate();
       return { success: true, message: successMessage };
     } catch (error) {
-      console.error("Erreur:", error);
       return { success: false, message: errorMessage };
     } finally {
       setIsUpdating(false);

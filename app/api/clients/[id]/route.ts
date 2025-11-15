@@ -34,7 +34,6 @@ export async function DELETE(
 
     return NextResponse.json(rows[0]);
   } catch (error) {
-    console.error("Erreur DELETE :", error);
     return NextResponse.json(
       { error: "Erreur lors de la suppression du client" },
       { status: 500 }
@@ -82,7 +81,6 @@ export async function PUT(
         { status: 409 }
       );
     }
-    console.error("Erreur PUT :", error);
     return NextResponse.json(
       { error: "Erreur lors de la mise à jour du client" },
       { status: 500 }
@@ -109,7 +107,6 @@ export async function GET(
 
     return NextResponse.json(rows[0]);
   } catch (error) {
-    console.error("Erreur GET :", error);
     return NextResponse.json(
       { error: "Erreur lors de la récupération du client" },
       { status: 500 }

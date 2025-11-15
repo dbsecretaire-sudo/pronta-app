@@ -83,7 +83,6 @@ export function useUser(userId?: string) {
       setUserData(transformedData);
       setError(null);
     } catch (err) {
-      console.error("Error fetching user data:", err);
       setError(err instanceof Error ? err.message : "Unknown error");
       setUserData(null);
     } finally {
@@ -110,7 +109,6 @@ export function useUser(userId?: string) {
         setUsersName(AllUsersName);
         setUsersRole(AllUsersRole);
       } catch(error) {
-        console.error("Erreur lors de la récupération des users:", error);
         setUsers([]);
         setUsersName([]);
         setUsersRole([]);

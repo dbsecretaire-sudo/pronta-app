@@ -28,7 +28,6 @@ export const useEditClient = () => {
           company: data.company || "",
         });
       } catch (error) {
-        console.error("Erreur:", error);
         setError(error instanceof Error ? error.message : "Erreur inconnue");
       } finally {
         setLoading(false);
@@ -51,7 +50,6 @@ export const useEditClient = () => {
         router.push('/dashboard/Services/prontaInvoices/clients');
       }
     } catch (error) {
-      console.error("Erreur:", error);
       setError("Erreur lors de la mise à jour du client");
     }
   };

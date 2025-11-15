@@ -32,7 +32,6 @@ export async function updateResource(resource: string, id: number | undefined, d
     }
 
   } catch (error: any) {
-    console.error("Erreur serveur:", error); 
     return { success: false, error: error.message };
   }
 }
@@ -74,7 +73,6 @@ export async function fetchResource(resource: string) {
 }
 
 export async function createResource(resource: string, prevState: any, formData: FormData) {
-  console.log('Hello createResource from src/lib/admin/api.ts (S1)');
   const data = Object.fromEntries(formData.entries());
   const response = await fetch(`/api/admin/${resource}`, {
     method: 'POST',

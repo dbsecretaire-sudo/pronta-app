@@ -19,7 +19,6 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials): Promise<CustomUser | null> {
         try {
           if (!credentials?.email || !credentials?.password) {
-            console.error("Email ou mot de passe manquant");
             return null;
           }
 
@@ -30,24 +29,20 @@ export const authOptions: NextAuthOptions = {
 
           const user = rows[0];
           if (!user) {
-            console.error("Utilisateur non trouvé pour l'email:", credentials.email);
             return null;
           }
 
           const isValid = await compare(credentials.password, user.password_hash);
           if (!isValid) {
-            console.error("Mot de passe incorrect pour l'utilisateur:", user.email);
             return null;
           }
 
-          console.log("Utilisateur autorisé:", user.email);
           return {
             id: user.id.toString(),
             email: user.email,
             name: user.name,
           };
         } catch (error) {
-          console.error("Erreur lors de l'autorisation:", error);
           return null; // Retournez null pour éviter les erreurs 500 non contrôlées
         }
       },

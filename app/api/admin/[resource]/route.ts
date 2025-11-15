@@ -135,7 +135,6 @@ export async function POST(
     }
   } catch (error) {
     const pgError = error as PostgreSQLError;
-    console.error(error);
     return new Response(
       JSON.stringify({ success: false, error: error instanceof Error ? pgError.detail : "Erreur Serveur" }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
@@ -159,7 +158,6 @@ export async function GET(
     }
     return NextResponse.json(result.rows);
   } catch (error) {
-    console.error('GET error:', error);
     return NextResponse.json({ error: 'Failed to fetch' }, { status: 500 });
   }
 }

@@ -69,7 +69,6 @@ export const useInvoices = (userId: number | undefined) => {
         });
 
       } catch (error) {
-        console.error("Erreur:", error);
         setError(error instanceof Error ? error.message : "Erreur inconnue");
       } finally {
         setLoading(false);

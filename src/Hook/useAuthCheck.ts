@@ -40,7 +40,6 @@ useEffect(() => {
           const userData = await getUserById(data.user.id); // Attendre la résolution de la promesse
           setUser(userData);
         } catch (error) {
-          console.error("Erreur lors de la récupération des données utilisateur:", error);
           setUser(data.user); // Utiliser les données de base en cas d'erreur
         }
       } else {
@@ -49,7 +48,6 @@ useEffect(() => {
         setUser(null);
       }
     } catch (error) {
-      console.error("Erreur lors de la vérification de l'authentification:", error);
       setStatus("unauthenticated"); // Correction de la faute de frappe "unathenticated" -> "unauthenticated"
       setData(null);
       setUser(null);

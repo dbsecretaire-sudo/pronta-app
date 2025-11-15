@@ -39,7 +39,6 @@ export async function PUT(
 
     return NextResponse.json(updatedSubscription);
   } catch (error) {
-    console.error("Error updating user subscription:", error);
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -75,7 +74,6 @@ export async function DELETE(
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error deleting user subscription:", error);
 
     return NextResponse.json(
       {
@@ -98,7 +96,6 @@ export async function GET(
     const subscriptions = await subscriptionService.getSubscriptionByUserId(userId);
     return NextResponse.json(subscriptions);
   } catch (error) {
-    console.error("Error fetching subscriptions:", error);
     return NextResponse.json(
       {
         error: error instanceof Error

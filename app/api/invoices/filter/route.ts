@@ -72,7 +72,6 @@ export async function GET(request: Request) {
       }
     }
 
-    console.log(filters);
 
     // 3. Appeler le contrôleur
     const invoices = await invoiceService.filterInvoices(filters);
@@ -81,7 +80,6 @@ export async function GET(request: Request) {
     return NextResponse.json(invoices);
 
   } catch (error) {
-    console.error("Error filtering invoices:", error);
     return NextResponse.json(
       { error: "Failed to filter invoices" },
       { status: 500 }

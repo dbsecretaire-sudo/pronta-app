@@ -56,7 +56,6 @@ export default function Login() {
         router.push("/dashboard");
       }
     } catch (error) {
-      console.error("Erreur lors de la connexion:", error);
       setError("Erreur lors de la connexion");
     }
   };

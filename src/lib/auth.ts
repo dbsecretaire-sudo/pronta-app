@@ -10,13 +10,11 @@ export async function login(email: string, password: string): Promise<boolean> {
     });
 
     if (result?.error) {
-      console.error("Erreur lors de la connexion avec NextAuth:", result.error);
       return false;
     }
 
     return true;
   } catch (error) {
-    console.error("Erreur lors de la connexion:", error);
     return false;
   }
 }

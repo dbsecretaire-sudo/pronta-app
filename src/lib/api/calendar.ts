@@ -16,7 +16,6 @@ export const fetchCalendarEvents = async (userId?: number) => {
     }
     return response.json();
   } catch (error) {
-    console.error("Error fetching calendar events:", error);
     throw error;
   }
 };
