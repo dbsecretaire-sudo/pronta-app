@@ -4,7 +4,7 @@ import { UpdateSubscriptionSchema } from "@/src/lib/schemas/subscription";
 import { z } from "zod";
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../../auth/[...nextauth]/route';
-
+const API_URL = process.env.NEXTAUTH_URL
 const subscriptionService = new SubscriptionService();
 
 // PUT /api/subscription/[subscriptionId]
@@ -16,7 +16,7 @@ export async function PUT(
 
     const session = await getServerSession(authOptions);
   if (!session) {
-    return NextResponse.redirect(new URL('/unauthorized', request.url));  
+     return NextResponse.redirect(new URL(`${API_URL}/unauthorized`, request.url));  
   }
 
   try {
@@ -103,7 +103,7 @@ export async function DELETE(
 
     const session = await getServerSession(authOptions);
   if (!session) {
-    return NextResponse.redirect(new URL('/unauthorized', request.url));  
+     return NextResponse.redirect(new URL(`${API_URL}/unauthorized`, request.url));  
   }
 
   try {
@@ -136,7 +136,7 @@ export async function GET(
 
     const session = await getServerSession(authOptions);
   if (!session) {
-    return NextResponse.redirect(new URL('/unauthorized', request.url));  
+     return NextResponse.redirect(new URL(`${API_URL}/unauthorized`, request.url));  
   }
 
   try {

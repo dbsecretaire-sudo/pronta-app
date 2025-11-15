@@ -3,7 +3,7 @@ import pool from '@/src/lib/db';
 import bcrypt from 'bcryptjs';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../../auth/[...nextauth]/route';
-
+const API_URL = process.env.NEXTAUTH_URL
 interface PostgreSQLError extends Error {
   code: string;
   detail: string;
@@ -22,7 +22,7 @@ export async function POST(
 
   const session = await getServerSession(authOptions);
   if (!session) {
-    return NextResponse.redirect(new URL('/unauthorized', request.url));  
+    return NextResponse.redirect(new URL(`${API_URL}/unauthorized`, request.url));  
   }
 
   try {
@@ -156,7 +156,7 @@ export async function GET(
 
   const session = await getServerSession(authOptions);
   if (!session) {
-    return NextResponse.redirect(new URL('/unauthorized', request.url));  
+        return NextResponse.redirect(new URL(`${API_URL}/unauthorized`, request.url));  
   }
 
   const { resource } = await params;

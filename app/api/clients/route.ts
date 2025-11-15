@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { ClientService } from './service';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../auth/[...nextauth]/route';
-
+const API_URL = process.env.NEXTAUTH_URL
 const clientService = new ClientService();
 
 // GET /api/clients
@@ -11,7 +11,7 @@ export async function GET(request: Request) {
 
     const session = await getServerSession(authOptions);
   if (!session) {
-    return NextResponse.redirect(new URL('/unauthorized', request.url));  
+     return NextResponse.redirect(new URL(`${API_URL}/unauthorized`, request.url));  
   }
 
   try {
@@ -38,7 +38,7 @@ export async function POST(request: Request) {
 
     const session = await getServerSession(authOptions);
   if (!session) {
-    return NextResponse.redirect(new URL('/unauthorized', request.url));  
+     return NextResponse.redirect(new URL(`${API_URL}/unauthorized`, request.url));  
   }
 
   try {

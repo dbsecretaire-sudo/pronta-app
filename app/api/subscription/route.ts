@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { CreateSubscriptionSchema } from "@/src/lib/schemas/subscription"; // Import du schéma existant
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../auth/[...nextauth]/route';
-
+const API_URL = process.env.NEXTAUTH_URL
 const subscriptionService = new SubscriptionService();
 
 // POST /api/user/[id]/subscription/ - Pour créer un nouvel abonnement
@@ -13,7 +13,7 @@ export async function POST(request: Request) {
 
     const session = await getServerSession(authOptions);
   if (!session) {
-    return NextResponse.redirect(new URL('/unauthorized', request.url));  
+     return NextResponse.redirect(new URL(`${API_URL}/unauthorized`, request.url));  
   }
 
   try {
@@ -78,7 +78,7 @@ export async function GET(request: Request) {
 
     const session = await getServerSession(authOptions);
   if (!session) {
-    return NextResponse.redirect(new URL('/unauthorized', request.url));  
+     return NextResponse.redirect(new URL(`${API_URL}/unauthorized`, request.url));  
   }
 
   try {

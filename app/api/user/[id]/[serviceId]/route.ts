@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { UserService } from '../../service';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { getServerSession } from 'next-auth';
-
+const API_URL = process.env.NEXTAUTH_URL
 const userService = new UserService;
 
 // GET /api/User/[id]/[serviceId]
@@ -14,7 +14,7 @@ export async function GET(
 
     const session = await getServerSession(authOptions);
   if (!session) {
-    return NextResponse.redirect(new URL('/unauthorized', request.url));  
+     return NextResponse.redirect(new URL(`${API_URL}/unauthorized`, request.url));  
   }
 
   try {
@@ -43,7 +43,7 @@ export async function PUT(
 
     const session = await getServerSession(authOptions);
   if (!session) {
-    return NextResponse.redirect(new URL('/unauthorized', request.url));  
+     return NextResponse.redirect(new URL(`${API_URL}/unauthorized`, request.url));  
   }
 
   try {
