@@ -202,37 +202,61 @@ export class SubscriptionModel {
    * Crée un abonnement pour un utilisateur spécifique
    */
   async createUserSubscription(userId: number, subscriptionData: CreateSubscription): Promise<Subscription> {
-    // Vérifie que l'utilisateur existe
-    const { rows: userRows } = await pool.query('SELECT id FROM users WHERE id = $1', [userId]);
-    if (userRows.length === 0) {
-      throw new Error(`User with id ${userId} not found`);
-    }
+  console.log("createUserSubscription called with:", { userId, subscriptionData });
 
-    // Valide les données avec le schéma
+  // Vérifie que l'utilisateur existe
+  const { rows: userRows } = await pool.query('SELECT id FROM users WHERE id = $1', [userId]);
+  console.log("User check result:", userRows);
+  if (userRows.length === 0) {
+    throw new Error(`User with id ${userId} not found`);
+  }
+
+  // Valide les données avec le schéma
+  try {
     const validatedData = CreateSubscriptionSchema.parse({
       ...subscriptionData,
       user_id: userId
     });
-
-    const query = `
-      INSERT INTO user_subscriptions (
-        user_id, service_id, status, start_date, end_date, next_payment_date
-      )
-      VALUES ($1, $2, $3, $4, $5, $6)
-      RETURNING *
-    `;
-
-    const { rows } = await pool.query(query, [
-      validatedData.user_id,
-      validatedData.service_id,
-      validatedData.status || 'active',
-      formatDateForDB(validatedData.start_date),
-      formatDateForDB(validatedData.end_date),
-      formatDateForDB(validatedData.next_payment_date)
-    ]);
-
-    return this.mapDbSubscriptionToSubscription(rows[0]);
+    console.log("Validated data:", validatedData);
+  } catch (error) {
+    console.error("Validation error in createUserSubscription:", error);
+    throw error;
   }
+
+  const query = `
+    INSERT INTO user_subscriptions (
+      user_id, service_id, status, start_date, end_date, next_payment_date
+    )
+    VALUES ($1, $2, $3, $4, $5, $6)
+    RETURNING *
+  `;
+
+  console.log("Executing query with values:",
+    userId,
+    subscriptionData.service_id,
+    subscriptionData.status || 'active',
+    subscriptionData.start_date,
+    subscriptionData.end_date,
+    subscriptionData.next_payment_date
+  );
+
+  try {
+    const { rows } = await pool.query(query, [
+      userId,
+      subscriptionData.service_id,
+      subscriptionData.status || 'active',
+      formatDateForDB(subscriptionData.start_date),
+      formatDateForDB(subscriptionData.end_date),
+      formatDateForDB(subscriptionData.next_payment_date)
+    ]);
+    console.log("Query result:", rows);
+    return this.mapDbSubscriptionToSubscription(rows[0]);
+  } catch (error) {
+    console.error("Database error in createUserSubscription:", error);
+    throw error;
+  }
+}
+
 
   /**
    * Supprime un abonnement

@@ -54,6 +54,12 @@ export function ResourceEditForm({ resourceName, id }: ResourceEditFormProps) {
   const router = useRouter();
   const [errors, setErrors] = useState<{ duration?: string }>({});
 
+  const now = new Date();
+  const nextDate = new Date(now);
+  nextDate.setMonth(now.getMonth() + 1);
+  const endDate = new Date(now);
+  endDate.setFullYear(now.getFullYear() + 1);
+
   useEffect(() => {
   const initialize = async () => {
     try {
@@ -78,6 +84,9 @@ export function ResourceEditForm({ resourceName, id }: ResourceEditFormProps) {
                 paypal_email: "",
               }
             },
+          service_ids: data.service_ids ? data.service_ids : [],
+          removedServiceIds: [],
+
         };
         setFormData(normalizedData);
       } else {
@@ -97,6 +106,7 @@ export function ResourceEditForm({ resourceName, id }: ResourceEditFormProps) {
               }
             },
             service_ids: [],
+            removedServiceIds: [],
           },
           // Ajoutez d'autres ressources si nécessaire
         };
@@ -151,21 +161,37 @@ export function ResourceEditForm({ resourceName, id }: ResourceEditFormProps) {
     const { name, value, type } = e.target;
     const target = e.target as HTMLInputElement;
 
-    // Gestion des checkboxes simples
-    if (target.type === 'checkbox' && !name.endsWith('[]')) {
-      setFormData(prev => ({ ...prev, [name]: target.checked }));
+    // Gestion des checkboxes multiples
+    if (type === "checkbox" && name === "service_ids[]") {
+      const serviceId = parseInt(value, 10);
+      setFormData((prev) => {
+        const updatedServiceIds = target.checked
+          ? [...prev.service_ids, serviceId] // Ajoute l'ID
+          : prev.service_ids.filter((id: number) => id !== serviceId); // Retire l'ID
+
+        // Met à jour les services retirés
+        const removedServiceIds = target.checked
+          ? prev.removedServiceIds?.filter((id: number) => id !== serviceId) // Retire de la liste des retirés si coché
+          : [...(prev.removedServiceIds || []), serviceId]; // Ajoute à la liste des retirés si décoché
+
+        return {
+          ...prev,
+          service_ids: updatedServiceIds,
+          removedServiceIds: removedServiceIds,
+        };
+      });
     }
     // Gestion des select multiples (ex: service_ids[])
-    else if (target instanceof HTMLSelectElement && target.multiple) {
-      const selectedOptions = Array.from(target.options)
-        .filter((option) => option.selected)
-        .map((option) => parseInt(option.value));
+    // else if (target instanceof HTMLSelectElement && target.multiple) {
+    //   const selectedOptions = Array.from(target.options)
+    //     .filter((option) => option.selected)
+    //     .map((option) => parseInt(option.value));
 
-      setFormData((prev) => ({
-        ...prev,
-        [name.replace('[]', '')]: selectedOptions,
-      }));
-    }
+    //   setFormData((prev) => ({
+    //     ...prev,
+    //     [name.replace('[]', '')]: selectedOptions,
+    //   }));
+    // }
     // Gestion des champs de type number
     else if (type === 'number') {
       setFormData(prev => ({ ...prev, [name]: value === '' ? 0 : parseInt(value) }));
@@ -352,37 +378,48 @@ const handleSubmit = async (e: React.FormEvent) => {
       // Utilisateurs
     if (resourceName === 'users') {
       // Récupère les services cochés
-      const selectedServiceIds = Array.from((e.currentTarget as HTMLFormElement).elements)
-        .filter((el) => (el as HTMLInputElement).name === 'service_ids' && (el as HTMLInputElement).checked)
-        .map((el) => parseInt((el as HTMLInputElement).value, 10));
+      const selectedServiceIds = formData.service_ids || [];
+      const removedServiceIds = formData.removedServiceIds || [];
 
       // Pour chaque service coché, vérifie s'il existe déjà une subscription
-      const updatedSubscriptions = await Promise.all(
-        selectedServiceIds.map(async (serviceId) => {
+      const updatedSubscriptions = await Promise.all([
+        // Met à jour les abonnements des services cochés
+        ...selectedServiceIds.map(async (serviceId: number) => {
           const existingSubscription = await getSubscriptionByService(formData.id, serviceId);
           if (existingSubscription) {
-            // Met à jour la subscription existante
             return await updateUserSubscription(existingSubscription.id, {
               user_id: formData.id,
               service_id: serviceId,
-              status: formData.user_subscriptions?.find((sub: { service_id: number; }) => sub.service_id === serviceId)?.status || 'active',
-              start_date: formData.user_subscriptions?.find((sub: { service_id: number; }) => sub.service_id === serviceId)?.start_date || new Date().toISOString().split('T')[0],
-              end_date: formData.user_subscriptions?.find((sub: { service_id: number; }) => sub.service_id === serviceId)?.end_date || '2025-12-31',
-              next_payment_date: formData.user_subscriptions?.find((sub: { service_id: number; }) => sub.service_id === serviceId)?.next_payment_date || '2025-11-01',
+              status: 'active', // Statut actif si le service est coché
+              start_date: formData.user_subscriptions?.find((sub: {service_id: number}) => sub.service_id === serviceId)?.start_date || new Date().toISOString().split('T')[0],
+              end_date: formData.user_subscriptions?.find((sub: {service_id: number}) => sub.service_id === serviceId)?.end_date || endDate.toISOString().split('T')[0],
+              next_payment_date: formData.user_subscriptions?.find((sub: {service_id: number}) => sub.service_id === serviceId)?.next_payment_date || nextDate.toISOString().split('T')[0],
             });
           } else {
-            // Crée une nouvelle subscription
             return await createSubscription({
               user_id: formData.id,
               service_id: serviceId,
-              status: 'active',
-              start_date: new Date().toISOString().split('T')[0], //ici j'attend une date
-              end_date: '2025-12-31',//ici j'attend une date
-              next_payment_date: '2025-11-01',//ici j'attend une date
+              status: 'active', // Statut actif pour les nouveaux abonnements
+              start_date: new Date().toISOString().split('T')[0],
+              end_date: endDate.toISOString().split('T')[0],
+              next_payment_date: nextDate.toISOString().split('T')[0],
             });
           }
-        })
-      );
+        }),
+        // Désactive les abonnements des services retirés
+        ...removedServiceIds.map(async (serviceId: number) => {
+          const existingSubscription = await getSubscriptionByService(formData.id, serviceId);
+          if (existingSubscription) {
+            return await updateUserSubscription(existingSubscription.id, {
+              user_id: formData.id,
+              service_id: serviceId,
+              status: 'cancelled', // Statut inactif si le service est retiré
+              end_date: new Date().toISOString().split('T')[0], // Met fin aujourd'hui
+            });
+          }
+          return null;
+        }).filter(Boolean), // Filtre les valeurs null
+      ]);
 
       // Prépare les données à envoyer
       dataToSend = {
@@ -1008,7 +1045,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                     <input
                       type="checkbox"
                       id={`service_${service.id}`}
-                      name="service_ids"
+                      name="service_ids[]"
                       value={service.id}
                       checked={formData.service_ids?.includes(service.id) || false}
                       onChange={handleChange}

@@ -11,43 +11,49 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    // Utilise le schéma existant pour la validation
-    const subscriptionData = CreateSubscriptionSchema.parse({
-      ...body,
-      user_id: Number(body.user_id), // Assure-toi que c'est un number
-      status: body.status || 'active' // Valeur par défaut
-    });
-
-    // Conversion des dates en ISOString si nécessaire
-    const processedData = {
-      ...subscriptionData,
-      start_date: subscriptionData.start_date instanceof Date
-        ? subscriptionData.start_date.toISOString()
-        : subscriptionData.start_date || new Date().toISOString(),
-      end_date: subscriptionData.end_date instanceof Date
-        ? subscriptionData.end_date.toISOString()
-        : subscriptionData.end_date,
-      next_payment_date: subscriptionData.next_payment_date instanceof Date
-        ? subscriptionData.next_payment_date.toISOString()
-        : subscriptionData.next_payment_date
+    const toISODate = (date: string | Date | null | undefined): string | null => {
+      if (!date) return null;
+      if (date instanceof Date) return date.toISOString();
+      if (typeof date === 'string') {
+        // Si la date est au format "YYYY-MM-DD", ajoute le timezone
+        if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+          return new Date(`${date}T00:00:00Z`).toISOString();
+        }
+        // Si la date est déjà au format ISO, retourne-la telle quelle
+        return date;
+      }
+      return null;
     };
 
-    // Appel au service pour créer un nouvel abonnement
+    // Utilise le schéma existant pour la validation
+    const dataToValidate = {
+      ...body,
+      user_id: Number(body.user_id),
+      status: body.status || 'active',
+      start_date: toISODate(body.start_date) || new Date().toISOString(),
+      end_date: toISODate(body.end_date),
+      next_payment_date: toISODate(body.next_payment_date),
+    };
+    // Valide les données avec le schéma
+    const subscriptionData = CreateSubscriptionSchema.parse(dataToValidate);
+
+    // Pas besoin de conversion supplémentaire, le schéma Zod a déjà validé les dates
+    const processedData = { ...subscriptionData };
+
+    // Appel au service
     const newSubscription = await subscriptionService.createUserSubscription(
       body.user_id,
       processedData
     );
-
     return NextResponse.json(newSubscription, { status: 201 });
   } catch (error) {
-
+    console.error("Error details:", error);
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Invalid data", details: error.format() },
         { status: 400 }
       );
     }
-
     return NextResponse.json(
       {
         error: error instanceof Error

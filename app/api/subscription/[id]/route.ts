@@ -6,47 +6,75 @@ import { z } from "zod";
 const subscriptionService = new SubscriptionService();
 
 // PUT /api/subscription/[subscriptionId]
+// PUT /api/subscription/[subscriptionId]
 export async function PUT(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }  // Correction: params n'est pas une Promise ici
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Attend la résolution de la Promise pour accéder à params.id
     const { id } = await params;
     const body = await request.json();
+    console.log("Received body:", body);
 
-    // Utilise le schéma existant pour valider les données
-    const updates = UpdateSubscriptionSchema.parse(body);
+    // Vérifie que l'ID est un nombre valide
+    const subscriptionId = Number(id);
+    if (isNaN(subscriptionId)) {
+      return NextResponse.json(
+        { error: "Invalid subscription ID" },
+        { status: 400 }
+      );
+    }
 
-    // Conversion des dates en ISOString si nécessaire
-    const processedUpdates = {
-      ...updates,
-      start_date: updates.start_date instanceof Date
-        ? updates.start_date.toISOString()
-        : updates.start_date,
-      end_date: updates.end_date instanceof Date
-        ? updates.end_date.toISOString()
-        : updates.end_date,
-      next_payment_date: updates.next_payment_date instanceof Date
-        ? updates.next_payment_date.toISOString()
-        : updates.next_payment_date
+    // Fonction pour convertir les dates en ISO datetime
+    const toISODate = (date: string | Date | null | undefined): string | null => {
+      if (!date) return null;
+      if (date instanceof Date) return date.toISOString();
+      if (typeof date === 'string') {
+        if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+          return new Date(`${date}T00:00:00Z`).toISOString();
+        }
+        return date;
+      }
+      return null;
     };
 
-    // Appel au service pour mettre à jour l'abonnement
+    // Prépare les données pour la validation
+    const dataToValidate = {
+      ...body,
+      user_id: body.user_id ? Number(body.user_id) : undefined,
+      status: body.status || 'active',
+      start_date: toISODate(body.start_date) || new Date().toISOString(),
+      end_date: toISODate(body.end_date),
+      next_payment_date: toISODate(body.next_payment_date),
+    };
+
+    // Vérifie que user_id est valide si fourni
+    if (dataToValidate.user_id !== undefined && isNaN(dataToValidate.user_id)) {
+      return NextResponse.json(
+        { error: "Invalid user ID" },
+        { status: 400 }
+      );
+    }
+
+    // Valide les données avec le schéma
+    const subscriptionData = UpdateSubscriptionSchema.parse(dataToValidate);
+
+    // Met à jour la subscription
     const updatedSubscription = await subscriptionService.updateUserSubscription(
-      Number(id),
-      processedUpdates
+      subscriptionId,
+      subscriptionData
     );
 
     return NextResponse.json(updatedSubscription);
   } catch (error) {
-
+    console.error("Error updating subscription:", error);
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Invalid data", details: error.format() },
         { status: 400 }
       );
     }
-
     return NextResponse.json(
       {
         error: error instanceof Error
@@ -57,6 +85,7 @@ export async function PUT(
     );
   }
 }
+
 
 // DELETE /api/subscription/[subscriptionId]
 export async function DELETE(
