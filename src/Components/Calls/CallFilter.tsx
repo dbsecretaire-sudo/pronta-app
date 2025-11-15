@@ -9,9 +9,7 @@ export default function CallFilter({ onFilterChange, userId }: CallFilterProps) 
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Incluez userId dans les filtres transmis
-      console.log("Submit triggered!", { userId, byName, byPhone }); // Debug
-
+    
     onFilterChange({
       userId,         
       byName,

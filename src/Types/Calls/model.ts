@@ -15,7 +15,7 @@ export class CallModel {
         const params: any[] = [filters.userId];  // userId est obligatoire
 
         if (filters.byName) {
-        query += ' AND name ILIKE $' + (params.length + 1);
+        query += ' AND contact_name ILIKE $' + (params.length + 1);
         params.push(`%${filters.byName}%`);
         }
         if (filters.byPhone) {
