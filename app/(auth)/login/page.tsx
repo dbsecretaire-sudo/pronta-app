@@ -1,25 +1,62 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { login } from "@/src/lib/auth";
+import { signIn } from "next-auth/react";
 
 export default function Login() {
   const [email, setEmail] = useState("");     // Champ vide par défaut
   const [password, setPassword] = useState(""); // Champ vide par défaut
+  const [csrfToken, setCsrfToken] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
+// Récupérer le jeton CSRF au chargement du composant
+  useEffect(() => {
+    const fetchCsrfToken = async () => {
+      try {
+        const response = await fetch('/api/auth/csrf');
+        const data = await response.json();
+        setCsrfToken(data.csrfToken);
+      } catch (error) {
+        console.error("Erreur lors de la récupération du jeton CSRF:", error);
+      }
+    };
+    fetchCsrfToken();
+  }, []);
+
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+
+  //   try {
+  //     const success = await login(email, password);
+  //     if (success) {
+  //       router.push("/dashboard");
+  //     } else {
+  //       setError("Identifiants incorrects");
+  //     }
+  //   } catch (err) {
+  //     setError("Erreur lors de la connexion");
+  //   }
+  // };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     try {
-      const success = await login(email, password);
-      if (success) {
-        router.push("/dashboard");
+      const result = await signIn("credentials", {
+        email,
+        password,
+        csrfToken,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setError(result.error);
       } else {
-        setError("Identifiants incorrects");
+        router.push("/dashboard");
       }
-    } catch (err) {
+    } catch (error) {
+      console.error("Erreur lors de la connexion:", error);
       setError("Erreur lors de la connexion");
     }
   };
