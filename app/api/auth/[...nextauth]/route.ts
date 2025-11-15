@@ -18,15 +18,15 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Mot de passe", type: "password" },
       },
       async authorize(credentials): Promise<CustomUser | null> {
-        if (!credentials?.email || !credentials?.password) {
-          console.error("Email ou mot de passe manquant");
-          return null;
-        }
-
         try {
+          if (!credentials?.email || !credentials?.password) {
+            console.error("Email ou mot de passe manquant");
+            return null;
+          }
+
           const { rows } = await pool.query(
             "SELECT id, email, password_hash, name FROM users WHERE email = $1",
-            [credentials.email.toLowerCase()] // Normalisez l'email
+            [credentials.email.toLowerCase()]
           );
 
           const user = rows[0];
@@ -49,7 +49,7 @@ export const authOptions: NextAuthOptions = {
           };
         } catch (error) {
           console.error("Erreur lors de l'autorisation:", error);
-          return null;
+          throw new Error("Internal server error"); // Assurez-vous que cette erreur est correctement gérée
         }
       },
     }),
