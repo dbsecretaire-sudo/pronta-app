@@ -1,12 +1,24 @@
 // app/dashboard/Services/prontaInvoices/page.tsx
 "use client";
-import { useSession } from "next-auth/react";
+import { useAuthCheck } from "@/src/Hook/useAuthCheck";
 import { InvoicesStats, InvoicesList, InvoicesFilter } from "@/src/Components";
 import { useInvoices } from "@/src/Hook/useInvoices";
+import { useEffect, useState } from "react";
 
 export default function ProntaInvoicesDashboard() {
-  const { data: session } = useSession();
-  const { invoices, stats, loading, handleFilterChange } = useInvoices(session?.user?.id);
+  const { data: session, status } = useAuthCheck();
+
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
+  const userIdVerified = isAuthChecked && status === 'authenticated' ? session?.id : undefined;
+
+    // Attendre que l'authentification soit vérifiée
+  useEffect(() => {
+    if (status !== 'loading') {
+      setIsAuthChecked(true);
+    }
+  }, [status]);
+
+  const { invoices, stats, loading, handleFilterChange } = useInvoices(userIdVerified);
 
   if (loading) {
     return <div className="p-8 max-w-7xl mx-auto">Chargement...</div>;

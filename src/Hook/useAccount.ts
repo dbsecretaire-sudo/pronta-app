@@ -1,18 +1,27 @@
 // src/hooks/useAccount.ts
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useUser } from "@/src/Hook/useUser";
 import { useSubscription } from "./useSubscriptions";
 import { useTab } from '@/src/context/TabContext';
 import { useServices } from "./useServices";
-import { useSession } from "next-auth/react";
+import { useAuthCheck } from "@/src/Hook/useAuthCheck";
 
 export function useAccount() {
-  const { data: session, status } = useSession();
+  const { data: session, status } = useAuthCheck();
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
+  const userIdVerified = isAuthChecked && status === 'authenticated' ? session?.id : undefined;
+
+    // Attendre que l'authentification soit vérifiée
+  useEffect(() => {
+    if (status !== 'loading') {
+      setIsAuthChecked(true);
+    }
+  }, [status]);
   const { userData, loading, error, mutate } = useUser();
   const { activeTab, setActiveTab } = useTab();
   const [isUpdating, setIsUpdating] = useState(false); 
-  const { sO } = useServices(session?.user.id, status);
-  const { subscriptionServices } = useSubscription(session?.user.id, sO);
+  const { sO } = useServices(userIdVerified, status);
+  const { subscriptionServices } = useSubscription(userIdVerified, sO);
 
   // Fonction générique pour les mises à jour
   const updateUser = async <T extends object>( updatedData: T, successMessage: string, errorMessage: string ) => {

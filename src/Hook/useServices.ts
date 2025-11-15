@@ -1,8 +1,8 @@
 // src/Hook/useServices.ts
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Service } from '@/src/lib/schemas/services';
-import { User } from '../Types/Users';
+import { User } from '../lib/schemas';
 import {
   fetchUser,
   fetchAllServices,
@@ -28,8 +28,9 @@ export const useServices = (userId: string | undefined, status: string) => {
   const endDate = new Date(now);
   endDate.setFullYear(now.getFullYear() + 1);
 
-  const fetchData = async () => {
-    if (!userId) {
+  const fetchData = useCallback(async () => {
+    if (!userId || isNaN(Number(userId))) {
+      setError("ID utilisateur invalide");
       setLoading(false);
       return;
     }
@@ -37,14 +38,14 @@ export const useServices = (userId: string | undefined, status: string) => {
     try {
       setLoading(true);
       setError(null);
-
+      const userIdNumber = Number(userId);
       const [fetchedUser, allServices] = await Promise.all([
-        fetchUser(Number(userId)),
+        fetchUser(userIdNumber),
         fetchAllServices(),
       ]);
-
       setUser(fetchedUser);
       setS(allServices);
+
       const servicesWithStatus = allServices.map(service => {
         return {
           ...service,
@@ -52,87 +53,78 @@ export const useServices = (userId: string | undefined, status: string) => {
         };
       });
 
-      const sO = servicesWithStatus.filter(service => 
+      const subscribedServices = servicesWithStatus.filter(service =>
         service.isSubscribed === true && service.is_active === true
       );
-
-      const sN = servicesWithStatus.filter(service => 
+      const unSubscribedServices = servicesWithStatus.filter(service =>
         service.isSubscribed === false && service.is_active === true
       );
 
-      setSO(sO);
-      setSN(sN); 
-
+      setSO(subscribedServices);
+      setSN(unSubscribedServices);
     } catch (error) {
       setError("Impossible de charger les services.");
+      console.error("Erreur lors de la récupération des services:", error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
 
   useEffect(() => {
-    if (status === "loading" || status === "unauthenticated") {
-      setLoading(false);
-      return;
-    }
-    if (status === "authenticated" && userId) {
+    console.log("useEffect triggered with:", { status, userId });
+
+    if (status === "authenticated" && userId && !isNaN(Number(userId))) {
+      console.log("Fetching data...");
       fetchData();
+    } else {
+      console.log("Skipping fetch, setting loading to false");
+      setLoading(false);
     }
-  }, [status, userId]);
+  }, [status, userId, fetchData]);
 
   const refreshServices = async () => {
     await fetchData();
   };
 
- const handleSubscribe = async (service: Service) => {
-  try {
-    if (!userId) throw new Error("User ID is required");
-
-    // 1. Vérifie si une subscription existe déjà
-    const subscription = await getSubscriptionByService(
-      Number(userId),
-      Number(service.id)
-    );
-
-    if (subscription?.id) {
-      // 2. Si elle existe, mets-la à jour
-      await updateUserSubscription(subscription.id, {
-        user_id: Number(userId),
-        service_id: Number(service.id),
-        start_date: now,
-        end_date: endDate,
-        next_payment_date: nextDate,
-        status: 'active',
-      });
-    } else {
-      // 3. Sinon, crée une nouvelle subscription
-      await createSubscription({
-        user_id: Number(userId),
-        service_id: Number(service.id),
-        start_date: now,
-        end_date: endDate,
-        next_payment_date: nextDate,
-        status: 'active',
-      });
+  const handleSubscribe = async (service: Service) => {
+    try {
+      if (!userId) throw new Error("User ID is required");
+      const subscription = await getSubscriptionByService(Number(userId), Number(service.id));
+      if (subscription?.id) {
+        await updateUserSubscription(subscription.id, {
+          user_id: Number(userId),
+          service_id: Number(service.id),
+          start_date: now,
+          end_date: endDate,
+          next_payment_date: nextDate,
+          status: 'active',
+        });
+      } else {
+        await createSubscription({
+          user_id: Number(userId),
+          service_id: Number(service.id),
+          start_date: now,
+          end_date: endDate,
+          next_payment_date: nextDate,
+          status: 'active',
+        });
+      }
+      await reactivateUserService(Number(userId), service.id);
+      await refreshServices();
+    } catch (error) {
+      console.error("Erreur lors de l'abonnement:", error);
+      setError(error instanceof Error ? error.message : "Échec de l'abonnement au service.");
     }
-    await reactivateUserService(Number(userId), service.id);
-    await refreshServices();
-  } catch (error) {
-    console.error("Erreur lors de l'abonnement:", error);
-    setError(error instanceof Error ? error.message : "Échec de l'abonnement au service.");
-  }
-};
+  };
+
   const handleDeactivate = async (service: Service) => {
     if (!userId) return;
-
     try {
-      if (!user?.service_ids.includes(service.id)) {
+      if (!user?.service_ids?.includes(service.id)) {
         setError("Vous n'êtes pas abonné à ce service.");
         return;
       }
-
       await deactivateUserService(Number(userId), service.id);
-
       await refreshServices();
     } catch (error) {
       console.error("Erreur lors de la désactivation:", error);
@@ -142,10 +134,8 @@ export const useServices = (userId: string | undefined, status: string) => {
 
   const handleReactivate = async (service: Service) => {
     if (!userId) return;
-
     try {
       await reactivateUserService(Number(userId), service.id);
-
       await refreshServices();
     } catch (error) {
       console.error("Erreur lors de la réactivation:", error);
@@ -156,6 +146,7 @@ export const useServices = (userId: string | undefined, status: string) => {
       setError(errorMessage);
     }
   };
+
 
   return { s, sO, sN, loading, error, handleSubscribe, handleDeactivate, handleReactivate };
 };

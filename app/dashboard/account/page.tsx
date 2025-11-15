@@ -1,9 +1,10 @@
 "use client";
 import { ProfileTab, BillingTab, MessagesTab } from "@/src/Components";
 import { useAccount } from "@/src/Hook/useAccount";
-import { useSession } from "next-auth/react";
+import { useAuthCheck } from "@/src/Hook/useAuthCheck";
 import { useServices } from "@/src/Hook/useServices";
 import { useSubscription } from "@/src/Hook/useSubscriptions";
+import { useEffect, useState } from "react";
 
 export default function AccountPage() {
   const {
@@ -17,9 +18,20 @@ export default function AccountPage() {
     handleBillingUpdate
   } = useAccount();
 
-  const { data: session, status} = useSession();
-  const { sO } = useServices(session?.user.id, status);
-  const { subscriptionServices } = useSubscription(session?.user.id, sO);
+  const { data: session, status} = useAuthCheck();
+
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
+  const userIdVerified = isAuthChecked && status === 'authenticated' ? session?.id : undefined;
+
+    // Attendre que l'authentification soit vérifiée
+  useEffect(() => {
+    if (status !== 'loading') {
+      setIsAuthChecked(true);
+    }
+  }, [status]);
+
+  const { sO } = useServices(userIdVerified, status);
+  const { subscriptionServices } = useSubscription(userIdVerified, sO);
 
   if (loading) return <div className="text-center py-8">Chargement...</div>;
   if (error) return <div className="text-center py-8 text-red-500">Erreur: {error}</div>;

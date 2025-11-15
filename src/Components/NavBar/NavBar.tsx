@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import { NavbarProps } from "./NavBar.types";
+import { useAuthCheck } from "@/src/Hook/useAuthCheck";
 
 export default function Navbar({
   children,
@@ -14,7 +15,7 @@ export default function Navbar({
 }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const { data: session, status } = useSession();
+  const { data: session, status } = useAuthCheck();
   const pathname = usePathname();
 
   // Menu principal (fixe)

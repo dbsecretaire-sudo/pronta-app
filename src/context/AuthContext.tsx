@@ -1,7 +1,7 @@
 // context/AuthContext.tsx
 'use client';
 
-import { useSession } from "next-auth/react";
+import { useAuthCheck } from "@/src/Hook/useAuthCheck";
 import { createContext, useContext, ReactNode } from 'react';
 
 type AuthContextType = {
@@ -14,7 +14,7 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children, initialSession }: { children: ReactNode; initialSession: any }) {
-  const { data: session, status } = useSession();
+  const { data: session, status } = useAuthCheck();
   const isLoading = status === "loading";
   const isAuthenticated = status === "authenticated" || !!initialSession;
   const currentSession = session || initialSession;

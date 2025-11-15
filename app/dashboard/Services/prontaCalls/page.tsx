@@ -1,14 +1,25 @@
 "use client";
-import { useSession } from "next-auth/react";
+import { useAuthCheck } from "@/src/Hook/useAuthCheck";
 import { CallStats, CallList, CallFilter, Calendar } from "@/src/Components";
 import { CallFilter as CallFilterType } from "@/src/lib/schemas/calls";
 import { useCalls } from "@/src/Hook/useCalls";
 import { Tabs } from "@/src/Components"; // À créer ou utiliser une lib comme @radix-ui/react-tabs
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function ProntaCallsDashboard() {
-  const { data: session } = useSession();
-  const { calls, stats, calendarEvents, loading, handleFilterChange } = useCalls(session?.user?.id);
+  const { data: session, status } = useAuthCheck();
+
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
+  const userIdVerified = isAuthChecked && status === 'authenticated' ? session?.id : undefined;
+
+    // Attendre que l'authentification soit vérifiée
+  useEffect(() => {
+    if (status !== 'loading') {
+      setIsAuthChecked(true);
+    }
+  }, [status]);
+
+  const { calls, stats, calendarEvents, loading, handleFilterChange } = useCalls(userIdVerified);
 
   const tabs = [
     {
@@ -17,7 +28,7 @@ export default function ProntaCallsDashboard() {
       content: (
         <div className="bg-white p-6 rounded-lg shadow">
           <CallFilter
-            userId={Number(session?.user.id)}
+            userId={Number(userIdVerified)}
             onFilterChange={handleFilterChange}
           />
           <CallList calls={calls} />

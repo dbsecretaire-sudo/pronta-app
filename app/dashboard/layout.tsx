@@ -1,28 +1,41 @@
-// src/app/dashboard/layout.tsx
 "use client";
-import { usePathname } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { usePathname, useRouter } from "next/navigation";
+import { useAuthCheck } from "@/src/Hook/useAuthCheck";
 import { useServices } from '@/src/Hook/useServices';
 import { NavBar } from "@/src/Components";
 import { TabProvider } from "@/src/context/TabContext";
+import { useEffect, useState } from "react";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  // Tous les hooks doivent être appelés au début, sans condition
+  const { status, loading: authLoading, error, data, user } = useAuthCheck();
+  const [isAuthenticated, setIsAuthenticated] = useState<Boolean>();
+  const router = useRouter();
   const pathname = usePathname();
   const isInService = pathname.includes('/dashboard/Services/');
-  const { data: session, status } = useSession();
+
+ useEffect(() => {
+    setIsAuthenticated(status === 'authenticated');
+  }, [status]);
+
+  // Utilisez directement user?.id si disponible, sinon undefined
+  const userId = user?.id;
+
+  // Utilisez useServices uniquement si userId est défini
   const { sO, loading: servicesLoading } = useServices(
-    session?.user?.id,
-    status
+    isAuthenticated ? userId?.toString() : undefined,
+    isAuthenticated ? 'authenticated' : 'unauthenticated'
   );
 
-  const userServices = sO
-    .map(service => ({
-      name: service.name,
-      path: service.route || `/dashboard/services/${service.id}`,
-      icon: service.icon || "🔧"
-    }));
+  // Vérification de la session et redirection si nécessaire
+  useEffect(() => {
+    if (!isAuthenticated && !authLoading) {
+      router.push('/login');
+    }
+  }, [isAuthenticated, authLoading, router]);
 
-  if (status === "loading" || servicesLoading) {
+  // Retour conditionnel après tous les hooks
+  if (authLoading || servicesLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="text-center">
@@ -33,9 +46,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     );
   }
 
-  if (status === "unauthenticated") {
+  if (!isAuthenticated) {
     return null;
   }
+
+  // Calcul des données après les hooks
+  const userServices = sO.map(service => ({
+    name: service.name,
+    path: service.route || `/dashboard/services/${service.id}`,
+    icon: service.icon || "🔧"
+  }));
 
   return (
     <NavBar
@@ -47,6 +67,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <TabProvider>
         {children}
       </TabProvider>
-    </NavBar>    
+    </NavBar>
   );
 }

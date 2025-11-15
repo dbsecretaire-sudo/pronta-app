@@ -3,11 +3,23 @@
 
 import { Calendar } from "@/src/Components";
 import { useCalendar } from "@/src/Hook/useCalendar";
-import { useSession } from "next-auth/react";
+import { useAuthCheck } from "@/src/Hook/useAuthCheck";
+import { useEffect, useState } from "react";
 
 export function CalendarClient() {
-  const { data:session, status } = useSession();
-  const { calendarEvents } = useCalendar(session?.user.id);
+  const { data:session, status } = useAuthCheck();
+
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
+  const userIdVerified = isAuthChecked && status === 'authenticated' ? session?.id : undefined;
+
+    // Attendre que l'authentification soit vérifiée
+  useEffect(() => {
+    if (status !== 'loading') {
+      setIsAuthChecked(true);
+    }
+  }, [status]);
+
+  const { calendarEvents } = useCalendar(userIdVerified);
 
   if (status === "loading") {
     return <div className="p-6">Chargement...</div>;

@@ -5,10 +5,21 @@ import { CallFilter as CallFilterType } from "@/src/lib/schemas/calls";
 import { PhoneIcon } from "@heroicons/react/24/outline";
 import { CallModal } from "@/src/Components";
 import { useCalls } from "@/src/Hook/useCalls";
-import { useSession } from "next-auth/react";
+import { useAuthCheck } from "@/src/Hook/useAuthCheck";
 
 export default function Calls() {
-  const { data: session, status } = useSession();
+  const { data: session, status } = useAuthCheck();
+
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
+  const userIdVerified = isAuthChecked && status === 'authenticated' ? session?.id : undefined;
+
+    // Attendre que l'authentification soit vérifiée
+  useEffect(() => {
+    if (status !== 'loading') {
+      setIsAuthChecked(true);
+    }
+  }, [status]);
+
   // const [loading, setLoading] = useState(true);
   // const [filter, setFilter] = useState<CallFilterType>({
   //   userId: 0,
@@ -16,7 +27,7 @@ export default function Calls() {
   //   byPhone: "",
   // });
   const [isCallModalOpen, setIsCallModalOpen] = useState(false);
-  const { calls, loading, filter, handleFilterChange } = useCalls(session?.user?.id);
+  const { calls, loading, filter, handleFilterChange } = useCalls(userIdVerified);
 
   // const initiateZoiperCall = (phoneNumber: string) => {
   //   if (window.ZoiperAPI) {
@@ -44,7 +55,7 @@ export default function Calls() {
       <div className="bg-white rounded-lg shadow p-6 mb-6">
         <CallFilter
           onFilterChange={handleFilterChange}
-          userId={Number(session?.user?.id)}
+          userId={Number(userIdVerified)}
         />
       </div>
 

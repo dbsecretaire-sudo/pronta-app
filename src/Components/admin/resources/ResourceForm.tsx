@@ -8,7 +8,7 @@ import { fetchAllClients, fetchUsers } from '@/src/lib/api';
 import { User } from '@/src/lib/schemas';
 import { Client } from '@/src/lib/schemas';
 import { useServices } from '@/src/Hook/useServices';
-import { useSession } from 'next-auth/react';
+import { useAuthCheck } from "@/src/Hook/useAuthCheck";
 import { TrashIcon } from '@heroicons/react/16/solid';
 
 export default function ResourceForm({ resource }: {resource: string}) {
@@ -16,7 +16,7 @@ export default function ResourceForm({ resource }: {resource: string}) {
   const [state, formAction] = useActionState( (prevState: FormState, formData: FormData) => createResource(resource, prevState, formData), { success: undefined, error: undefined} as FormState);
   const [users, setUsers] = useState<User[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
-  const { data, status } = useSession();
+  const { data, status } = useAuthCheck();
   const {s, sN} = useServices(data?.user.id, status);
   const [ paymentMethod, setPaymentMethod ] = useState<string>('');
 

@@ -6,7 +6,7 @@ import { Invoice, InvoiceFilter, InvoiceStatus } from '@/src/Types/Invoices';
 import { fetchInvoiceItems } from '../lib/api';
 import { InvoiceItem, InvoiceWithItems } from '../lib/schemas/invoices';
 
-export const useInvoices = (userId: string | undefined) => {
+export const useInvoices = (userId: number | undefined) => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [stats, setStats] = useState({
     totalInvoices: 0,
@@ -16,7 +16,7 @@ export const useInvoices = (userId: string | undefined) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null); // Ajout d'un état pour les erreurs
   const [filter, setFilter] = useState<InvoiceFilter>({
-    userId: userId ? parseInt(userId, 10) : undefined,
+    userId: userId ? userId : undefined,
   });
   const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([])
   const [invoicesWithItems, setInvoicesWithItems] = useState<InvoiceWithItems[]>([])

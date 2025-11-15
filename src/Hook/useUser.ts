@@ -1,14 +1,25 @@
 // src/Hooks/useUser.ts
 'use client';
-import { useSession } from "next-auth/react";
+import { useAuthCheck } from "@/src/Hook/useAuthCheck";
 import { useEffect, useState } from "react";
 import { User } from "@/src/lib/schemas";
 import { fetchUsers, fetchUsersName, fetchUsersRole, getUserById } from "../lib/api";
 
 export type UserNameRecord = Record<number, {id: number, name: string}>;
 
-export function useUser(userId?: number) {
-  const { data: session } = useSession();
+export function useUser(userId?: string) {
+  const { data: session, status } = useAuthCheck();
+
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
+  const userIdVerified = isAuthChecked && status === 'authenticated' ? session?.id : undefined;
+
+    // Attendre que l'authentification soit vérifiée
+  useEffect(() => {
+    if (status !== 'loading') {
+      setIsAuthChecked(true);
+    }
+  }, [status]);
+
   const [userData, setUserData] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -20,7 +31,7 @@ export function useUser(userId?: number) {
   if(userId){
     useEffect(()=> {
       const findUserById = async () => {
-        const getUser = await getUserById(userId);
+        const getUser = await getUserById(Number(userId));
         setUser(getUser);
       }
       findUserById();
@@ -29,10 +40,10 @@ export function useUser(userId?: number) {
   
   // Fonction pour rafraîchir les données
   const mutate = async () => {
-    if (!session?.user?.id) return;
+    if (!userIdVerified) return;
     setLoading(true);
     try {
-      const response = await fetch(`/api/user/${session.user.id}`);
+      const response = await fetch(`/api/user/${userIdVerified}`);
       if (!response.ok) throw new Error("Failed to fetch user data");
 
       const data = await response.json();
@@ -81,13 +92,13 @@ export function useUser(userId?: number) {
   };
 
   useEffect(() => {
-    if (session?.user?.id) {
+    if (userIdVerified) {
       mutate();
     } else {
       setUserData(null);
       setLoading(false);
     }
-  }, [session?.user?.id]);
+  }, [userIdVerified]);
 
   useEffect(() => {
     const fetch = async () => {

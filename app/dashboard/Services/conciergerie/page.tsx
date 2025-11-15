@@ -1,19 +1,30 @@
 // app/dashboard/Services/prontaCalls/page.tsx
 "use client";
-import { useSession } from "next-auth/react";
+import { useAuthCheck } from "@/src/Hook/useAuthCheck";
 import { CallStats, CallList, CallFilter } from "@/src/Components";
 import { CallFilter as CallFilterType } from "@/src/lib/schemas/calls";
 import { useCalls } from "@/src/Hook/useCalls";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function ConciergerieDashboard() {
-  const { data: session } = useSession();
-    const [filter, setFilter] = useState<CallFilterType>({
+  const { data: session, status } = useAuthCheck();
+
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
+  const userIdVerified = isAuthChecked && status === 'authenticated' ? session?.id : undefined;
+
+    // Attendre que l'authentification soit vérifiée
+  useEffect(() => {
+    if (status !== 'loading') {
+      setIsAuthChecked(true);
+    }
+  }, [status]);
+
+  const [filter, setFilter] = useState<CallFilterType>({
       userId: 0,
       byName: "",
       byPhone: "",
     });
-  const { calls, stats, loading } = useCalls(session?.user?.id);
+  const { calls, stats, loading } = useCalls(userIdVerified);
 
   if (loading) {
     return (

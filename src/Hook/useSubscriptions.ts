@@ -1,3 +1,4 @@
+// src/Hook/useSubscription.ts
 'use client';
 import { useState, useEffect } from 'react';
 import { Service } from '@/src/lib/schemas/services';
@@ -19,49 +20,50 @@ export const useSubscription = (userId: string | undefined, services: Service[])
 
     // Récupérer tous les abonnements et filtrer ceux de l'utilisateur
     useEffect(() => {
-      const fetchData = async () => {
-        try {
-            // 1. Récupérer tous les abonnements
-            const allSubscriptions = await fetchAllSubscriptions();
-            setSubscriptions(allSubscriptions);
+        const fetchData = async () => {
+            try {
+                // 1. Récupérer tous les abonnements
+                const allSubscriptions = await fetchAllSubscriptions();
+                setSubscriptions(allSubscriptions);
 
-            // 2. Filtrer les abonnements pour l'utilisateur et les services donnés
-            const userSubscriptions = allSubscriptions.filter(sub =>
-                sub.user_id === Number(userId) &&
-                servicesIds.includes(sub.service_id)
-            );
+                // 2. Filtrer les abonnements pour l'utilisateur et les services donnés
+                const userSubscriptions = allSubscriptions.filter(sub =>
+                    sub.user_id === Number(userId) &&
+                    servicesIds.includes(sub.service_id)
+                );
 
-            // 3. Créer userSubscriptionsWithService en combinant avec les services
-            const userSubscriptionsWithService = userSubscriptions.map(sub => {
-                // Trouver le service correspondant
-                const service = services.find(s => s.id === sub.service_id) ?? {
-                    id: 0,
-                    name: '',
-                    price: 0,
-                    unit: '',
-                    icon: '',
-                    route: '',
-                    description: '',
-                    is_active: true,
-                };
+                // 3. Créer userSubscriptionsWithService en combinant avec les services
+                const userSubscriptionsWithService = userSubscriptions.map(sub => {
+                    // Trouver le service correspondant
+                    const service = services.find(s => s.id === sub.service_id) ?? {
+                        id: 0,
+                        name: '',
+                        price: 0,
+                        unit: '',
+                        icon: '',
+                        route: '',
+                        description: '',
+                        is_active: true,
+                    };
 
-                // Retourner un nouvel objet qui combine l'abonnement et le service
-                return {
-                    ...sub, // Toutes les propriétés de l'abonnement
-                    service: service // Ajouter le service correspondant
-                };
-            });
+                    // Retourner un nouvel objet qui combine l'abonnement et le service
+                    return {
+                        ...sub, // Toutes les propriétés de l'abonnement
+                        service: service // Ajouter le service correspondant
+                    };
+                });
 
-            // 4. Mettre à jour l'état avec les abonnements enrichis
-            setSubscriptionServices(userSubscriptionsWithService);
-        } catch (error) {
-            console.error("Erreur lors de la récupération des abonnements:", error);
+                // 4. Mettre à jour l'état avec les abonnements enrichis
+                setSubscriptionServices(userSubscriptionsWithService);
+            } catch (error) {
+                console.error("Erreur lors de la récupération des abonnements:", error);
+            }
+        };
+
+        if (userId && servicesIds.length > 0) {
+            fetchData();
         }
-    };
-
-    fetchData();
-}, [userId, servicesIds, services]);
-   
+    }, [userId, servicesIds, services]); // Dépendances correctes
 
     return { subscriptions, subscriptionServices };
 };

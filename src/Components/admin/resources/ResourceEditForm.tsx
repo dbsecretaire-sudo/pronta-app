@@ -5,7 +5,7 @@ import { useState, useEffect, ChangeEvent, JSX } from 'react';
 import { useRouter } from 'next/navigation';
 import { updateResource, getResourceById, createResource } from '@/src/lib/admin/api';
 import { useServices } from '@/src/Hook/useServices';
-import { useSession } from 'next-auth/react';
+import { useAuthCheck } from "@/src/Hook/useAuthCheck";
 import { User, UserWithSubscriptions } from '@/src/lib/schemas/users';
 import { createSubscription, fetchAllClients, fetchUsers, getSubscriptionByService, updateUserSubscription } from '@/src/lib/api';
 import { TrashIcon } from '@heroicons/react/16/solid';
@@ -34,8 +34,19 @@ type CreateResourceData =
   | Record<string, any>;
 
 export function ResourceEditForm({ resourceName, id }: ResourceEditFormProps) {
-  const { data: session, status } = useSession();
-  const { s } = useServices(session?.user.id, status);
+  const { data: session, status } = useAuthCheck();
+
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
+  const userIdVerified = isAuthChecked && status === 'authenticated' ? session?.id : undefined;
+
+    // Attendre que l'authentification soit vérifiée
+  useEffect(() => {
+    if (status !== 'loading') {
+      setIsAuthChecked(true);
+    }
+  }, [status]);
+
+  const { s } = useServices(userIdVerified, status);
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [isLoading, setIsLoading] = useState(!!id);
   const [users, setUsers] = useState<User[]>([]);
@@ -105,7 +116,7 @@ export function ResourceEditForm({ resourceName, id }: ResourceEditFormProps) {
     }
   };
   initialize();
-}, [resourceName, id, session?.user.id]);
+}, [resourceName, id, userIdVerified]);
 
   useEffect(() => {
     if (formData.duration !== undefined && formData.duration !== '') {

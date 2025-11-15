@@ -1,16 +1,27 @@
 "use client";
-import { useSession } from "next-auth/react";
+import { useAuthCheck } from '@/src/Hook/useAuthCheck';
 import { useServices } from '@/src/Hook/useServices';
 import { ServiceCard, AccountSummary } from '@/src/Modules/index';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ServiceForm } from "@/src/Components";
 import { createService } from "@/src/lib/api";
 import { useSubscription } from "@/src/Hook/useSubscriptions";
 
 export default function DashboardHome() {
-  const { data: session, status } = useSession();
-  const { s, sO, sN, loading, handleSubscribe, handleDeactivate, handleReactivate } = useServices(session?.user?.id, status);
-  const { subscriptionServices } = useSubscription(session?.user.id, sO)
+  const { data: session, status } = useAuthCheck();
+
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
+  const userIdVerified = isAuthChecked && status === 'authenticated' ? session?.id : undefined;
+
+    // Attendre que l'authentification soit vérifiée
+  useEffect(() => {
+    if (status !== 'loading') {
+      setIsAuthChecked(true);
+    }
+  }, [status]);
+
+  const { s, sO, sN, loading, handleSubscribe, handleDeactivate, handleReactivate } = useServices(userIdVerified, status);
+  const { subscriptionServices } = useSubscription(userIdVerified, sO)
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -18,7 +29,6 @@ export default function DashboardHome() {
   const unSubscribedServices = sN;
 
   if (loading) return <div className="p-8">Chargement...</div>;
-
   return (
     <div className="p-8 max-w-7xl mx-auto">
       <h1 className="text-2xl font-bold mb-8">Tableau de bord</h1>
