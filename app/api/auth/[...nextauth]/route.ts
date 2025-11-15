@@ -1,11 +1,10 @@
 // auth/[...nextauth]/route.ts
-import NextAuth from "next-auth";
+import NextAuth from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
 import pool from "@/src/lib/db";
 import { compare } from "bcryptjs";
 import type { NextAuthOptions } from "next-auth";
 import { CustomUser } from "@/src/Components";
-import { NextResponse } from "next/server";
 
 const DOMAIN = process.env.DOMAIN;
 
@@ -49,7 +48,7 @@ export const authOptions: NextAuthOptions = {
           };
         } catch (error) {
           console.error("Erreur lors de l'autorisation:", error);
-          throw new Error("Internal server error"); // Assurez-vous que cette erreur est correctement gérée
+          return null; // Retournez null pour éviter les erreurs 500 non contrôlées
         }
       },
     }),
@@ -58,8 +57,6 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        // Ajoutez d'autres claims JWT ici si nécessaire
-        // Ex: token.role = user.role;
       }
       return token;
     },
@@ -69,19 +66,18 @@ export const authOptions: NextAuthOptions = {
           id: token.id,
           email: token.email,
           name: token.name,
-          // Ajoutez d'autres champs ici si nécessaire
         };
       }
       return session;
     },
   },
   pages: {
-    signIn: "/login", // Page de connexion personnalisée
-    error: "/login",  // Page d'erreur (optionnel)
+    signIn: "/login",
+    error: "/login",
   },
   session: {
-    strategy: "jwt", // Stratégie JWT pour les sessions
-    maxAge: 30 * 60, // Durée de vie de la session (30 minutes)
+    strategy: "jwt",
+    maxAge: 30 * 60,
   },
   secret: process.env.NEXTAUTH_SECRET,
   cookies: {
@@ -92,24 +88,14 @@ export const authOptions: NextAuthOptions = {
         sameSite: "lax",
         path: "/",
         secure: process.env.NODE_ENV === "production",
-        domain: process.env.NODE_ENV === "production" ? `.${DOMAIN}` : undefined, // Notez le `.` avant le domaine
+        domain: process.env.NODE_ENV === "production" ? `.${DOMAIN}` : undefined,
       },
     },
   },
-  // debug: process.env.NODE_ENV !== "production", // Désactivez le debug en production
-  debug: true,
+  debug: true, // Activez le debug uniquement en développement
 };
 
 const handler = NextAuth(authOptions);
-const handleAuth = (req: Request) => {
-  try {
-    return handler(req);
-  } catch (error) {
-    console.error("Erreur dans NextAuth:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
-  }
-};
-export { handleAuth as GET, handleAuth as POST };
+
+// Export pour App Router
+export { handler as GET, handler as POST };
