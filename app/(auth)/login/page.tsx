@@ -37,6 +37,7 @@ export default function Login() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="w-full p-2 border rounded"
+            autoComplete="username"
             required
           />
         </div>
@@ -48,6 +49,7 @@ export default function Login() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full p-2 border rounded"
+            autoComplete="current-password"
             required
           />
         </div>

@@ -5,6 +5,7 @@ import pool from "@/src/lib/db";
 import { compare } from "bcryptjs";
 import type { NextAuthOptions } from "next-auth";
 import { CustomUser } from "@/src/Components";
+import { NextResponse } from "next/server";
 
 const DOMAIN = process.env.DOMAIN;
 
@@ -100,4 +101,15 @@ export const authOptions: NextAuthOptions = {
 };
 
 const handler = NextAuth(authOptions);
-export { handler as GET, handler as POST };
+const handleAuth = (req: Request) => {
+  try {
+    return handler(req);
+  } catch (error) {
+    console.error("Erreur dans NextAuth:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+};
+export { handleAuth as GET, handleAuth as POST };
