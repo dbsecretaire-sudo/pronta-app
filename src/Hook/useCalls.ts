@@ -5,6 +5,9 @@ import { Call,  CallFilter as CallFilterType } from "@/src/lib/schemas/calls";
 
 import { fetchCalendarEvents } from '../lib/api';
 import { useCalendar } from './useCalendar';
+import { useAuthCheck } from './useAuthCheck';
+import { redirect } from 'next/dist/server/api-utils';
+import { useRouter } from 'next/navigation';
 
 const calculateCallStats = (calls: Call[]) => {
   // Convertir les dates en objets Date si nécessaire
@@ -44,6 +47,8 @@ const calculateCallStats = (calls: Call[]) => {
 };
 
 export const useCalls = (userId: string | undefined, initialFilter: Omit<CallFilterType, 'userId'> = {}) => {
+  const router = useRouter();
+  const { data: session, status } = useAuthCheck();  
   const [filter, setFilter] = useState<Omit<CallFilterType, 'userId'>>(initialFilter);
   const [calls, setCalls] = useState<Call[]>([]);
   const [stats, setStats] = useState({
@@ -56,12 +61,18 @@ export const useCalls = (userId: string | undefined, initialFilter: Omit<CallFil
   const [loading, setLoading] = useState(true);
   const { calendarEvents } = useCalendar(userId)
 
+// useEffect(() => {
+//     // Si la session n'est pas chargée ou n'existe pas
+//     if (status === 'unauthenticated' || !session) {
+//       router.push('/login');
+//       return;
+//     }
+    
+//   }, [session, status, router]);
+
   useEffect(() => {
   const loadData = async () => {
-    if (!userId) {
-      setLoading(false);
-      return;
-    }
+
     setLoading(true);
     try {
       const params = new URLSearchParams();

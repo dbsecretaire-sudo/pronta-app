@@ -1,10 +1,18 @@
 // app/api/invoices/route.ts
 import { NextResponse } from 'next/server';
 import { InvoiceService } from './service';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '../auth/[...nextauth]/route';
 
 const invoiceService = new InvoiceService;
 
 export async function GET(request: Request) {
+
+      const session = await getServerSession(authOptions);
+    if (!session) {
+      return NextResponse.redirect(new URL('/unauthorized', request.url));  
+    }
+
   try {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
@@ -25,6 +33,12 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+
+    const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.redirect(new URL('/unauthorized', request.url));  
+  }
+
   try {
     const invoiceData = await request.json();
     const newInvoice = await invoiceService.createInvoice(invoiceData);

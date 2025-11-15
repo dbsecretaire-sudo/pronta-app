@@ -2,14 +2,27 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { Client } from '@/src/lib/schemas/clients';
+import { useAuthCheck } from './useAuthCheck';
+import { useRouter } from 'next/navigation';
 
 export const useClients = () => {
+  const router = useRouter();
+  const { data: session, status } = useAuthCheck();
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalClients, setTotalClients] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const itemsPerPage = 10;
+
+// useEffect(() => {
+//     // Si la session n'est pas chargée ou n'existe pas
+//     if (status === 'unauthenticated' || !session) {
+//       router.push('/login');
+//       return;
+//     }
+    
+//   }, [session, status, router]);
 
   // Fonction pour récupérer les clients
   const fetchClients = async () => {
@@ -35,6 +48,7 @@ export const useClients = () => {
 
   // Fonction pour supprimer un client
   const handleDelete = async (clientId: number) => {
+   
     try {
       const res = await fetch(`/api/clients/${clientId}`, {
         method: "DELETE",

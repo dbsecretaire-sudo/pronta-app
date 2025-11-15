@@ -1,6 +1,8 @@
 // app/api/services/[id]/route.ts
 import { NextResponse } from 'next/server';
 import { ServiceService } from '../service';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '../../auth/[...nextauth]/route';
 
 const serviceService = new ServiceService;
 
@@ -9,6 +11,12 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+
+      const session = await getServerSession(authOptions);
+    if (!session) {
+      return NextResponse.redirect(new URL('/unauthorized', request.url));  
+    }
+
   try {
     const { id } = await params;
     const service = await serviceService.getServiceById(Number(id));
@@ -32,6 +40,12 @@ export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+
+    const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.redirect(new URL('/unauthorized', request.url));  
+  }
+
   try {
     const { id } = await params;
     const serviceData = await request.json();
@@ -50,6 +64,12 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+
+    const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.redirect(new URL('/unauthorized', request.url));  
+  }
+
   try {
     const { id } = await params;
     await serviceService.deleteService(Number(id));

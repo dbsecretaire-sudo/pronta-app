@@ -4,11 +4,23 @@ import { useState, useEffect } from 'react';
 import { Service } from '@/src/lib/schemas/services';
 import { Subscription, SubscriptionWithService } from '@/src/lib/schemas/subscription';
 import { fetchAllSubscriptions } from '@/src/lib/api';
-
+import { useAuthCheck } from './useAuthCheck';
+import { useRouter } from 'next/navigation'; 
 export const useSubscription = (userId: string | undefined, services: Service[]) => {
+    const router = useRouter();
+    const { data: session, status } = useAuthCheck();    
     const [subscriptionServices, setSubscriptionServices] = useState<SubscriptionWithService[]>([]);
     const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
     const [servicesIds, setServicesIds] = useState<number[]>([]);
+
+// useEffect(() => {
+//     // Si la session n'est pas chargée ou n'existe pas
+//     if (status === 'unauthenticated' || !session) {
+//       router.push('/login');
+//       return;
+//     }
+
+//   }, [session, status, router]);
 
     // Initialiser les IDs des services
     useEffect(() => {

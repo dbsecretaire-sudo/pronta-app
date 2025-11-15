@@ -12,17 +12,24 @@ export default async function AdminLayout({
 }) {
   const session = await getServerSession(authOptions);
 
-  if (!session) {
+  if (!session?.user?.id) {
     redirect('/login');
   }
 
-  const role = await getRoleByUserId(Number(session.user.id));
-  if (role.role !== 'ADMIN') {
+  let role;
+  try {
+    role = await getRoleByUserId(Number(session.user.id));
+  } catch (error) {
+    console.error("Erreur lors de la récupération du rôle :", error);
+    redirect('/error');
+  }
+  console.log(role)
+
+  if (role?.role !== 'ADMIN') {
     redirect('/unauthorized');
   }
 
   return (
-    
     <div className="flex h-screen bg-gray-50">
       <main className="flex-1 p-8">
         <AuthProvider initialSession={session}>
@@ -30,8 +37,5 @@ export default async function AdminLayout({
         </AuthProvider>
       </main>
     </div>
-
-    
-    
   );
 }

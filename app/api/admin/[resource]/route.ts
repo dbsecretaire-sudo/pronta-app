@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import pool from '@/src/lib/db';
 import bcrypt from 'bcryptjs';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '../../auth/[...nextauth]/route';
 
 interface PostgreSQLError extends Error {
   code: string;
@@ -17,6 +19,11 @@ export async function POST(
 ) {
   const { resource } = await params;
   const data = await request.json();
+
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.redirect(new URL('/unauthorized', request.url));  
+  }
 
   try {
     if (resource === "invoices") {
@@ -146,6 +153,12 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ resource: string }> }
 ) {
+
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.redirect(new URL('/unauthorized', request.url));  
+  }
+
   const { resource } = await params;
   try {
     let result;

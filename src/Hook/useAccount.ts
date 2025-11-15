@@ -1,22 +1,31 @@
 // src/hooks/useAccount.ts
+'use client'
 import { useEffect, useState } from "react";
 import { useUser } from "@/src/Hook/useUser";
 import { useSubscription } from "./useSubscriptions";
 import { useTab } from '@/src/context/TabContext';
 import { useServices } from "./useServices";
 import { useAuthCheck } from "@/src/Hook/useAuthCheck";
+import { useRouter } from "next/navigation";
 
 export function useAccount() {
+  const router = useRouter();
   const { data: session, status } = useAuthCheck();
+
   const [isAuthChecked, setIsAuthChecked] = useState(false);
   const userIdVerified = isAuthChecked && status === 'authenticated' ? session?.id : undefined;
 
     // Attendre que l'authentification soit vérifiée
-  useEffect(() => {
-    if (status !== 'loading') {
-      setIsAuthChecked(true);
-    }
-  }, [status]);
+// useEffect(() => {
+//     // Si la session n'est pas chargée ou n'existe pas
+//     if (status === 'unauthenticated' || !session) {
+      
+//       router.push('/login');
+//       return;
+//     }
+
+//   }, [session, status, router]);
+
   const { userData, loading, error, mutate } = useUser();
   const { activeTab, setActiveTab } = useTab();
   const [isUpdating, setIsUpdating] = useState(false); 
@@ -25,10 +34,11 @@ export function useAccount() {
 
   // Fonction générique pour les mises à jour
   const updateUser = async <T extends object>( updatedData: T, successMessage: string, errorMessage: string ) => {
+
     if (!userData?.id) { return { success: false, message: "Utilisateur non trouvé" };    }
 
     setIsUpdating(true);
-
+    
     try {
       const response = await fetch(`/api/user/${userData.id}`, {
         method: "PUT",

@@ -2,6 +2,8 @@ import { SubscriptionService } from '../service';
 import { NextResponse } from 'next/server';
 import { UpdateSubscriptionSchema } from "@/src/lib/schemas/subscription";
 import { z } from "zod";
+import { getServerSession } from 'next-auth';
+import { authOptions } from '../../auth/[...nextauth]/route';
 
 const subscriptionService = new SubscriptionService();
 
@@ -11,6 +13,12 @@ export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+
+    const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.redirect(new URL('/unauthorized', request.url));  
+  }
+
   try {
     // Attend la résolution de la Promise pour accéder à params.id
     const { id } = await params;
@@ -92,6 +100,12 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }  // Correction: params n'est pas une Promise
 ) {
+
+    const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.redirect(new URL('/unauthorized', request.url));  
+  }
+
   try {
     const { id } = await params;
 
@@ -119,6 +133,12 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+
+    const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.redirect(new URL('/unauthorized', request.url));  
+  }
+
   try {
     const { id } = await params;
     const userId = Number(id);

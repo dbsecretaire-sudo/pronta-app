@@ -1,6 +1,8 @@
 // app/api/UserServices/[userId]/[serviceId]/route.ts
 import { NextResponse } from 'next/server';
 import { UserService } from '../../service';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { getServerSession } from 'next-auth';
 
 const userService = new UserService;
 
@@ -9,6 +11,12 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string; serviceId: string }> }
 ) {
+
+    const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.redirect(new URL('/unauthorized', request.url));  
+  }
+
   try {
     const { id, serviceId } = await params; // ✅ Utilisez await pour obtenir les valeurs
     const user = await userService.getUserById(Number(id));
@@ -32,6 +40,12 @@ export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string; serviceId: string }> }
 ) {
+
+    const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.redirect(new URL('/unauthorized', request.url));  
+  }
+
   try {
     const { id, serviceId } = await params; // ✅ Utilisez await pour obtenir les valeurs
     const permissions = await request.json();

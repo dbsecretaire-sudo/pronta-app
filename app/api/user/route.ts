@@ -1,11 +1,19 @@
 // app/api/user/route.ts
 import { NextResponse } from 'next/server';
 import { UserService} from './service';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '../auth/[...nextauth]/route';
 
 const userService = new UserService;
 
 // GET /api/user
-export async function GET() {
+export async function GET(request: Request) {
+
+    const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.redirect(new URL('/unauthorized', request.url));  
+  }
+
   try {
     const users = await userService.getAllUsers();
     return NextResponse.json(users);
@@ -19,6 +27,12 @@ export async function GET() {
 
 // POST /api/user
 export async function POST(request: Request) {
+
+    const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.redirect(new URL('/unauthorized', request.url));  
+  }
+
   try {
     const userData = await request.json();
     const newUser = await userService.createUser(userData);

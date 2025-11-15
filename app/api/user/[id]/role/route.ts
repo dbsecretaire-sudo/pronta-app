@@ -9,6 +9,7 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+
   try {
     const { id } = await params;
     const userRole = await userService.getRoleByUserId(Number(id));

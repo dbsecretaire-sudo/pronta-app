@@ -2,9 +2,22 @@
 import { useState, useEffect } from 'react';
 import { fetchCalendar } from '@/src/lib/api';
 import { CalendarEvent } from '../lib/schemas/calendar';
+import { useAuthCheck } from './useAuthCheck';
+import { useRouter } from 'next/navigation';
 
 export const useCalendar = (userId: string | undefined) => {
+    const router = useRouter();
+    const { data: session, status } = useAuthCheck();
     const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]); // Initialisez comme un tableau vide
+
+// useEffect(() => {
+//     // Si la session n'est pas chargée ou n'existe pas
+//     if (status === 'unauthenticated' || !session) {
+//       router.push('/login');
+//       return;
+//     }
+   
+//   }, [session, status, router]);
 
     useEffect(() => {
         const fetchEvents = async () => {

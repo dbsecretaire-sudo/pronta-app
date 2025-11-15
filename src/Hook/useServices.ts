@@ -13,8 +13,12 @@ import {
   updateUserSubscription,
   getSubscriptionByService,
 } from '@/src/lib/api';
+import { useAuthCheck } from './useAuthCheck';
+import { useRouter } from 'next/navigation';
 
 export const useServices = (userId: string | undefined, status: string) => {
+  const router = useRouter();
+  const { data: session } = useAuthCheck();
   const [sO, setSO] = useState<Service[]>([]);
   const [sN, setSN] = useState<Service[]>([]);
   const [s, setS] = useState<Service[]>([]);
@@ -27,6 +31,15 @@ export const useServices = (userId: string | undefined, status: string) => {
   nextDate.setMonth(now.getMonth() + 1);
   const endDate = new Date(now);
   endDate.setFullYear(now.getFullYear() + 1);
+
+// useEffect(() => {
+//     // Si la session n'est pas chargée ou n'existe pas
+//     if (status === 'unauthenticated' || !session) {
+//       router.push('/login');
+//       return;
+//     }
+
+//   }, [session, status, router]);
 
   const fetchData = useCallback(async () => {
     if (!userId || isNaN(Number(userId))) {

@@ -5,8 +5,12 @@ import { useState, useEffect } from 'react';
 import { Invoice, InvoiceFilter, InvoiceStatus } from '@/src/Types/Invoices';
 import { fetchInvoiceItems } from '../lib/api';
 import { InvoiceItem, InvoiceWithItems } from '../lib/schemas/invoices';
+import { useAuthCheck } from './useAuthCheck';
+import { useRouter } from 'next/navigation';
 
 export const useInvoices = (userId: number | undefined) => {
+  const router = useRouter();
+  const { data: session, status } = useAuthCheck();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [stats, setStats] = useState({
     totalInvoices: 0,
@@ -20,6 +24,15 @@ export const useInvoices = (userId: number | undefined) => {
   });
   const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([])
   const [invoicesWithItems, setInvoicesWithItems] = useState<InvoiceWithItems[]>([])
+
+// useEffect(() => {
+//     // Si la session n'est pas chargée ou n'existe pas
+//     if (status === 'unauthenticated' || !session) {
+//       router.push('/login');
+//       return;
+//     }
+    
+//   }, [session, status, router]);
 
   useEffect(() => {
     const loadInvoices = async () => {

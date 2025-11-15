@@ -1,11 +1,19 @@
 // app/api/clients/route.ts
 import { NextResponse } from 'next/server';
 import { ClientService } from './service';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '../auth/[...nextauth]/route';
 
 const clientService = new ClientService();
 
 // GET /api/clients
 export async function GET(request: Request) {
+
+    const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.redirect(new URL('/unauthorized', request.url));  
+  }
+
   try {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
@@ -27,6 +35,12 @@ export async function GET(request: Request) {
 
 // POST /api/clients
 export async function POST(request: Request) {
+
+    const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.redirect(new URL('/unauthorized', request.url));  
+  }
+
   try {
     const clientData = await request.json();
     const newClient = await clientService.createClient(clientData);

@@ -1,11 +1,19 @@
 // app/api/user/route.ts
 import { NextResponse } from 'next/server';
 import { UserService} from '../service';
+import { authOptions } from '../../auth/[...nextauth]/route';
+import { getServerSession } from 'next-auth';
 
 const userService = new UserService;
 
 // GET /api/user
 export async function GET(request: Request) {
+
+    const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.redirect(new URL('/unauthorized', request.url));  
+  }
+
   try {
     const users = await userService.getAllUsersRole();
     return NextResponse.json(users);

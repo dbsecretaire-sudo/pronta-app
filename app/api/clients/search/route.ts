@@ -1,11 +1,19 @@
 // app/api/clients/search/route.ts
 import { NextResponse } from 'next/server';
 import { ClientService } from '../service';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '../../auth/[...nextauth]/route';
 
 const clientService = new ClientService;
 
 // GET /api/clients/search
 export async function GET(request: Request) {
+
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.redirect(new URL('/unauthorized', request.url));  
+  }
+
   try {
     const { searchParams } = new URL(request.url);
     const query = searchParams.get('query');

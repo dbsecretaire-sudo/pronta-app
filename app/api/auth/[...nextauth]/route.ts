@@ -5,7 +5,11 @@ import pool from "@/src/lib/db";
 import { compare } from "bcryptjs";
 import type { NextAuthOptions } from "next-auth";
 import { CustomUser } from "@/src/Components";
+import bcrypt from "bcrypt";
 
+async function verifyPassword(plainPassword: string, hashedPassword: string) {
+  return await bcrypt.compare(plainPassword, hashedPassword);
+}
 const DOMAIN = process.env.DOMAIN;
 
 export const authOptions: NextAuthOptions = {

@@ -2,11 +2,17 @@
 import { NextResponse } from 'next/server';
 import { CalendarEventService } from "./service";
 import { validateCalendarEvent } from "./utils";
+import { getServerSession } from 'next-auth';
+import { authOptions } from '../auth/[...nextauth]/route';
 
 const eventService = new CalendarEventService();
 
 // GET /api/calendar
 export async function GET(request: Request) {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.redirect(new URL('/unauthorized', request.url));  
+  }
   try {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
@@ -28,6 +34,10 @@ export async function GET(request: Request) {
 
 // POST /api/calendar
 export async function POST(request: Request) {
+    const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.redirect(new URL('/unauthorized', request.url));  
+  }
   try {
     const event = await request.json();
 

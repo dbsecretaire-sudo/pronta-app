@@ -1,6 +1,8 @@
 // app/api/calls/[id]/route.ts
 import { NextResponse } from 'next/server';
 import { CallService } from '../service';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '../../auth/[...nextauth]/route';
 
 const callService = new CallService();
 
@@ -9,6 +11,12 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.redirect(new URL('/unauthorized', request.url));  
+  }
+
   try {
     const { id } = await params;
     const call = await callService.getCallById(Number(id));
@@ -34,6 +42,12 @@ export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.redirect(new URL('/unauthorized', request.url));  
+  }
+
   try {
     const { id } = await params;
     const call = await request.json();
@@ -52,6 +66,12 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.redirect(new URL('/unauthorized', request.url));  
+  }
+
   try {
     const { id } = await params;
     await callService.deleteCall(Number(id));
