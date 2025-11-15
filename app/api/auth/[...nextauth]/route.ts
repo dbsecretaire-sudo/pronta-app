@@ -95,7 +95,8 @@ export const authOptions: NextAuthOptions = {
       },
     },
   },
-  debug: process.env.NODE_ENV !== "production", // Désactivez le debug en production
+  // debug: process.env.NODE_ENV !== "production", // Désactivez le debug en production
+  debug: true,
 };
 
 const handler = NextAuth(authOptions);
