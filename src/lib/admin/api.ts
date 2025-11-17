@@ -1,13 +1,12 @@
 import { resourcesConfig } from './resources';
 import { FormState } from '@/app/actions/admin';
+import { Invoice } from "@/src/Types/Invoices";
+import { getSession } from 'next-auth/react';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export async function fetchResourceItem(resource: string, id: number) {
-    
-  const response = await fetch(`/api/admin/${resource}/${id}`);
-  if (!response.ok) throw new Error('Failed to fetch item');
-  return response.json();
+export async function fetchResourceItem<T>(resource: string, id: number): Promise<T> {
+  return safeFetch<T>(`/api/admin/${resource}/${id}`);
 }
 
 export async function updateResource(resource: string, id: number | undefined, data: any): Promise<FormState> {
@@ -23,7 +22,21 @@ export async function updateResource(resource: string, id: number | undefined, d
   }
 
   try {
-    const response = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(id ? { id, ...data } : data), });
+    const currentSession = await getSession();
+    if (!currentSession) {
+      throw new Error("Session expirée. Veuillez vous reconnecter.");
+    }
+
+    const response = await fetch(url, { 
+      method, 
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${currentSession.accessToken}`, // <-- Utilise le token
+      }, 
+      credentials: 'include', 
+      body: JSON.stringify(id ? { id, ...data } : data) 
+    });
+
     if(!response.ok){
         const errorData = await response.json();
         return { success: false, error: errorData.error || response.statusText };
@@ -39,9 +52,27 @@ export async function updateResource(resource: string, id: number | undefined, d
 export async function getResourceById(resourceName: string, id: number) {
   // Appel à votre API ou base de données
   if(resourceName === 'invoices'){
+    
+    const currentSession = await getSession();
+    if (!currentSession) {
+      throw new Error("Session expirée. Veuillez vous reconnecter.");
+    }
+
     const [invoiceResponse, itemsResponse] = await Promise.all([
-      fetch(`/api/admin/invoices/${id}`),
-      fetch(`/api/invoices/${id}/items`), // Endpoint dédié aux items
+      fetch(`/api/admin/invoices/${id}`, { 
+        credentials: 'include',
+        headers: {
+          "Content-Type": "application/json",
+          'Authorization': `Bearer ${currentSession.accessToken}`, // <-- Utilise le token
+        },
+      }),
+      fetch(`/api/invoices/${id}/items`, {
+        credentials: 'include',
+        headers: {
+          "Content-Type": "application/json",
+          'Authorization': `Bearer ${currentSession.accessToken}`, // <-- Utilise le token
+        },
+      }), // Endpoint dédié aux items
     ]);
 
     if (!invoiceResponse.ok || !itemsResponse.ok) {
@@ -57,7 +88,18 @@ export async function getResourceById(resourceName: string, id: number) {
       items: itemsData, // Ajoute les items à la facture
     };
   } else {
-     const response = await fetch(`/api/admin/${resourceName}/${id}`);
+    const currentSession = await getSession();
+    if (!currentSession) {
+      throw new Error("Session expirée. Veuillez vous reconnecter.");
+    }
+
+    const response = await fetch(`/api/admin/${resourceName}/${id}`, {
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${currentSession.accessToken}`, // <-- Utilise le token
+      },
+    });
     if (!response.ok) {
       throw new Error('Failed to fetch resource');
     }
@@ -74,11 +116,57 @@ export async function fetchResource(resource: string) {
 
 export async function createResource(resource: string, prevState: any, formData: FormData) {
   const data = Object.fromEntries(formData.entries());
+
+  const currentSession = await getSession();
+  if (!currentSession) {
+    throw new Error("Session expirée. Veuillez vous reconnecter.");
+  }
+
   const response = await fetch(`/api/admin/${resource}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 
+      "Content-Type": "application/json",
+      'Authorization': `Bearer ${currentSession.accessToken}`, // <-- Utilise le token
+    },
+    credentials: 'include',
     body: JSON.stringify(data),
   });
   if (!response.ok) throw new Error('Failed to create');
   return response.json();
+}
+
+
+// src/lib/api.ts
+export async function safeFetch<T>(
+  url: string,
+  config?: RequestInit
+): Promise<T> {
+  try {
+    const currentSession = await getSession();
+    if (!currentSession) {
+      throw new Error("Session expirée. Veuillez vous reconnecter.");
+    }
+
+    const response = await fetch(url, {
+      ...config,
+      credentials: 'include', // <-- Toujours inclure les cookies
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${currentSession.accessToken}`, // <-- Utilise le token
+        ...config?.headers,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        `Erreur ${response.status}: ${JSON.stringify(errorData)}`
+      );
+    }
+
+    return response.json() as Promise<T>;
+  } catch (error) {
+    console.error(`Erreur lors de la requête vers ${url}:`, error);
+    throw error; // <-- Relance l'erreur pour une gestion supérieure
+  }
 }

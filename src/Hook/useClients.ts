@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Client } from '@/src/lib/schemas/clients';
 import { useAuthCheck } from './useAuthCheck';
 import { useRouter } from 'next/navigation';
+import { getSession } from 'next-auth/react';
 
 export const useClients = () => {
   const router = useRouter();
@@ -28,8 +29,20 @@ export const useClients = () => {
   const fetchClients = async () => {
     try {
       setLoading(true);
+
+      const currentSession = await getSession();
+      if (!currentSession) {
+        throw new Error("Session expirée. Veuillez vous reconnecter.");
+      }
+
       const res = await fetch(
-        `/api/clients?page=${currentPage}&limit=${itemsPerPage}&search=${searchTerm}`
+        `/api/clients?page=${currentPage}&limit=${itemsPerPage}&search=${searchTerm}`, {
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+            'Authorization': `Bearer ${currentSession.accessToken}`, // <-- Utilise le token
+          },
+        }
       );
       const data = await res.json();
       setClients(data.clients);
@@ -50,8 +63,18 @@ export const useClients = () => {
   const handleDelete = async (clientId: number) => {
    
     try {
+      const currentSession = await getSession();
+      if (!currentSession) {
+        throw new Error("Session expirée. Veuillez vous reconnecter.");
+      }
+
       const res = await fetch(`/api/clients/${clientId}`, {
         method: "DELETE",
+        credentials: 'include',
+        headers: {
+          "Content-Type": "application/json",
+          'Authorization': `Bearer ${currentSession.accessToken}`, // <-- Utilise le token
+        },
       });
       if (res.ok) {
         // Rafraîchir la liste après suppression

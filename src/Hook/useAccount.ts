@@ -1,5 +1,5 @@
 // src/hooks/useAccount.ts
-'use client'
+'use client';
 import { useEffect, useState } from "react";
 import { useUser } from "@/src/Hook/useUser";
 import { useSubscription } from "./useSubscriptions";
@@ -7,55 +7,63 @@ import { useTab } from '@/src/context/TabContext';
 import { useServices } from "./useServices";
 import { useAuthCheck } from "@/src/Hook/useAuthCheck";
 import { useRouter } from "next/navigation";
+import { getSession } from 'next-auth/react';
 
 export function useAccount() {
   const router = useRouter();
   const { data: session, status } = useAuthCheck();
-
   const [isAuthChecked, setIsAuthChecked] = useState(false);
-  const userIdVerified = isAuthChecked && status === 'authenticated' ? session?.id : undefined;
+  const [isUpdating, setIsUpdating] = useState(false);
 
-    // Attendre que l'authentification soit vérifiée
-// useEffect(() => {
-//     // Si la session n'est pas chargée ou n'existe pas
-//     if (status === 'unauthenticated' || !session) {
-      
-//       router.push('/login');
-//       return;
-//     }
+  // Vérifie l'authentification au chargement
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/login');
+    } else if (status === 'authenticated') {
+      setIsAuthChecked(true);
+    }
+  }, [status, router]);
 
-//   }, [session, status, router]);
-
+  const userIdVerified = session?.user.id;
   const { userData, loading, error, mutate } = useUser();
   const { activeTab, setActiveTab } = useTab();
-  const [isUpdating, setIsUpdating] = useState(false); 
-  const { sO } = useServices(userIdVerified, status);
-  const { subscriptionServices } = useSubscription(userIdVerified, sO);
+  const { sO } = useServices(session?.user.id, status);
+  const { subscriptionServices } = useSubscription(session?.user.id, sO);
 
   // Fonction générique pour les mises à jour
-  const updateUser = async <T extends object>( updatedData: T, successMessage: string, errorMessage: string ) => {
-
-    if (!userData?.id) { return { success: false, message: "Utilisateur non trouvé" };    }
+  const updateUser = async <T extends object>(
+    updatedData: T,
+    successMessage: string,
+    errorMessage: string
+  ) => {
+    if (!userData?.id) {
+      return { success: false, message: "Utilisateur non trouvé" };
+    }
 
     setIsUpdating(true);
-    
+
     try {
+      // 2. Envoie la requête avec le token dans l'Authorization header
       const response = await fetch(`/api/user/${userData.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          'Authorization': `Bearer ${session?.accessToken}`, // <-- Utilise le token
         },
         body: JSON.stringify(updatedData),
       });
 
       if (!response.ok) {
-        throw new Error(errorMessage);
+        const errorData = await response.json();
+        throw new Error(errorData.message || errorMessage);
       }
 
+      // 3. Met à jour les données locales après succès
       await mutate();
       return { success: true, message: successMessage };
     } catch (error) {
-      return { success: false, message: errorMessage };
+      console.error("Erreur lors de la mise à jour:", error);
+      return { success: false, message: error instanceof Error ? error.message : errorMessage };
     } finally {
       setIsUpdating(false);
     }

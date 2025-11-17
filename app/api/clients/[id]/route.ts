@@ -1,134 +1,128 @@
 // app/api/clients/[id]/route.ts
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import pool from '@/src/lib/db';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../../auth/[...nextauth]/route';
+import { withAuth } from '@/src/utils/withAuth';
 const API_URL = process.env.NEXTAUTH_URL
 // DELETE /api/clients/[id]
 export async function DELETE(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
 
-  const session = await getServerSession(authOptions);
-  if (!session) {
-     return NextResponse.redirect(new URL(`${API_URL}/unauthorized`, request.url));  
-  }
+  return withAuth(request, async (session) => {
+    try {
+      const { id } = await params;
 
-  try {
-    const { id } = await params;
+      // Vérifie si le client est lié à des factures
+      const checkQuery = 'SELECT 1 FROM invoices WHERE client_id = $1 LIMIT 1';
+      const checkRes = await pool.query(checkQuery, [Number(id)]);
 
-    // Vérifie si le client est lié à des factures
-    const checkQuery = 'SELECT 1 FROM invoices WHERE client_id = $1 LIMIT 1';
-    const checkRes = await pool.query(checkQuery, [Number(id)]);
+      if (checkRes.rows.length > 0) {
+        return NextResponse.json(
+          { error: "Ce client est lié à des factures et ne peut pas être supprimé" },
+          { status: 400 }
+        );
+      }
 
-    if (checkRes.rows.length > 0) {
+      // Supprime le client
+      const deleteQuery = 'DELETE FROM clients WHERE id = $1 RETURNING *';
+      const { rows } = await pool.query(deleteQuery, [Number(id)]);
+
+      if (rows.length === 0) {
+        return NextResponse.json(
+          { error: "Client non trouvé" },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json(rows[0]);
+    } catch (error) {
       return NextResponse.json(
-        { error: "Ce client est lié à des factures et ne peut pas être supprimé" },
-        { status: 400 }
+        { error: "Erreur lors de la suppression du client" },
+        { status: 500 }
       );
     }
-
-    // Supprime le client
-    const deleteQuery = 'DELETE FROM clients WHERE id = $1 RETURNING *';
-    const { rows } = await pool.query(deleteQuery, [Number(id)]);
-
-    if (rows.length === 0) {
-      return NextResponse.json(
-        { error: "Client non trouvé" },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json(rows[0]);
-  } catch (error) {
-    return NextResponse.json(
-      { error: "Erreur lors de la suppression du client" },
-      { status: 500 }
-    );
-  }
+  });
 }
 
 // PUT /api/clients/[id]
 export async function PUT(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await getServerSession(authOptions);
-  if (!session) {
-     return NextResponse.redirect(new URL(`${API_URL}/unauthorized`, request.url));  
-  }
+  return withAuth(request, async (session) => {
 
-  try {
-    const { id } = await params;
-    const { name, email, phone, address, company } = await request.json();
+    try {
+      const { id } = await params;
+      const { name, email, phone, address, company } = await request.json();
 
-    if (!name || !email) {
+      if (!name || !email) {
+        return NextResponse.json(
+          { error: "Le nom et l'email sont obligatoires" },
+          { status: 400 }
+        );
+      }
+
+      const query = `
+        UPDATE clients
+        SET name = $1, email = $2, phone = $3, address = $4, company = $5, updated_at = NOW()
+        WHERE id = $6
+        RETURNING *
+      `;
+
+      const { rows } = await pool.query(query, [name, email, phone, address, company, Number(id)]);
+
+      if (rows.length === 0) {
+        return NextResponse.json(
+          { error: "Client non trouvé" },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json(rows[0]);
+    } catch (error) {
+      if (error instanceof Error && "code" in error && error.code === '23505') {
+        return NextResponse.json(
+          { error: "Un client avec cet email existe déjà" },
+          { status: 409 }
+        );
+      }
       return NextResponse.json(
-        { error: "Le nom et l'email sont obligatoires" },
-        { status: 400 }
+        { error: "Erreur lors de la mise à jour du client" },
+        { status: 500 }
       );
     }
-
-    const query = `
-      UPDATE clients
-      SET name = $1, email = $2, phone = $3, address = $4, company = $5, updated_at = NOW()
-      WHERE id = $6
-      RETURNING *
-    `;
-
-    const { rows } = await pool.query(query, [name, email, phone, address, company, Number(id)]);
-
-    if (rows.length === 0) {
-      return NextResponse.json(
-        { error: "Client non trouvé" },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json(rows[0]);
-  } catch (error) {
-    if (error instanceof Error && "code" in error && error.code === '23505') {
-      return NextResponse.json(
-        { error: "Un client avec cet email existe déjà" },
-        { status: 409 }
-      );
-    }
-    return NextResponse.json(
-      { error: "Erreur lors de la mise à jour du client" },
-      { status: 500 }
-    );
-  }
+  });
 }
 
 // GET /api/clients/[id]
 export async function GET(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
 
-    const session = await getServerSession(authOptions);
-  if (!session) {
-     return NextResponse.redirect(new URL(`${API_URL}/unauthorized`, request.url));  
-  }
+  return withAuth(request, async (session) => {
 
-  try {
-    const { id } = await params;
-    const query = 'SELECT * FROM clients WHERE id = $1';
-    const { rows } = await pool.query(query, [Number(id)]);
+    try {
+      const { id } = await params;
+      const query = 'SELECT * FROM clients WHERE id = $1';
+      const { rows } = await pool.query(query, [Number(id)]);
 
-    if (rows.length === 0) {
+      if (rows.length === 0) {
+        return NextResponse.json(
+          { error: "Client non trouvé" },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json(rows[0]);
+    } catch (error) {
       return NextResponse.json(
-        { error: "Client non trouvé" },
-        { status: 404 }
+        { error: "Erreur lors de la récupération du client" },
+        { status: 500 }
       );
     }
-
-    return NextResponse.json(rows[0]);
-  } catch (error) {
-    return NextResponse.json(
-      { error: "Erreur lors de la récupération du client" },
-      { status: 500 }
-    );
-  }
+  });
 }

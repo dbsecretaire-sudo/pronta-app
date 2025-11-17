@@ -23,7 +23,7 @@ export const useAuthCheck = () => {
 useEffect(() => {
   const checkAuth = async () => {
     try {
-      const response = await fetch('/api/auth/session');
+      const response = await fetch('/api/auth/session', {credentials: "include"});
       if (!response.ok) {
         setStatus("unauthenticated");
         setData(null);
@@ -33,7 +33,7 @@ useEffect(() => {
       const data = await response.json();
       if (data.user) {
         setStatus("authenticated");
-        setData(data.user);
+        setData(data);
 
         // Version corrigée pour récupérer les données utilisateur
         try {

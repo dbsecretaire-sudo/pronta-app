@@ -4,6 +4,7 @@ import { useAuthCheck } from "@/src/Hook/useAuthCheck";
 import { useEffect, useState } from "react";
 import { User } from "@/src/lib/schemas";
 import { fetchUsers, fetchUsersName, fetchUsersRole, getUserById } from "../lib/api";
+import { getSession } from "next-auth/react";
 
 export type UserNameRecord = Record<number, {id: number, name: string}>;
 
@@ -11,7 +12,7 @@ export function useUser(userId?: string) {
   const { data: session, status } = useAuthCheck();
 
   const [isAuthChecked, setIsAuthChecked] = useState(false);
-  const userIdVerified = isAuthChecked && status === 'authenticated' ? session?.id : undefined;
+  const userIdVerified = isAuthChecked && status === 'authenticated' ? session?.user.id : undefined;
 
     // Attendre que l'authentification soit vérifiée
   useEffect(() => {
@@ -43,7 +44,13 @@ export function useUser(userId?: string) {
     if (!userIdVerified) return;
     setLoading(true);
     try {
-      const response = await fetch(`/api/user/${userIdVerified}`);
+      const response = await fetch(`/api/user/${userIdVerified}`, {
+        credentials: 'include',
+        headers: {
+          "Content-Type": "application/json",
+          'Authorization': `Bearer ${session?.accessToken ?? null}`, // <-- Utilise le token
+        },
+      });
       if (!response.ok) throw new Error("Failed to fetch user data");
 
       const data = await response.json();
@@ -102,9 +109,9 @@ export function useUser(userId?: string) {
   useEffect(() => {
     const fetch = async () => {
       try {
-        const AllUsers = await fetchUsers();
-        const AllUsersName = await fetchUsersName();
-        const AllUsersRole = await fetchUsersRole();
+        const AllUsers = await fetchUsers(session?.accessToken ?? null);
+        const AllUsersName = await fetchUsersName(session?.accessToken ?? null);
+        const AllUsersRole = await fetchUsersRole(session?.accessToken ?? null);
         setUsers(AllUsers);
         setUsersName(AllUsersName);
         setUsersRole(AllUsersRole);

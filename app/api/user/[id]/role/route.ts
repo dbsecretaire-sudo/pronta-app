@@ -1,12 +1,12 @@
 // app/api/user/[id]/route.ts
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { UserService } from '../../service';
 
 const userService = new UserService;
 
 // GET /api/user/[id]
 export async function GET(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
 

@@ -12,7 +12,6 @@ export const AccountSummary = ({sN, sO}: {sN: Service[], sO: Service[]}) => {
   const { userData, subscriptionServices, loading, error } = useAccount();
   const { setActiveTab } = useTab();
   const router = useRouter();
-
   const formatDate = (date: string | Date | null | undefined) => { // ✅ Ajoute `null` au type
     if (!date) return "Aucune date";
 

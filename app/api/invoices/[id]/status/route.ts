@@ -1,30 +1,29 @@
 // app/api/invoices/[id]/status/route.ts
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { InvoiceService } from '../../service';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { withAuth } from '@/src/utils/withAuth';
 const API_URL = process.env.NEXTAUTH_URL
 const invoiceService = new InvoiceService;
 
 export async function PATCH(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
 
-    const session = await getServerSession(authOptions);
-  if (!session) {
-     return NextResponse.redirect(new URL(`${API_URL}/unauthorized`, request.url));  
-  }
+  return withAuth(request, async (session) => {
 
-  try {
-    const { id } = await params;
-    const { status } = await request.json();
-    const updatedInvoice = await invoiceService.updateInvoiceStatus(Number(id), status);
-    return NextResponse.json(updatedInvoice);
-  } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to update invoice status" },
-      { status: 500 }
-    );
-  }
+    try {
+      const { id } = await params;
+      const { status } = await request.json();
+      const updatedInvoice = await invoiceService.updateInvoiceStatus(Number(id), status);
+      return NextResponse.json(updatedInvoice);
+    } catch (error) {
+      return NextResponse.json(
+        { error: "Failed to update invoice status" },
+        { status: 500 }
+      );
+    }
+  });
 }

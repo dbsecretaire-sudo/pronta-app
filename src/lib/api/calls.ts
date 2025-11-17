@@ -1,4 +1,5 @@
 import { Call, CallFilter } from "@/src/Types/Calls/index";
+import { getSession } from "next-auth/react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -9,12 +10,29 @@ export async function fetchCalls(filter: CallFilter) {
   if (filter.byPhone) queryParams.append('byPhone', filter.byPhone);
 
   const url = `${API_URL}/api/calls?${queryParams.toString()}`;
-  const res = await fetch(url);
+  const currentSession = await getSession();
+  if (!currentSession) {
+    throw new Error("Session expirée. Veuillez vous reconnecter.");
+  }
+
+  const res = await fetch(url, { 
+    credentials: 'include',
+    headers: {
+      'Content-type': "application/json",
+      'Authorization': `Bearer ${currentSession.accessToken}`,
+    } 
+  });
   return res.json();
 }
 
-export const fetchAllCalls = async (): Promise<Call[]> => {
-  const res = await fetch(`${API_URL}/api/calls/All`, { credentials: 'include' });
+export const fetchAllCalls = async (accessToken: string | null): Promise<Call[]> => {
+  const res = await fetch(`${API_URL}/api/calls/All`, { 
+    credentials: 'include',
+    headers: {
+      'Content-type': "application/json",
+      'Authorization': `Bearer ${accessToken}`,
+    } 
+  });
   if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
   return res.json();
 }

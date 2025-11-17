@@ -6,12 +6,18 @@ import { useEffect, useState } from "react";
 import { ServiceForm } from "@/src/Components";
 import { createService } from "@/src/lib/api";
 import { useSubscription } from "@/src/Hook/useSubscriptions";
+import { getServerSession } from 'next-auth';
+import { authOptions } from '../api/auth/[...nextauth]/route';
+import { CpuChipIcon } from '@heroicons/react/24/outline';
+
+interface DashboardHomeProps {
+  searchParams: { [key: string]: string | string[] };
+}
 
 export default function DashboardHome() {
   const { data: session, status } = useAuthCheck();
-
   const [isAuthChecked, setIsAuthChecked] = useState(false);
-  const userIdVerified = isAuthChecked && status === 'authenticated' ? session?.id : undefined;
+  const userIdVerified = isAuthChecked && status === 'authenticated' ? session?.user.id : undefined;
 
     // Attendre que l'authentification soit vérifiée
   useEffect(() => {
@@ -20,8 +26,8 @@ export default function DashboardHome() {
     }
   }, [status]);
 
-  const { s, sO, sN, loading, handleSubscribe, handleDeactivate, handleReactivate } = useServices(userIdVerified, status);
-  const { subscriptionServices } = useSubscription(userIdVerified, sO)
+  const { s, sO, sN, loading, handleSubscribe, handleDeactivate, handleReactivate } = useServices(session?.user.id, status);
+  const { subscriptionServices } = useSubscription(session?.user.id, sO)
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

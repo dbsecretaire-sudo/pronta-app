@@ -1,15 +1,19 @@
 "use client";
 import { useAuthCheck } from '@/src/Hook/useAuthCheck';
+import { getServerSession } from 'next-auth';
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { authOptions } from './api/auth/[...nextauth]/route';
+import { useSession } from 'next-auth/react';
 
 export default function Home() {
   const { status } = useAuthCheck();
   const router = useRouter();
 
+
   useEffect(() => {
     if (status === "authenticated") {
-      router.push("/dashboard");
+      router.push(`/dashboard`);
     } else if (status === "unauthenticated") {
       router.push("/login");
     }

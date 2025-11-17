@@ -7,18 +7,23 @@ declare module "next-auth" {
     id: string;
     email: string;
     name?: string;
+    role?: string;
+    accessToken?: string;
   }
 
   interface Session {
+    accessToken?: string;
     user: {
       id: string;
       email: string;
       name?: string;
+      role?: string,
     } & DefaultSession["user"];
     auth?: {
       userId: string;
       email: string;
       name?: string;
+      role?: string;
     };
   }
 }
@@ -35,4 +40,5 @@ export interface CustomUser extends Omit<User, 'id' | "password_hash" | "role" |
   id: string; // Redéfini en string
   email: string;
   name: string;
+  accessToken: string;
 }

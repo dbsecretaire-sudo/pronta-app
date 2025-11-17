@@ -15,8 +15,11 @@ import {
 } from '@/src/lib/api';
 import { useAuthCheck } from './useAuthCheck';
 import { useRouter } from 'next/navigation';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
-export const useServices = (userId: string | undefined, status: string) => {
+
+export const useServices = (userIdVerified: string | undefined, status: string) => {
   const router = useRouter();
   const { data: session } = useAuthCheck();
   const [sO, setSO] = useState<Service[]>([]);
@@ -42,7 +45,7 @@ export const useServices = (userId: string | undefined, status: string) => {
 //   }, [session, status, router]);
 
   const fetchData = useCallback(async () => {
-    if (!userId || isNaN(Number(userId))) {
+    if (!session?.user.id || isNaN(Number(session?.user.id))) {
       setError("ID utilisateur invalide");
       setLoading(false);
       return;
@@ -51,10 +54,11 @@ export const useServices = (userId: string | undefined, status: string) => {
     try {
       setLoading(true);
       setError(null);
-      const userIdNumber = Number(userId);
+      
+      const userIdNumber = Number(session?.user.id);
       const [fetchedUser, allServices] = await Promise.all([
         fetchUser(userIdNumber),
-        fetchAllServices(),
+        fetchAllServices(session?.accessToken ?? null),
       ]);
       setUser(fetchedUser);
       setS(allServices);
@@ -80,16 +84,16 @@ export const useServices = (userId: string | undefined, status: string) => {
     } finally {
       setLoading(false);
     }
-  }, [userId]);
+  }, [session?.user.id]);
 
   useEffect(() => {
 
-    if (status === "authenticated" && userId && !isNaN(Number(userId))) {
+    if (status === "authenticated" && session?.user.id && !isNaN(Number(session?.user.id))) {
       fetchData();
     } else {
       setLoading(false);
     }
-  }, [status, userId, fetchData]);
+  }, [status, session?.user.id, fetchData]);
 
   const refreshServices = async () => {
     await fetchData();
@@ -97,11 +101,11 @@ export const useServices = (userId: string | undefined, status: string) => {
 
   const handleSubscribe = async (service: Service) => {
     try {
-      if (!userId) throw new Error("User ID is required");
-      const subscription = await getSubscriptionByService(Number(userId), Number(service.id));
+      if (!session?.user.id) throw new Error("User ID is required");
+      const subscription = await getSubscriptionByService(Number(session?.user.id), Number(service.id));
       if (subscription?.id) {
         await updateUserSubscription(subscription.id, {
-          user_id: Number(userId),
+          user_id: Number(session?.user.id),
           service_id: Number(service.id),
           start_date: now,
           end_date: endDate,
@@ -110,7 +114,7 @@ export const useServices = (userId: string | undefined, status: string) => {
         });
       } else {
         await createSubscription({
-          user_id: Number(userId),
+          user_id: Number(session?.user.id),
           service_id: Number(service.id),
           start_date: now,
           end_date: endDate,
@@ -118,7 +122,7 @@ export const useServices = (userId: string | undefined, status: string) => {
           status: 'active',
         });
       }
-      await reactivateUserService(Number(userId), service.id);
+      await reactivateUserService(Number(session?.user.id), service.id);
       await refreshServices();
     } catch (error) {
       setError(error instanceof Error ? error.message : "Échec de l'abonnement au service.");
@@ -126,13 +130,13 @@ export const useServices = (userId: string | undefined, status: string) => {
   };
 
   const handleDeactivate = async (service: Service) => {
-    if (!userId) return;
+    if (!session?.user.id) return;
     try {
       if (!user?.service_ids?.includes(service.id)) {
         setError("Vous n'êtes pas abonné à ce service.");
         return;
       }
-      await deactivateUserService(Number(userId), service.id);
+      await deactivateUserService(Number(session?.user.id), service.id);
       await refreshServices();
     } catch (error) {
       console.error("Erreur lors de la désactivation:", error);
@@ -141,9 +145,9 @@ export const useServices = (userId: string | undefined, status: string) => {
   };
 
   const handleReactivate = async (service: Service) => {
-    if (!userId) return;
+    if (!session?.user.id) return;
     try {
-      await reactivateUserService(Number(userId), service.id);
+      await reactivateUserService(Number(session?.user.id), service.id);
       await refreshServices();
     } catch (error) {
       let errorMessage = "Échec de la réactivation.";

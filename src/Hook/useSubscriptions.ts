@@ -35,7 +35,7 @@ export const useSubscription = (userId: string | undefined, services: Service[])
         const fetchData = async () => {
             try {
                 // 1. Récupérer tous les abonnements
-                const allSubscriptions = await fetchAllSubscriptions();
+                const allSubscriptions = await fetchAllSubscriptions(session?.accessToken ?? null);
                 setSubscriptions(allSubscriptions);
 
                 // 2. Filtrer les abonnements pour l'utilisateur et les services donnés

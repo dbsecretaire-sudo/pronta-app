@@ -14,8 +14,7 @@ export class CalendarEventModel {
     }
     
     async getEvents(): Promise<CalendarEvent[]> {
-        const res = await pool.query(
-            'SELECT * FROM calendar_events ORDER BY start_time');
+        const res = await pool.query('SELECT * FROM calendar_events ORDER BY start_time');
         return res.rows;
     }
 

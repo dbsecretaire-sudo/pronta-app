@@ -7,10 +7,10 @@ import { fetchInvoiceItems } from '../lib/api';
 import { InvoiceItem, InvoiceWithItems } from '../lib/schemas/invoices';
 import { useAuthCheck } from './useAuthCheck';
 import { useRouter } from 'next/navigation';
+import { getSession } from 'next-auth/react';
+const API_URL = process.env.NEXTAUTH_URL
 
-export const useInvoices = (userId: number | undefined) => {
-  const router = useRouter();
-  const { data: session, status } = useAuthCheck();
+export const useInvoices = (request: Request, userId: number | undefined) => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [stats, setStats] = useState({
     totalInvoices: 0,
@@ -24,15 +24,6 @@ export const useInvoices = (userId: number | undefined) => {
   });
   const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([])
   const [invoicesWithItems, setInvoicesWithItems] = useState<InvoiceWithItems[]>([])
-
-// useEffect(() => {
-//     // Si la session n'est pas chargée ou n'existe pas
-//     if (status === 'unauthenticated' || !session) {
-//       router.push('/login');
-//       return;
-//     }
-    
-//   }, [session, status, router]);
 
   useEffect(() => {
     const loadInvoices = async () => {
@@ -51,8 +42,16 @@ export const useInvoices = (userId: number | undefined) => {
         if (filter.status) queryParams.append("status", filter.status);
         if (filter.startDate) queryParams.append("startDate", filter.startDate.toISOString());
         if (filter.endDate) queryParams.append("endDate", filter.endDate?.toISOString());
+        const { searchParams } = new URL(request.url);
+        const accessToken = searchParams.get('accessToken');
 
-        const response = await fetch(`/api/invoices?${queryParams.toString()}`);
+        const response = await fetch(`/api/invoices?${queryParams.toString()}`, { 
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+            'Authorization': `Bearer ${accessToken}`, // <-- Utilise le token
+          },
+        });
         if (!response.ok) {
           throw new Error("Erreur lors de la récupération des factures");
         }
@@ -98,7 +97,9 @@ export const useInvoices = (userId: number | undefined) => {
   useEffect(() => {
     const fetchInvoiceItem = async () => {
       try {
-        const allItems = await fetchInvoiceItems();
+        const { searchParams } = new URL(request.url);
+        const accessToken = searchParams.get('accessToken');
+        const allItems = await fetchInvoiceItems(accessToken);
 
         const itemsArray = Array.isArray(invoiceItems) ? invoiceItems : [];
         const itemsByInvoiceId = itemsArray.reduce((acc, item) => {
@@ -136,7 +137,18 @@ export const useFetchInvoices = () => {
   useEffect(() => {
     const fetchInvoices = async () => {
       try {
-        const res = await fetch('/api/invoices');
+        const currentSession = await getSession();
+        if (!currentSession) {
+          throw new Error("Session expirée. Veuillez vous reconnecter.");
+        }
+
+        const res = await fetch(`${API_URL}/api/invoices`, {
+          credentials: 'include',
+          headers: {
+            "Content-Type": "application/json",
+            'Authorization': `Bearer ${currentSession.accessToken}`, // <-- Utilise le token
+          },
+        });
         const data = await res.json();
         setInvoices(data);
       } catch (error) {

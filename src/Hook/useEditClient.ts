@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { ClientFormData } from '@/src/Types/Clients';
 import { useAuthCheck } from './useAuthCheck';
+import { getSession } from 'next-auth/react';
 
 export const useEditClient = () => {
   const router = useRouter();
@@ -27,7 +28,19 @@ export const useEditClient = () => {
     const fetchClient = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`/api/clients/${params.id}`);
+        
+        const currentSession = await getSession();
+        if (!currentSession) {
+          throw new Error("Session expirée. Veuillez vous reconnecter.");
+        }
+          
+        const res = await fetch(`/api/clients/${params.id}`, {
+          credentials: 'include',
+          headers: {
+            "Content-Type": "application/json",
+            'Authorization': `Bearer ${currentSession.accessToken}`, // <-- Utilise le token
+          },
+        });
         if (!res.ok) {
           throw new Error("Client non trouvé");
         }
@@ -52,11 +65,19 @@ export const useEditClient = () => {
   const handleSubmit = async (data: ClientFormData) => {
     
     try {
+      const currentSession = await getSession();
+      if (!currentSession) {
+        throw new Error("Session expirée. Veuillez vous reconnecter.");
+      }
+
+
       const response = await fetch(`/api/clients/${params.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${currentSession.accessToken}`, // <-- Utilise le token
         },
+        credentials: 'include',
         body: JSON.stringify(data),
       });
       if (response.ok) {

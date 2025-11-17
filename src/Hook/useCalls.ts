@@ -8,6 +8,7 @@ import { useCalendar } from './useCalendar';
 import { useAuthCheck } from './useAuthCheck';
 import { redirect } from 'next/dist/server/api-utils';
 import { useRouter } from 'next/navigation';
+import { getSession } from 'next-auth/react';
 
 const calculateCallStats = (calls: Call[]) => {
   // Convertir les dates en objets Date si nécessaire
@@ -79,7 +80,18 @@ export const useCalls = (userId: string | undefined, initialFilter: Omit<CallFil
       if (filter.byName) params.append('byName', filter.byName);
       if (filter.byPhone) params.append('byPhone', filter.byPhone);
 
-      const response = await fetch(`/api/calls?userId=${userId}&${params.toString()}`);
+      const currentSession = await getSession();
+      if (!currentSession) {
+        throw new Error("Session expirée. Veuillez vous reconnecter.");
+      }
+
+      const response = await fetch(`/api/calls?userId=${userId}&${params.toString()}`, {
+        credentials: 'include',
+        headers: {
+          "Content-Type": "application/json",
+          'Authorization': `Bearer ${currentSession.accessToken}`,
+        }
+      });
       if (!response.ok) throw new Error("Erreur lors de la récupération des appels");
       const callsData: Call[] = await response.json();
       setCalls(callsData);

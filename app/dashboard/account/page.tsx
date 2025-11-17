@@ -21,7 +21,7 @@ export default function AccountPage() {
   const { data: session, status} = useAuthCheck();
 
   const [isAuthChecked, setIsAuthChecked] = useState(false);
-  const userIdVerified = isAuthChecked && status === 'authenticated' ? session?.id : undefined;
+  const userIdVerified = isAuthChecked && status === 'authenticated' ? session?.user.id : undefined;
 
     // Attendre que l'authentification soit vérifiée
   useEffect(() => {

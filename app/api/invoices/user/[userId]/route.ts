@@ -3,6 +3,7 @@ import { NextResponse, NextRequest } from 'next/server';
 import { InvoiceService } from "../../service";
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { withAuth } from '@/src/utils/withAuth';
 const API_URL = process.env.NEXTAUTH_URL
 const invoiceService = new InvoiceService;
 
@@ -11,22 +12,20 @@ export async function GET(
   { params }: { params: Promise<{ userId: string }> }
 ) {  
   
-      const session = await getServerSession(authOptions);
-    if (!session) {
-       return NextResponse.redirect(new URL(`${API_URL}/unauthorized`, request.url));  
-    }
+  return withAuth(request, async (session) => {
   
-  try {
-  const { userId } = await params;
+    try {
+    const { userId } = await params;
 
-  const invoice = await invoiceService.getInvoicesByUserId(Number(userId));
-    return NextResponse.json(invoice);
-  } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to fetch invoice" },
-      { status: 500 }
-    );
-  }
+    const invoice = await invoiceService.getInvoicesByUserId(Number(userId));
+      return NextResponse.json(invoice);
+    } catch (error) {
+      return NextResponse.json(
+        { error: "Failed to fetch invoice" },
+        { status: 500 }
+      );
+    }
+  });
 }
 
 // // POST /api/invoices/[userId]

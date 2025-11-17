@@ -15,7 +15,7 @@ export default function Login() {
   useEffect(() => {
     const fetchCsrfToken = async () => {
       try {
-        const response = await fetch('/api/auth/csrf');
+        const response = await fetch('/api/auth/csrf', {credentials: 'include'});
         const data = await response.json();
         setCsrfToken(data.csrfToken);
       } catch (error) {
@@ -24,21 +24,6 @@ export default function Login() {
     };
     fetchCsrfToken();
   }, []);
-
-  // const handleSubmit = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-
-  //   try {
-  //     const success = await login(email, password);
-  //     if (success) {
-  //       router.push("/dashboard");
-  //     } else {
-  //       setError("Identifiants incorrects");
-  //     }
-  //   } catch (err) {
-  //     setError("Erreur lors de la connexion");
-  //   }
-  // };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,7 +38,7 @@ export default function Login() {
       if (result?.error) {
         setError(result.error);
       } else {
-        router.push("/dashboard");
+        router.push(`/dashboard`);
       }
     } catch (error) {
       setError("Erreur lors de la connexion");

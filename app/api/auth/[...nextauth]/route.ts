@@ -6,6 +6,8 @@ import { compare } from "bcryptjs";
 import type { NextAuthOptions } from "next-auth";
 import { CustomUser } from "@/src/Components";
 import bcrypt from "bcrypt";
+import { generateAccessToken } from "@/src/Types/Utils/Param";
+import { sign } from 'jsonwebtoken';
 
 async function verifyPassword(plainPassword: string, hashedPassword: string) {
   return await bcrypt.compare(plainPassword, hashedPassword);
@@ -45,6 +47,7 @@ export const authOptions: NextAuthOptions = {
             id: user.id.toString(),
             email: user.email,
             name: user.name,
+            accessToken: user.accessToken,
           };
         } catch (error) {
           return null; // Retournez null pour éviter les erreurs 500 non contrôlées
@@ -56,17 +59,24 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        token.role = user.role;
+        // Token standard pour tous les utilisateurs
+        token.accessToken = sign(
+          { id: user.id, email: user.email, role: user.role },
+          process.env.NEXTAUTH_SECRET!,
+          { expiresIn: '1h' }
+        );
       }
       return token;
     },
     async session({ session, token }) {
-      if (token.id) {
-        session.user = {
-          id: token.id,
-          email: token.email,
-          name: token.name,
-        };
-      }
+      if (session.user) {
+        session.user.id = token.id as string;
+        session.user.email = token.email as string;
+        session.user.name = token.name as string;
+        session.user.role = token.role as string;
+        session.accessToken = token.accessToken as string;
+      };
       return session;
     },
   },
@@ -91,7 +101,7 @@ export const authOptions: NextAuthOptions = {
       },
     },
   },
-  debug: true, // Activez le debug uniquement en développement
+  debug: process.env.NODE_ENV === "development", // Activez le debug uniquement en développement
 };
 
 const handler = NextAuth(authOptions);

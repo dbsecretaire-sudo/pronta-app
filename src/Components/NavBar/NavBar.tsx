@@ -5,6 +5,8 @@ import { useSession, signOut } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import { NavbarProps } from "./NavBar.types";
 import { useAuthCheck } from "@/src/Hook/useAuthCheck";
+import { getUserById } from "@/src/lib/api";
+import { useRouter } from "next/navigation";
 
 export default function Navbar({
   children,
@@ -17,6 +19,8 @@ export default function Navbar({
   const [isMobile, setIsMobile] = useState(false);
   const { data: session, status } = useAuthCheck();
   const pathname = usePathname();
+  const [ isAdmin, setIsAdmin ] = useState(false);
+  const router = useRouter();
 
   // Menu principal (fixe)
   const mainMenuItems = [
@@ -35,7 +39,27 @@ export default function Navbar({
   if (status === "unauthenticated") return null;
   if (status === "loading") return null;
 
-  // ✅ Fonction de déconnexion avec NextAuth
+  useEffect(() => {
+    const checkAdminRole = async () => {
+      if (!session?.user.id) {
+        setIsAdmin(false);
+        return;
+      }
+      try {
+        const user = await getUserById(Number(session.user.id));
+        setIsAdmin(user.role === 'ADMIN');
+      } catch (error) {
+        console.error("Erreur lors de la récupération du rôle :", error);
+        setIsAdmin(false);
+      }
+    };
+
+    checkAdminRole();
+  }, [session?.user.id]);
+  
+  const handleAdmin = () => {
+    router.push('/admin');
+  };
   const handleLogout = () => {
     signOut({ callbackUrl: "/login" });
   };
@@ -118,6 +142,15 @@ export default function Navbar({
               </div>
             )}
 
+            {isAdmin && (
+              <button
+                onClick={handleAdmin}
+                className="mt-auto block py-2 text-gray-600 hover:text-gray-900 text-left w-full"
+              >
+                Administration
+              </button>
+            )}
+
             <button
               onClick={handleLogout}
               className="mt-auto block py-2 text-gray-600 hover:text-gray-900 text-left w-full"
@@ -185,6 +218,16 @@ export default function Navbar({
       </div>
 
       <div className="p-4 border-t border-gray-200">
+
+        {isAdmin && (
+          <button
+            onClick={handleAdmin}
+            className="mt-auto block py-2 text-gray-600 hover:text-gray-900 text-left w-full"
+          >
+            Administration
+          </button>
+        )}
+
         <button
           onClick={handleLogout}
           className="w-full text-left py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded px-2"

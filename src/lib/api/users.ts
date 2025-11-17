@@ -1,10 +1,21 @@
 import { Role } from "@/src/Types/Users";
 import { User } from '@/src/lib/schemas'
+import { getSession } from "next-auth/react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export const fetchUser = async (userId: number) => {
-  const res = await fetch(`${API_URL}/api/user/${userId}`, { credentials: 'include' });
+  const currentSession = await getSession();
+  if (!currentSession) {
+    throw new Error("Session expirée. Veuillez vous reconnecter.");
+  }
+  const res = await fetch(`${API_URL}/api/user/${userId}`, { 
+    credentials: 'include',
+    headers: { 
+      "Content-Type": "application/json",
+      'Authorization': `Bearer ${currentSession.accessToken}`, // <-- Utilise le token
+    },
+  });
   if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
   return res.json();
 };
@@ -15,9 +26,17 @@ export async function updateProfile(userId: number, data: {
   name: string;
   role: Role;
 }) {
+  const currentSession = await getSession();
+  if (!currentSession) {
+    throw new Error("Session expirée. Veuillez vous reconnecter.");
+  }
   const response = await fetch(`/api/user/${userId}`, {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      'Authorization': `Bearer ${currentSession.accessToken}`, // <-- Utilise le token
+    },
+    credentials: "include",
     body: JSON.stringify(data),
   });
   if (!response.ok) throw new Error("Échec de la mise à jour du profil");
@@ -39,9 +58,17 @@ export async function updateBilling(userId: number, data: {
     is_default: boolean;
   };
 }) {
+  const currentSession = await getSession();
+  if (!currentSession) {
+    throw new Error("Session expirée. Veuillez vous reconnecter.");
+  }
   const response = await fetch(`/api/users/${userId}`, {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      'Authorization': `Bearer ${currentSession.accessToken}`, // <-- Utilise le token
+    },
+    credentials: 'include',
     body: JSON.stringify(data),
   });
   if (!response.ok) throw new Error("Échec de la mise à jour des informations de facturation");
@@ -49,27 +76,60 @@ export async function updateBilling(userId: number, data: {
 }
 
 export async function getRoleByUserId(userId: number){
-  const res = await fetch(`${API_URL}/api/user/${userId}/role`, { credentials: 'include' });
+  const currentSession = await getSession();
+  if (!currentSession) {
+    throw new Error("Session expirée. Veuillez vous reconnecter.");
+  }
+  const res = await fetch(`${API_URL}/api/user/${userId}/role`, { 
+    credentials: 'include',
+    headers: {
+      "Content-Type": "application/json",
+      'Authorization': `Bearer ${currentSession.accessToken}`, // <-- Utilise le token
+    },
+  });
   if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
   return res.json();
 }
 
-export const fetchUsers = async ():Promise<User[]> => {
-    const res = await fetch(`${API_URL}/api/user`, {credentials : 'include'});
+export const fetchUsers = async (accessToken: string | null):Promise<User[]> => {
+    const res = await fetch(`${API_URL}/api/user`, {
+      credentials: 'include',
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${accessToken}`, // <-- Utilise le token
+      },
+    });
     if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
     return res.json();
 }
 
 
-export const fetchUsersRole = async () => {
-    const res = await fetch(`${API_URL}/api/user/role`, {credentials : 'include'});
-    if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
-    return res.json();
+export const fetchUsersRole = async (accessToken: string | null) => {
+
+    const res = await fetch(`${API_URL}/api/user/role`, {
+      credentials: 'include',
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${accessToken}`, // <-- Utilise le token
+      },
+    });
+  if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+  return res.json();
 }
 
 
 export const fetchUsersForAdmin = async () => {
-    const res = await fetch(`${API_URL}/api/user/role`, {credentials : 'include'});
+    const currentSession = await getSession();
+    if (!currentSession) {
+      throw new Error("Session expirée. Veuillez vous reconnecter.");
+    }
+    const res = await fetch(`${API_URL}/api/user/role`, {
+      credentials: 'include',
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${currentSession.accessToken}`, // <-- Utilise le token
+      },
+    });
     const users = await res.json();
      
     return users.reduce((acc: Record<number, any>, user: any) => {
@@ -79,14 +139,31 @@ export const fetchUsersForAdmin = async () => {
 
 }
 
-export const fetchUsersName = async () : Promise<Record<number, User>> => {
-    const res = await fetch(`${API_URL}/api/user/name`, {credentials : 'include'});
+export const fetchUsersName = async (accessToken: string | null) : Promise<Record<number, User>> => {
+
+    const res = await fetch(`${API_URL}/api/user/name`, {
+      credentials: 'include',
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${accessToken}`, // <-- Utilise le token
+      },
+    });
     if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
     return res.json();
 }
 
 export const getUserById = async (userId: number) : Promise<User> => {
-    const res = await fetch(`${API_URL}/api/user/${userId}`, {credentials : 'include'});
+    const currentSession = await getSession();
+    if (!currentSession) {
+      throw new Error("Session expirée. Veuillez vous reconnecter.");
+    }
+    const res = await fetch(`${API_URL}/api/user/${userId}`, {
+      credentials: 'include',
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${currentSession.accessToken}`, // <-- Utilise le token
+      },
+    });
     if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
     return res.json();
 }
