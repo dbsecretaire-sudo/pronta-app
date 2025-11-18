@@ -58,11 +58,12 @@ export const getCreateSchema = async (resourceName: string) => {
 export async function createResource(
   resource: string,
   prevState: FormState,
-  formData: FormData
+  formData: FormData,
+  // accessToken: string,
 ): Promise<FormState> {
   const currentSession = await getServerSession(authOptions);
   const accessToken = currentSession?.accessToken ?? null;
-  console.log("adminActions",accessToken);
+
   try {
     const data = Object.fromEntries(formData.entries());
     // Validation selon la ressource
@@ -98,7 +99,7 @@ export async function createResource(
       const rawData = {
         ...data,
         date: new Date(data.date).toISOString(),  // Conversion en ISO
-        duration: Number(data.duration),          // Conversion en number
+        duration: convertTimeToSeconds(data.duration.toString()),          //ici il faut convertir 03:20 en nombre de secondes
       };
 
       validatedData = validateCreateCall(rawData);
@@ -131,8 +132,19 @@ export async function createResource(
 
       validatedData = validateCreateInvoice(rawData);
 
-    } else if (resource === 'subscription') {
-      validatedData = validateCreateSubscription(data);
+    } else if (resource === 'subscriptions') {
+      if (typeof data.start_date !== 'string' || typeof data.end_date !== 'string'||typeof data.next_payment_date !== 'string') {
+        return { error: "La date est invalide" };
+      }
+
+      const rawData = {
+        ...data,
+        start_date: new Date(data.start_date).toISOString().split('T')[0],  // Conversion en ISO
+        end_date: new Date(data.end_date).toISOString().split('T')[0],  // Conversion en ISO
+        next_payment_date: new Date(data.next_payment_date).toISOString().split('T')[0],  // Conversion en ISO
+      };
+console.log(rawData);
+      validatedData = validateCreateInvoice(rawData);
     } else if (resource === 'users') {
 
       const serviceIds = formData.getAll('service_ids[]');
@@ -180,4 +192,17 @@ export async function createResource(
     }
     return { error: error.message || "Une erreur est survenue" };
   }
+}
+
+function convertTimeToSeconds(timeString: string): number {
+  // 1. Vérifiez que timeString est au format "HH:MM"
+  if (!timeString || typeof timeString !== 'string') {
+    return 0; // Valeur par défaut si invalide
+  }
+
+  // 2. Séparez les heures et les minutes
+  const [minutes, secondes] = timeString.split(':').map(Number);
+
+  // 3. Calculez le total en secondes
+  return (minutes * 60) + (secondes * 1);
 }
