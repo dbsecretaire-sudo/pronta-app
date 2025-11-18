@@ -15,11 +15,10 @@ interface PageProps {
 
 export default async function ResourcePage({
   params,
-  searchParams,
 }: PageProps) {
-
+  const session = await getServerSession(authOptions);
+  const accessToken = session?.accessToken ?? null;
   const { resource } = await params;
-  const accessToken = (await searchParams).accessToken as string ;  
   // console.log("accessToken", await searchParams.accessToken);
   // const accessToken = searchParams.get('accessToken');
   const config = resourcesConfig[resource];
@@ -104,8 +103,6 @@ export default async function ResourcePage({
         resourceName={(await params).resource}
         createHref={`/admin/${(await params).resource}/new`}
         dataMaps={dataMaps}
-        // session={session}
-        // role={role}
       />
     </div>
   );

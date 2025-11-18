@@ -1,8 +1,13 @@
 import { notFound } from 'next/navigation';
 import { ResourceForm } from '@/src/Components'; // Composant client
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
 export default async function NewResourcePage({ params }: { params: Promise<{ resource: string }> }) {
-  const { resource } = await params;
+  const { resource } =  await params;
+
+  const session = await getServerSession(authOptions);
+  const accessToken = session?.accessToken ?? null;
 
   // Liste des ressources valides
   const validResources = ['clients', 'calls', 'users', 'invoices', 'calendar', 'services', 'subscriptions'];
@@ -28,7 +33,7 @@ export default async function NewResourcePage({ params }: { params: Promise<{ re
       <h1 className="text-2xl font-bold mb-4">
         Nouveau {resourceNames[resource]}
       </h1>
-      <ResourceForm resource={resource} />
+      <ResourceForm resource={resource} accessToken={accessToken} />
     </div>
   );
 }

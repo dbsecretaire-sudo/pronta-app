@@ -145,7 +145,7 @@ export default function Navbar({
             {isAdmin && (
               <button
                 onClick={handleAdmin}
-                className="mt-auto block py-2 text-gray-600 hover:text-gray-900 text-left w-full"
+                className="mt-auto block py-2 text-gray-600 hover:text-gray-900 text-left w-full cursor-pointer"
               >
                 Administration
               </button>
@@ -153,7 +153,7 @@ export default function Navbar({
 
             <button
               onClick={handleLogout}
-              className="mt-auto block py-2 text-gray-600 hover:text-gray-900 text-left w-full"
+              className="mt-auto block py-2 text-gray-600 hover:text-gray-900 text-left w-full cursor-pointer"
             >
               Déconnexion
             </button>
@@ -222,7 +222,7 @@ export default function Navbar({
         {isAdmin && (
           <button
             onClick={handleAdmin}
-            className="mt-auto block py-2 text-gray-600 hover:text-gray-900 text-left w-full"
+            className="mt-auto block py-2 text-gray-600 hover:text-gray-900 text-left w-full cursor-pointer"
           >
             Administration
           </button>
@@ -230,7 +230,7 @@ export default function Navbar({
 
         <button
           onClick={handleLogout}
-          className="w-full text-left py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded px-2"
+          className="w-full text-left py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded px-2 cursor-pointer"
         >
           Déconnexion
         </button>

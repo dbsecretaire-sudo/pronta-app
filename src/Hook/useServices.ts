@@ -35,15 +35,6 @@ export const useServices = (userIdVerified: string | undefined, status: string) 
   const endDate = new Date(now);
   endDate.setFullYear(now.getFullYear() + 1);
 
-// useEffect(() => {
-//     // Si la session n'est pas chargée ou n'existe pas
-//     if (status === 'unauthenticated' || !session) {
-//       router.push('/login');
-//       return;
-//     }
-
-//   }, [session, status, router]);
-
   const fetchData = useCallback(async () => {
     if (!session?.user.id || isNaN(Number(session?.user.id))) {
       setError("ID utilisateur invalide");

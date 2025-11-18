@@ -24,7 +24,7 @@ export const useCalendar = (userId: string | undefined) => {
             if (!userId) return; // Ne pas faire la requête si userId n'est pas défini
 
             try {
-                const events = await fetchCalendar(); // Attendre la résolution de la promesse
+                const events = await fetchCalendar(session?.accessToken ?? null); // Attendre la résolution de la promesse
 
                 // Filtrer les événements pour l'utilisateur donné
                 const userEvents = events.filter(

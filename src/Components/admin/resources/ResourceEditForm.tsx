@@ -114,8 +114,8 @@ export function ResourceEditForm({ resourceName, id }: ResourceEditFormProps) {
       }
       // Charge les utilisateurs et clients
       const [usersData, clientsData] = await Promise.all([
-        fetchUsers(),
-        fetchAllClients(),
+        fetchUsers(session?.accessToken ?? null),
+        fetchAllClients(session?.accessToken ?? null),
       ]);
       setUsers(usersData);
       setClients(clientsData);

@@ -31,7 +31,7 @@ useEffect(() => {
         return;
       }
       const data = await response.json();
-      if (data.user) {
+      if (data) {
         setStatus("authenticated");
         setData(data);
 

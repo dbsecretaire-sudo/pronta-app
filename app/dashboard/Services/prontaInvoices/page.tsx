@@ -5,7 +5,7 @@ import { InvoicesStats, InvoicesList, InvoicesFilter } from "@/src/Components";
 import { useInvoices } from "@/src/Hook/useInvoices";
 import { useEffect, useState } from "react";
 
-export default function ProntaInvoicesDashboard() {
+export default function ProntaInvoicesDashboard(request: Request) {
   const { data: session, status } = useAuthCheck();
 
   const [isAuthChecked, setIsAuthChecked] = useState(false);
@@ -18,7 +18,7 @@ export default function ProntaInvoicesDashboard() {
     }
   }, [status]);
 
-  const { invoices, stats, loading, handleFilterChange } = useInvoices(userIdVerified);
+  const { invoices, stats, loading, handleFilterChange } = useInvoices(request, userIdVerified);
 
   if (loading) {
     return <div className="p-8 max-w-7xl mx-auto">Chargement...</div>;

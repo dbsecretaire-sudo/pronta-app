@@ -1,5 +1,6 @@
 import { resourcesConfig } from './resources';
 import { FormState } from '@/app/actions/admin';
+import { useAuthCheck } from '@/src/Hook/useAuthCheck';
 import { Invoice } from "@/src/Types/Invoices";
 import { getSession } from 'next-auth/react';
 
@@ -108,10 +109,16 @@ export async function getResourceById(resourceName: string, id: number) {
 }
 
 export async function fetchResource(resource: string) {
+    const currentSession = await getSession();
+
+    if (!currentSession) {
+      throw new Error("Session expirée. Veuillez vous reconnecter.");
+    }
+
 //   const response = await fetch(`${API_URL}/api/admin/${resource}`);
 //   if (!response.ok) throw new Error('Failed to fetch');
 //   return response.json();
-    return resourcesConfig[resource]?.fetchData();
+    return resourcesConfig[resource]?.fetchData(currentSession?.accessToken ?? null);
 }
 
 export async function createResource(resource: string, prevState: any, formData: FormData) {

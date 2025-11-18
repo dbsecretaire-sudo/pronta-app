@@ -92,7 +92,7 @@ export async function getRoleByUserId(userId: number){
 }
 
 export const fetchUsers = async (accessToken: string | null):Promise<User[]> => {
-    const res = await fetch(`${API_URL}/api/user`, {
+  const res = await fetch(`${API_URL}/api/user`, {
       credentials: 'include',
       headers: {
         "Content-Type": "application/json",
