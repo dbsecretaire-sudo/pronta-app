@@ -23,8 +23,6 @@ export async function updateResource(accessToken: string | null, resource: strin
   }
 
   try {
-     
-
     const response = await fetch(url, { 
       method, 
       headers: { 

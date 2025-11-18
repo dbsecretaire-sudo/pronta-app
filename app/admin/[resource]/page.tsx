@@ -8,6 +8,7 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { CpuChipIcon } from '@heroicons/react/24/outline';
 import { getSession } from 'next-auth/react';
 import { verifyAndDecodeToken } from '@/src/lib/auth';
+import Link from 'next/link';
 
 interface PageProps {
   params: { resource: string };
@@ -102,6 +103,22 @@ export default async function ResourcePage({
   // Passe session et role à DataTableUi via un wrapper client
   return (
     <div className="space-y-6 p-6">
+       {/* Barre de retour spécifique à Admin */}
+      <nav className="bg-white border-b border-gray-200 h-16">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8 h-full">
+          <div className="flex justify-between items-center h-full">
+            <Link
+              href="/admin"
+              className="text-xl font-bold text-gray-900 hover:text-blue-600 flex items-center transition-colors"
+            >
+              ← Retour au tableau de bord Administration
+            </Link>
+            <div className="text-xl font-semibold text-gray-800">
+              Administration
+            </div>
+          </div>
+        </div>
+      </nav>
       <DataTableUi
         data={data}
         columns={config.getColumns()}

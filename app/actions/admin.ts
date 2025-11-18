@@ -139,12 +139,14 @@ export async function createResource(
 
       const rawData = {
         ...data,
-        start_date: new Date(data.start_date).toISOString().split('T')[0],  // Conversion en ISO
-        end_date: new Date(data.end_date).toISOString().split('T')[0],  // Conversion en ISO
-        next_payment_date: new Date(data.next_payment_date).toISOString().split('T')[0],  // Conversion en ISO
+        user_id: Number(data.user_id),
+        service_id: Number(data.service_id),
+        start_date: new Date(data.start_date).toISOString(),  // Conversion en ISO
+        end_date: new Date(data.end_date).toISOString(),  // Conversion en ISO
+        next_payment_date: new Date(data.next_payment_date).toISOString(),  // Conversion en ISO
       };
-console.log(rawData);
-      validatedData = validateCreateInvoice(rawData);
+
+      validatedData = validateCreateSubscription(rawData);
     } else if (resource === 'users') {
 
       const serviceIds = formData.getAll('service_ids[]');
@@ -180,7 +182,7 @@ console.log(rawData);
     } else {
       return { error: "Ressource non supportée" };
     }
-    // Appel à ta fonction updateResource
+  
     const result = await updateResource(accessToken, resource, undefined, validatedData);
     if(result.success === true){
       redirect(`/admin/${resource}`);

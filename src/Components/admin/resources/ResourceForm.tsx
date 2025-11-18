@@ -19,6 +19,7 @@ export default function ResourceForm({ resource, accessToken}: {resource: string
   const { data : session, status } = useAuthCheck(accessToken);
   const {s, sN} = useServices(session?.user.id, status, accessToken);
   const [ paymentMethod, setPaymentMethod ] = useState<string>('');
+  const [startDate, setStartDate] = useState<string>('');
 
   const handlePaymentMethodChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setPaymentMethod(e.target.value);
@@ -69,6 +70,26 @@ export default function ResourceForm({ resource, accessToken}: {resource: string
     }
     loader();
   }, []);
+
+  useEffect(() => {
+    if (!startDate) return;
+
+    const startDateObj = new Date(startDate);
+
+    // Date de fin = date de départ + 1 an
+    const endDateObj = new Date(startDateObj);
+    endDateObj.setFullYear(endDateObj.getFullYear() + 1);
+    const endDate = endDateObj.toISOString().slice(0, 16); // Format pour datetime-local
+
+    // Date de paiement = date de départ + 1 mois
+    const nextPaymentDateObj = new Date(startDateObj);
+    nextPaymentDateObj.setMonth(nextPaymentDateObj.getMonth() + 1);
+    const nextPaymentDate = nextPaymentDateObj.toISOString().slice(0, 16);
+
+    // Met à jour les champs du formulaire
+    (document.getElementById('end_date')! as HTMLInputElement).value = endDate;
+    (document.getElementById('next_payment_date')! as HTMLInputElement ).value = nextPaymentDate;
+  }, [startDate]);
 
   return (
     <form action={formAction} className="space-y-4">
@@ -602,7 +623,7 @@ export default function ResourceForm({ resource, accessToken}: {resource: string
           </div>
           <div>
             <label htmlFor="start_date" className="block mb-1">Date de départ</label>
-            <input type="datetime-local" id="start_date" name="start_date" className="w-full p-2 border rounded" required />
+            <input type="datetime-local" id="start_date" name="start_date" className="w-full p-2 border rounded" onChange={(e) => setStartDate(e.target.value)} required />
           </div>
           <div>
             <label htmlFor="end_date" className="block mb-1">Date de fin</label>

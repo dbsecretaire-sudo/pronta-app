@@ -16,7 +16,6 @@ export async function POST(request: NextRequest,) {
 
     try {
       const body = await request.json();
-
       const toISODate = (date: string | Date | null | undefined): string | null => {
         if (!date) return null;
         if (date instanceof Date) return date.toISOString();
@@ -42,7 +41,6 @@ export async function POST(request: NextRequest,) {
       };
       // Valide les données avec le schéma
       const subscriptionData = CreateSubscriptionSchema.parse(dataToValidate);
-
       // Pas besoin de conversion supplémentaire, le schéma Zod a déjà validé les dates
       const processedData = { ...subscriptionData };
 

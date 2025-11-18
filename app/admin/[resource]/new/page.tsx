@@ -3,6 +3,7 @@ import { ResourceForm } from '@/src/Components'; // Composant client
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { verifyAndDecodeToken } from '@/src/lib/auth';
+import Link from 'next/link';
 
 export default async function NewResourcePage({ params }: { params: Promise<{ resource: string }> }) {
   const { resource } =  await params;
@@ -34,8 +35,21 @@ export default async function NewResourcePage({ params }: { params: Promise<{ re
   };
 
   return (
-    <div className="max-w-md mx-auto my-8">
-      <h1 className="text-2xl font-bold mb-4">
+    <div className="max-w-7xl mx-auto my-8 mb-6">
+       {/* Barre de retour spécifique à Admin */}
+      <nav className="bg-white border-b border-gray-200 h-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
+          <div className="flex justify-between items-center h-full">
+            <Link
+              href="/admin"
+              className="text-xl font-bold text-gray-900 hover:text-blue-600 flex items-center transition-colors"
+            >
+              ← Retour au tableau de bord Administration
+            </Link>
+          </div>
+        </div>
+      </nav>
+      <h1 className="text-center text-2xl font-bold mb-6">
         Nouveau {resourceNames[resource]}
       </h1>
       <ResourceForm resource={resource} accessToken={accessToken} />
