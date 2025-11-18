@@ -10,7 +10,7 @@ import { useRouter } from 'next/navigation';
 import { getSession } from 'next-auth/react';
 const API_URL = process.env.NEXTAUTH_URL
 
-export const useInvoices = (request: Request, userId: number | undefined) => {
+export const useInvoices = (accessToken: string | null, userId: number | undefined) => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [stats, setStats] = useState({
     totalInvoices: 0,
@@ -42,9 +42,7 @@ export const useInvoices = (request: Request, userId: number | undefined) => {
         if (filter.status) queryParams.append("status", filter.status);
         if (filter.startDate) queryParams.append("startDate", filter.startDate.toISOString());
         if (filter.endDate) queryParams.append("endDate", filter.endDate?.toISOString());
-        const { searchParams } = new URL(request.url);
-        const accessToken = searchParams.get('accessToken');
-
+      
         const response = await fetch(`/api/invoices?${queryParams.toString()}`, { 
           credentials: "include",
           headers: {
@@ -97,8 +95,7 @@ export const useInvoices = (request: Request, userId: number | undefined) => {
   useEffect(() => {
     const fetchInvoiceItem = async () => {
       try {
-        const { searchParams } = new URL(request.url);
-        const accessToken = searchParams.get('accessToken');
+
         const allItems = await fetchInvoiceItems(accessToken);
 
         const itemsArray = Array.isArray(invoiceItems) ? invoiceItems : [];
@@ -130,23 +127,19 @@ export const useInvoices = (request: Request, userId: number | undefined) => {
   return { invoices, invoiceItems, invoicesWithItems, stats, loading, error, handleFilterChange };
 };
 
-export const useFetchInvoices = () => {
+export const useFetchInvoices = (accessToken: string|null) => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchInvoices = async () => {
       try {
-        const currentSession = await getSession();
-        if (!currentSession) {
-          throw new Error("Session expirée. Veuillez vous reconnecter.");
-        }
 
         const res = await fetch(`${API_URL}/api/invoices`, {
           credentials: 'include',
           headers: {
             "Content-Type": "application/json",
-            'Authorization': `Bearer ${currentSession.accessToken}`, // <-- Utilise le token
+            'Authorization': `Bearer ${accessToken}`, // <-- Utilise le token
           },
         });
         const data = await res.json();

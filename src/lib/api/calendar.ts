@@ -16,18 +16,15 @@ export async function fetchCalendar(accessToken: string | null): Promise<Calenda
   return res.json();
 }
 
-export const fetchCalendarEvents = async (userId?: number) => {
+export const fetchCalendarEvents = async (accessToken: string | null, userId?: number) => {
   try {
-    const currentSession = await getSession();
-    if (!currentSession) {
-      throw new Error("Session expirée. Veuillez vous reconnecter.");
-    }
+     
 
     const response = await fetch(`/api/calendar?userId=${userId}`, {
        credentials: 'include',
       headers: {
         'Content-type' : 'application/json',
-        'Authorization': `Bearer ${currentSession.accessToken}`
+        'Authorization': `Bearer ${accessToken}`
       }   
     });
     if (!response.ok) {

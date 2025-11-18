@@ -47,9 +47,9 @@ const calculateCallStats = (calls: Call[]) => {
   };
 };
 
-export const useCalls = (userId: string | undefined, initialFilter: Omit<CallFilterType, 'userId'> = {}) => {
+export const useCalls = (accessToken: string | null, initialFilter: Omit<CallFilterType, 'userId'> = {}) => {
   const router = useRouter();
-  const { data: session, status } = useAuthCheck();  
+  const { data: session, status } = useAuthCheck(accessToken);  
   const [filter, setFilter] = useState<Omit<CallFilterType, 'userId'>>(initialFilter);
   const [calls, setCalls] = useState<Call[]>([]);
   const [stats, setStats] = useState({
@@ -60,7 +60,7 @@ export const useCalls = (userId: string | undefined, initialFilter: Omit<CallFil
     missedRate: 0
   });
   const [loading, setLoading] = useState(true);
-  const { calendarEvents } = useCalendar(userId)
+  const { calendarEvents } = useCalendar(session?.user.id, accessToken)
 
 // useEffect(() => {
 //     // Si la session n'est pas chargée ou n'existe pas
@@ -80,16 +80,11 @@ export const useCalls = (userId: string | undefined, initialFilter: Omit<CallFil
       if (filter.byName) params.append('byName', filter.byName);
       if (filter.byPhone) params.append('byPhone', filter.byPhone);
 
-      const currentSession = await getSession();
-      if (!currentSession) {
-        throw new Error("Session expirée. Veuillez vous reconnecter.");
-      }
-
-      const response = await fetch(`/api/calls?userId=${userId}&${params.toString()}`, {
+      const response = await fetch(`/api/calls?userId=${session?.user.id}&${params.toString()}`, {
         credentials: 'include',
         headers: {
           "Content-Type": "application/json",
-          'Authorization': `Bearer ${currentSession.accessToken}`,
+          'Authorization': `Bearer ${accessToken}`,
         }
       });
       if (!response.ok) throw new Error("Erreur lors de la récupération des appels");
@@ -103,7 +98,7 @@ export const useCalls = (userId: string | undefined, initialFilter: Omit<CallFil
   };
 
   loadData();
-}, [userId, filter.byName, filter.byPhone]);
+}, [session?.user.id, filter.byName, filter.byPhone]);
 
   const handleFilterChange = useCallback((newFilters: Partial<CallFilterType>) => {
     setFilter(prev => ({ ...prev, ...newFilters }));

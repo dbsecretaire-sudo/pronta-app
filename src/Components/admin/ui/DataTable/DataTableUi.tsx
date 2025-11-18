@@ -32,6 +32,7 @@ interface DataTableProps<TData extends DataWithId> {
   createHref: string;
   onDelete?: (id: string | number) => void;
   dataMaps?: Record<string, Record<any, any>>;
+  accessToken: string | null;
 }
 
 // Composants de cellule
@@ -74,8 +75,9 @@ export function DataTableUi<TData extends DataWithId>({
   createHref,
   onDelete,
   dataMaps = {},
+  accessToken,
 }: DataTableProps<TData>) {
-  const { data: session, status } = useAuthCheck(); 
+  const { data: session, status } = useAuthCheck(accessToken); 
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 

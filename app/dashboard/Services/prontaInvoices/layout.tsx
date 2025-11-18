@@ -1,11 +1,17 @@
-"use client";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { AuthProvider } from "@/src/context/authContext";
+import { getServerSession } from "next-auth";
 import Link from "next/link";
 
-export default function ProntaInvoicesLayout({
+export default async function ProntaInvoicesLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+
+  const currentSession = await getServerSession(authOptions);
+  const accessToken = currentSession?.accessToken ?? null;
+
   return (
     <>
       {/* Barre de retour spécifique */}
@@ -23,7 +29,9 @@ export default function ProntaInvoicesLayout({
       </nav>
 
       <div className="pt-4">
-        {children}
+        <AuthProvider accessToken={accessToken}>
+          {children}
+        </AuthProvider>
       </div>
     </>
   );

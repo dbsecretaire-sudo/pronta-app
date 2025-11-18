@@ -1,5 +1,7 @@
 // src/app/admin/[resource]/[id]/page.tsx
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { ResourceEditForm } from '@/src/Components';
+import { getServerSession } from 'next-auth';
 import { notFound } from 'next/navigation';
 
 interface ResourceEditPageProps {
@@ -7,6 +9,8 @@ interface ResourceEditPageProps {
 }
 
 export default async function ResourceEditPage({ params }: ResourceEditPageProps) {
+  const session = await getServerSession(authOptions);
+  const accessToken = session?.accessToken ?? null;
   const { resource, id } = await params;
 
   // Vérifiez que l'ID est un nombre valide
@@ -19,6 +23,7 @@ export default async function ResourceEditPage({ params }: ResourceEditPageProps
       <ResourceEditForm
         resourceName={resource}
         id={parseInt(id)}
+        accessToken={accessToken}
       />
     </div>
   );

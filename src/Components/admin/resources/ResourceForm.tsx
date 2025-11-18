@@ -11,13 +11,13 @@ import { useServices } from '@/src/Hook/useServices';
 import { useAuthCheck } from "@/src/Hook/useAuthCheck";
 import { TrashIcon } from '@heroicons/react/16/solid';
 
-export default function ResourceForm({ resource, accessToken }: {resource: string, accessToken: string | null}) {
+export default function ResourceForm({ resource, accessToken}: {resource: string, accessToken: string | null}  ) {
   // const [state, formAction] = useActionState( createResource.bind(null, resource), {});
   const [state, formAction] = useActionState( (prevState: FormState, formData: FormData) => createResource(resource, prevState, formData), { success: undefined, error: undefined} as FormState);
   const [users, setUsers] = useState<User[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
-  const { data : session, status } = useAuthCheck();
-  const {s, sN} = useServices(session?.user.id, status);
+  const { data : session, status } = useAuthCheck(accessToken);
+  const {s, sN} = useServices(session?.user.id, status, accessToken);
   const [ paymentMethod, setPaymentMethod ] = useState<string>('');
 
   const handlePaymentMethodChange = (e: ChangeEvent<HTMLSelectElement>) => {

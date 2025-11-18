@@ -4,22 +4,14 @@ import { CallStats, CallList, CallFilter, Calendar } from "@/src/Components";
 import { CallFilter as CallFilterType } from "@/src/lib/schemas/calls";
 import { useCalls } from "@/src/Hook/useCalls";
 import { Tabs } from "@/src/Components"; // À créer ou utiliser une lib comme @radix-ui/react-tabs
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import Link from "next/link";
+import { AuthContext } from "@/src/context/authContext";
 
 export default function ProntaCallsDashboard() {
-  const { data: session, status } = useAuthCheck();
-
-  const [isAuthChecked, setIsAuthChecked] = useState(false);
-  const userIdVerified = isAuthChecked && status === 'authenticated' ? session?.id : undefined;
-
-    // Attendre que l'authentification soit vérifiée
-  useEffect(() => {
-    if (status !== 'loading') {
-      setIsAuthChecked(true);
-    }
-  }, [status]);
-
-  const { calls, stats, calendarEvents, loading, handleFilterChange } = useCalls(userIdVerified);
+  const accessToken = useContext(AuthContext);
+  const { data: session } = useAuthCheck(accessToken);
+  const { calls, stats, calendarEvents, loading, handleFilterChange } = useCalls(accessToken);
 
   const tabs = [
     {
@@ -28,7 +20,7 @@ export default function ProntaCallsDashboard() {
       content: (
         <div className="bg-white p-6 rounded-lg shadow">
           <CallFilter
-            userId={Number(userIdVerified)}
+            userId={Number(session?.user.id)}
             onFilterChange={handleFilterChange}
           />
           <CallList calls={calls} />
@@ -49,12 +41,35 @@ export default function ProntaCallsDashboard() {
    if (loading) return <div className="p-8 max-w-7xl mx-auto">Chargement...</div>;
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Pronta Calls - Tableau de bord</h1>
-      <CallStats {...stats} />
-      <div className="mt-8">
-        <Tabs tabs={tabs} defaultTab="calls" />
+    <div className="flex flex-col h-screen">
+      {/* Barre de retour spécifique à ProntaCalls */}
+      <nav className="bg-white border-b border-gray-200 h-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
+          <div className="flex justify-between items-center h-full">
+            <Link
+              href="/dashboard"
+              className="text-xl font-bold text-gray-900 hover:text-blue-600 flex items-center transition-colors"
+            >
+              ← Retour au tableau de bord
+            </Link>
+            <div className="text-xl font-semibold text-gray-800">
+              Pronta Calls
+            </div>
+          </div>
+        </div>
+      </nav>
+      <div className="p-8 max-w-7xl mx-auto">
+        <h1 className="text-2xl font-bold mb-6">Pronta Calls - Tableau de bord</h1>
+        <CallStats {...stats} />
+        <div className="mt-8">
+          <Tabs tabs={tabs} defaultTab="calls" />
+        </div>
+      </div>
+      <div className="flex-1">
       </div>
     </div>
+
+
+    
   );
 }

@@ -1,9 +1,5 @@
 // src/app/admin/layout.tsx
-import { getServerSession, Session } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { redirect } from "next/navigation";
-import { getRoleByUserId } from "@/src/lib/api";
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 
 interface AdminLayoutProps {
   children: ReactNode;

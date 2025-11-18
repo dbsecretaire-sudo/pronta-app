@@ -1,12 +1,15 @@
 "use client";
 import { ProfileTab, BillingTab, MessagesTab } from "@/src/Components";
+import { AuthContext } from "@/src/context/authContext";
 import { useAccount } from "@/src/Hook/useAccount";
 import { useAuthCheck } from "@/src/Hook/useAuthCheck";
 import { useServices } from "@/src/Hook/useServices";
 import { useSubscription } from "@/src/Hook/useSubscriptions";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 export default function AccountPage() {
+  const accessToken = useContext(AuthContext);
+  
   const {
     userData,
     loading,
@@ -16,9 +19,9 @@ export default function AccountPage() {
     isUpdating,
     handleProfileUpdate,
     handleBillingUpdate
-  } = useAccount();
+  } = useAccount(accessToken);
 
-  const { data: session, status} = useAuthCheck();
+  const { data: session, status} = useAuthCheck(accessToken);
 
   const [isAuthChecked, setIsAuthChecked] = useState(false);
   const userIdVerified = isAuthChecked && status === 'authenticated' ? session?.user.id : undefined;
@@ -30,8 +33,8 @@ export default function AccountPage() {
     }
   }, [status]);
 
-  const { sO } = useServices(userIdVerified, status);
-  const { subscriptionServices } = useSubscription(userIdVerified, sO);
+  const { sO } = useServices(userIdVerified, status, accessToken);
+  const { subscriptionServices } = useSubscription(userIdVerified, sO, accessToken);
 
   if (loading) return <div className="text-center py-8">Chargement...</div>;
   if (error) return <div className="text-center py-8 text-red-500">Erreur: {error}</div>;

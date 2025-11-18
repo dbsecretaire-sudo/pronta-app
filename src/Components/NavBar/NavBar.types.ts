@@ -9,6 +9,7 @@ export interface NavbarProps {
   children?: React.ReactNode;
   showLogo?: boolean;
   logoText?: string;
-  isInService?: boolean;
+  // isInService?: boolean;
   userServices?: ServiceItem[];
+  accessToken: string | null;
 }

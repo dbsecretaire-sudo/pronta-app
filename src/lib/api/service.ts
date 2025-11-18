@@ -4,7 +4,6 @@ import { getSession } from "next-auth/react";
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export const fetchAllServices = async (accessToken: string | null):Promise<Service[]> => {
- 
   const res = await fetch(`${API_URL}/api/services`, { 
     credentials: 'include',
     headers: {
@@ -16,16 +15,13 @@ export const fetchAllServices = async (accessToken: string | null):Promise<Servi
   return res.json();
 };
 
-export const fetchUserServices = async (userId: number) => {
-  const currentSession = await getSession();
-  if (!currentSession) {
-    throw new Error("Session expirée. Veuillez vous reconnecter.");
-  }
+export const fetchUserServices = async (userId: number, accessToken: string | null) => {
+
   const res = await fetch(`${API_URL}/api/user/${userId}/service`, { 
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${currentSession.accessToken}`, // <-- Utilise le token
+      'Authorization': `Bearer ${accessToken}`, // <-- Utilise le token
     },
   });
   if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
@@ -34,34 +30,28 @@ export const fetchUserServices = async (userId: number) => {
 
 
 
-export const subscribeToService = async (userId: number, serviceId: number): Promise<void> => {
-  const currentSession = await getSession();
-  if (!currentSession) {
-    throw new Error("Session expirée. Veuillez vous reconnecter.");
-  }
+export const subscribeToService = async (userId: number, serviceId: number, accessToken: string | null): Promise<void> => {
+
   const res = await fetch(`${API_URL}/api/user/${userId}/${serviceId}/reactivate`, {
     method: 'POST', 
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${currentSession.accessToken}`, // <-- Utilise le token
+      'Authorization': `Bearer ${accessToken}`, // <-- Utilise le token
     },
   });
   if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
   return res.json();
 };
 
-export const deactivateUserService = async (userId: number, serviceId: number): Promise<void> => {
-  const currentSession = await getSession();
-  if (!currentSession) {
-    throw new Error("Session expirée. Veuillez vous reconnecter.");
-  }
+export const deactivateUserService = async (userId: number, serviceId: number, accessToken: string | null): Promise<void> => {
+
   const response = await fetch(`${API_URL}/api/user/${userId}/${serviceId}/deactivate`, {
     method: 'PUT',
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${currentSession.accessToken}`, // <-- Utilise le token
+      'Authorization': `Bearer ${accessToken}`, // <-- Utilise le token
     },
   });
   if (!response.ok) {
@@ -70,17 +60,14 @@ export const deactivateUserService = async (userId: number, serviceId: number): 
   }
 };
 
-export const reactivateUserService = async (userId: number, serviceId: number): Promise<void> => {
-  const currentSession = await getSession();
-  if (!currentSession) {
-    throw new Error("Session expirée. Veuillez vous reconnecter.");
-  }
+export const reactivateUserService = async (userId: number, serviceId: number, accessToken: string | null): Promise<void> => {
+
   const response = await fetch(`${API_URL}/api/user/${userId}/${serviceId}/reactivate`, {
     method: 'PUT',
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${currentSession.accessToken}`, // <-- Utilise le token
+      'Authorization': `Bearer ${accessToken}`, // <-- Utilise le token
     },
   });
   if (!response.ok) {
@@ -89,16 +76,13 @@ export const reactivateUserService = async (userId: number, serviceId: number): 
   }
 };
 
-export const createService = async (serviceData: Omit<Service, 'id'>): Promise<Service> => {
-  const currentSession = await getSession();
-  if (!currentSession) {
-    throw new Error("Session expirée. Veuillez vous reconnecter.");
-  }
+export const createService = async (serviceData: Omit<Service, 'id'>, accessToken: string| null): Promise<Service> => {
+
   const response = await fetch(`${API_URL}/api/services`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${currentSession.accessToken}`, // <-- Utilise le token
+      'Authorization': `Bearer ${accessToken}`, // <-- Utilise le token
     },
     credentials: "include",
     body: JSON.stringify(serviceData),

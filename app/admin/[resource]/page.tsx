@@ -19,8 +19,7 @@ export default async function ResourcePage({
   const session = await getServerSession(authOptions);
   const accessToken = session?.accessToken ?? null;
   const { resource } = await params;
-  // console.log("accessToken", await searchParams.accessToken);
-  // const accessToken = searchParams.get('accessToken');
+
   const config = resourcesConfig[resource];
   if (!config) {
     return notFound();
@@ -103,6 +102,7 @@ export default async function ResourcePage({
         resourceName={(await params).resource}
         createHref={`/admin/${(await params).resource}/new`}
         dataMaps={dataMaps}
+        accessToken={accessToken}
       />
     </div>
   );

@@ -3,14 +3,19 @@
 import { useAuthCheck } from "@/src/Hook/useAuthCheck";
 import { InvoicesStats, InvoicesList, InvoicesFilter } from "@/src/Components";
 import { useInvoices } from "@/src/Hook/useInvoices";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { AuthContext } from "@/src/context/authContext";
 
-export default function ProntaInvoicesDashboard(request: Request) {
-  const { data: session, status } = useAuthCheck();
+export default async function ProntaInvoicesDashboard() {
+  const accessToken = useContext(AuthContext);
+
+  const { data: session, status } = useAuthCheck(accessToken);
 
   const [isAuthChecked, setIsAuthChecked] = useState(false);
   const userIdVerified = isAuthChecked && status === 'authenticated' ? session?.id : undefined;
-
+  
     // Attendre que l'authentification soit vérifiée
   useEffect(() => {
     if (status !== 'loading') {
@@ -18,7 +23,7 @@ export default function ProntaInvoicesDashboard(request: Request) {
     }
   }, [status]);
 
-  const { invoices, stats, loading, handleFilterChange } = useInvoices(request, userIdVerified);
+  const { invoices, stats, loading, handleFilterChange } = useInvoices(accessToken, userIdVerified);
 
   if (loading) {
     return <div className="p-8 max-w-7xl mx-auto">Chargement...</div>;

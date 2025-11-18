@@ -14,6 +14,8 @@ import {
   CreateSubscription, CreateSubscriptionSchema, validateCreateSubscription,
   CreateUser, CreateUserSchema, validateCreateUser
 } from "@/src/lib/schemas";
+import { getServerSession } from 'next-auth';
+import { authOptions } from '../api/auth/[...nextauth]/route';
 
 export type CreateResourceData =
   | CreateClient
@@ -58,7 +60,9 @@ export async function createResource(
   prevState: FormState,
   formData: FormData
 ): Promise<FormState> {
-
+  const currentSession = await getServerSession(authOptions);
+  const accessToken = currentSession?.accessToken ?? null;
+  console.log("adminActions",accessToken);
   try {
     const data = Object.fromEntries(formData.entries());
     // Validation selon la ressource
@@ -165,7 +169,7 @@ export async function createResource(
       return { error: "Ressource non supportée" };
     }
     // Appel à ta fonction updateResource
-    const result = await updateResource(resource, undefined, validatedData);
+    const result = await updateResource(accessToken, resource, undefined, validatedData);
     if(result.success === true){
       redirect(`/admin/${resource}`);
     };

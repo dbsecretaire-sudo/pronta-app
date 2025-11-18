@@ -21,6 +21,7 @@ import { CreateSubscription, CreateSubscriptionSchema } from '@/src/lib/schemas/
 interface ResourceEditFormProps {
   resourceName: string;
   id?: number;
+  accessToken: string | null;
 }
 
 type CreateResourceData =
@@ -33,8 +34,8 @@ type CreateResourceData =
   | CreateSubscription
   | Record<string, any>;
 
-export function ResourceEditForm({ resourceName, id }: ResourceEditFormProps) {
-  const { data: session, status } = useAuthCheck();
+export function ResourceEditForm({ resourceName, id, accessToken }: ResourceEditFormProps) {
+  const { data: session, status } = useAuthCheck(accessToken);
 
   const [isAuthChecked, setIsAuthChecked] = useState(false);
   const userIdVerified = isAuthChecked && status === 'authenticated' ? session?.id : undefined;
@@ -46,7 +47,7 @@ export function ResourceEditForm({ resourceName, id }: ResourceEditFormProps) {
     }
   }, [status]);
 
-  const { s } = useServices(userIdVerified, status);
+  const { s } = useServices(userIdVerified, status, accessToken);
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [isLoading, setIsLoading] = useState(!!id);
   const [users, setUsers] = useState<User[]>([]);
@@ -64,7 +65,7 @@ export function ResourceEditForm({ resourceName, id }: ResourceEditFormProps) {
   const initialize = async () => {
     try {
       if (id) {
-        const data = await getResourceById(resourceName, id);
+        const data = await getResourceById(resourceName, id, accessToken);
         const normalizedData = {
           ...data,
           address: data.address ?
@@ -114,8 +115,8 @@ export function ResourceEditForm({ resourceName, id }: ResourceEditFormProps) {
       }
       // Charge les utilisateurs et clients
       const [usersData, clientsData] = await Promise.all([
-        fetchUsers(session?.accessToken ?? null),
-        fetchAllClients(session?.accessToken ?? null),
+        fetchUsers(accessToken),
+        fetchAllClients(accessToken),
       ]);
       setUsers(usersData);
       setClients(clientsData);
@@ -385,7 +386,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       const updatedSubscriptions = await Promise.all([
         // Met à jour les abonnements des services cochés
         ...selectedServiceIds.map(async (serviceId: number) => {
-          const existingSubscription = await getSubscriptionByService(formData.id, serviceId);
+          const existingSubscription = await getSubscriptionByService(formData.id, serviceId, accessToken);
           if (existingSubscription) {
             return await updateUserSubscription(existingSubscription.id, {
               user_id: formData.id,
@@ -394,7 +395,7 @@ const handleSubmit = async (e: React.FormEvent) => {
               start_date: formData.user_subscriptions?.find((sub: {service_id: number}) => sub.service_id === serviceId)?.start_date || new Date().toISOString().split('T')[0],
               end_date: formData.user_subscriptions?.find((sub: {service_id: number}) => sub.service_id === serviceId)?.end_date || endDate.toISOString().split('T')[0],
               next_payment_date: formData.user_subscriptions?.find((sub: {service_id: number}) => sub.service_id === serviceId)?.next_payment_date || nextDate.toISOString().split('T')[0],
-            });
+            }, accessToken);
           } else {
             return await createSubscription({
               user_id: formData.id,
@@ -403,19 +404,19 @@ const handleSubmit = async (e: React.FormEvent) => {
               start_date: new Date().toISOString().split('T')[0],
               end_date: endDate.toISOString().split('T')[0],
               next_payment_date: nextDate.toISOString().split('T')[0],
-            });
+            }, accessToken);
           }
         }),
         // Désactive les abonnements des services retirés
         ...removedServiceIds.map(async (serviceId: number) => {
-          const existingSubscription = await getSubscriptionByService(formData.id, serviceId);
+          const existingSubscription = await getSubscriptionByService(formData.id, serviceId, accessToken);
           if (existingSubscription) {
             return await updateUserSubscription(existingSubscription.id, {
               user_id: formData.id,
               service_id: serviceId,
               status: 'cancelled', // Statut inactif si le service est retiré
               end_date: new Date().toISOString().split('T')[0], // Met fin aujourd'hui
-            });
+            }, accessToken);
           }
           return null;
         }).filter(Boolean), // Filtre les valeurs null
@@ -496,7 +497,7 @@ const handleSubmit = async (e: React.FormEvent) => {
     // 4. Soumets les données
     if (id) {
       // Mise à jour
-      await updateResource(resourceName, id, dataToSend);
+      await updateResource(accessToken, resourceName, id, dataToSend);
     } else {
       // Création
       if (resourceName === 'clients') {
@@ -511,7 +512,7 @@ const handleSubmit = async (e: React.FormEvent) => {
             }
           }
         });
-        await createResource(resourceName, undefined, formDataToSend);
+        await createResource(resourceName, undefined, formDataToSend, accessToken);
       } 
     }
 

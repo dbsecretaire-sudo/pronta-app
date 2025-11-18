@@ -8,8 +8,8 @@ import { useRouter } from 'next/navigation';
 import { Service } from '@/src/lib/schemas/services';
 import { PaymentMethod } from '@/src/lib/schemas/users';
 
-export const AccountSummary = ({sN, sO}: {sN: Service[], sO: Service[]}) => {
-  const { userData, subscriptionServices, loading, error } = useAccount();
+export const AccountSummary = ({sN, sO, accessToken}: {sN: Service[], sO: Service[], accessToken: string | null}) => {
+  const { userData, subscriptionServices, loading, error } = useAccount(accessToken);
   const { setActiveTab } = useTab();
   const router = useRouter();
   const formatDate = (date: string | Date | null | undefined) => { // ✅ Ajoute `null` au type

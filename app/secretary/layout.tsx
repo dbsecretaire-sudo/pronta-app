@@ -10,12 +10,12 @@ export default async function SecretaryLayout({
   children: React.ReactNode;
 }) {
   const session = await getServerSession(authOptions);
-
+  const accessToken = session?.accessToken ?? null;
   if (!session) {
     redirect('/login');
   }
 
-  const role = await getRoleByUserId(Number(session.user.id));
+  const role = await getRoleByUserId(Number(session.user.id), accessToken);
   if (role.role !== 'SECRETARY') {
     redirect('/unauthorized');
   }

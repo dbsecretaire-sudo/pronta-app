@@ -1,6 +1,8 @@
 // src/app/admin/[resource]/[id]/page.tsx
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { AdminForm } from '@/src/Components';
 import { fetchResourceItem, updateResource } from '@/src/lib/admin/api';
+import { getServerSession } from 'next-auth';
 import { notFound, redirect } from 'next/navigation';
 
 interface ResourceItemPageProps {
@@ -8,12 +10,14 @@ interface ResourceItemPageProps {
 }
 
 export default async function ResourceItemPage({ params }: ResourceItemPageProps) {
+  const session = await getServerSession(authOptions);
+  const accessToken = session?.accessToken ?? null;
   const { resource, id } = await params;
   const isNew = id === 'new';
 
   let defaultValues = {};
   if (!isNew) {
-    const data = await fetchResourceItem(resource, Number(id));
+    const data = await fetchResourceItem(resource, Number(id), accessToken);
     if (!data) return notFound();
     defaultValues = data;
   }
@@ -47,7 +51,7 @@ export default async function ResourceItemPage({ params }: ResourceItemPageProps
 
   const handleSubmit = async (formData: any) => {
     'use server';
-    await updateResource(resource, isNew ? undefined : Number(id), formData);
+    await updateResource(accessToken, resource, isNew ? undefined : Number(id), formData);
     redirect(`/admin/${resource}`);
   };
 

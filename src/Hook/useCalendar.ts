@@ -5,9 +5,9 @@ import { CalendarEvent } from '../lib/schemas/calendar';
 import { useAuthCheck } from './useAuthCheck';
 import { useRouter } from 'next/navigation';
 
-export const useCalendar = (userId: string | undefined) => {
+export const useCalendar = (userId: string | undefined, accessToken: string | null) => {
     const router = useRouter();
-    const { data: session, status } = useAuthCheck();
+    const { data: session, status } = useAuthCheck(accessToken);
     const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]); // Initialisez comme un tableau vide
 
 // useEffect(() => {
@@ -24,7 +24,7 @@ export const useCalendar = (userId: string | undefined) => {
             if (!userId) return; // Ne pas faire la requête si userId n'est pas défini
 
             try {
-                const events = await fetchCalendar(session?.accessToken ?? null); // Attendre la résolution de la promesse
+                const events = await fetchCalendar(accessToken); // Attendre la résolution de la promesse
 
                 // Filtrer les événements pour l'utilisateur donné
                 const userEvents = events.filter(

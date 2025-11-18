@@ -19,9 +19,9 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
 
-export const useServices = (userIdVerified: string | undefined, status: string) => {
+export const useServices = (userIdVerified: string | undefined, status: string, accessToken: string | null) => {
   const router = useRouter();
-  const { data: session } = useAuthCheck();
+  const { data: session } = useAuthCheck(accessToken);
   const [sO, setSO] = useState<Service[]>([]);
   const [sN, setSN] = useState<Service[]>([]);
   const [s, setS] = useState<Service[]>([]);
@@ -48,8 +48,8 @@ export const useServices = (userIdVerified: string | undefined, status: string) 
       
       const userIdNumber = Number(session?.user.id);
       const [fetchedUser, allServices] = await Promise.all([
-        fetchUser(userIdNumber),
-        fetchAllServices(session?.accessToken ?? null),
+        fetchUser(userIdNumber, accessToken),
+        fetchAllServices(accessToken),
       ]);
       setUser(fetchedUser);
       setS(allServices);
@@ -93,7 +93,7 @@ export const useServices = (userIdVerified: string | undefined, status: string) 
   const handleSubscribe = async (service: Service) => {
     try {
       if (!session?.user.id) throw new Error("User ID is required");
-      const subscription = await getSubscriptionByService(Number(session?.user.id), Number(service.id));
+      const subscription = await getSubscriptionByService(Number(session?.user.id), Number(service.id), accessToken);
       if (subscription?.id) {
         await updateUserSubscription(subscription.id, {
           user_id: Number(session?.user.id),
@@ -102,7 +102,7 @@ export const useServices = (userIdVerified: string | undefined, status: string) 
           end_date: endDate,
           next_payment_date: nextDate,
           status: 'active',
-        });
+        }, accessToken);
       } else {
         await createSubscription({
           user_id: Number(session?.user.id),
@@ -111,9 +111,9 @@ export const useServices = (userIdVerified: string | undefined, status: string) 
           end_date: endDate,
           next_payment_date: nextDate,
           status: 'active',
-        });
+        }, accessToken);
       }
-      await reactivateUserService(Number(session?.user.id), service.id);
+      await reactivateUserService(Number(session?.user.id), service.id, accessToken);
       await refreshServices();
     } catch (error) {
       setError(error instanceof Error ? error.message : "Échec de l'abonnement au service.");
@@ -127,7 +127,7 @@ export const useServices = (userIdVerified: string | undefined, status: string) 
         setError("Vous n'êtes pas abonné à ce service.");
         return;
       }
-      await deactivateUserService(Number(session?.user.id), service.id);
+      await deactivateUserService(Number(session?.user.id), service.id, accessToken);
       await refreshServices();
     } catch (error) {
       console.error("Erreur lors de la désactivation:", error);
@@ -138,7 +138,7 @@ export const useServices = (userIdVerified: string | undefined, status: string) 
   const handleReactivate = async (service: Service) => {
     if (!session?.user.id) return;
     try {
-      await reactivateUserService(Number(session?.user.id), service.id);
+      await reactivateUserService(Number(session?.user.id), service.id, accessToken);
       await refreshServices();
     } catch (error) {
       let errorMessage = "Échec de la réactivation.";

@@ -4,19 +4,16 @@ import { emptyClient } from "@/src/Types/Clients/index";
 import { getSession } from "next-auth/react";
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export const createClient = async (clientData: typeof emptyClient) => {
+export const createClient = async (clientData: typeof emptyClient, accessToken: string | null) => {
   try {
-    const currentSession = await getSession();
-    if (!currentSession) {
-      throw new Error("Session expirée. Veuillez vous reconnecter.");
-    }
+     
 
     const response = await fetch('/api/clients', {
       method: 'POST',
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${currentSession.accessToken}`,
+        'Authorization': `Bearer ${accessToken}`,
       },
       body: JSON.stringify(clientData),
     });

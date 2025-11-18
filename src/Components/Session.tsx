@@ -8,11 +8,11 @@ declare module "next-auth" {
     email: string;
     name?: string;
     role?: string;
-    accessToken?: string;
+    accessToken: string | null;
   }
 
   interface Session {
-    accessToken?: string;
+    accessToken: string | null;
     user: {
       id: string;
       email: string;
@@ -40,5 +40,5 @@ export interface CustomUser extends Omit<User, 'id' | "password_hash" | "role" |
   id: string; // Redéfini en string
   email: string;
   name: string;
-  accessToken: string;
+  accessToken: string | null;
 }

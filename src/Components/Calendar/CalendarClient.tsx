@@ -6,8 +6,8 @@ import { useCalendar } from "@/src/Hook/useCalendar";
 import { useAuthCheck } from "@/src/Hook/useAuthCheck";
 import { useEffect, useState } from "react";
 
-export function CalendarClient() {
-  const { data:session, status } = useAuthCheck();
+export function CalendarClient({accessToken}: {accessToken: string | null}) {
+  const { data:session, status } = useAuthCheck(accessToken);
 
   const [isAuthChecked, setIsAuthChecked] = useState(false);
   const userIdVerified = isAuthChecked && status === 'authenticated' ? session?.id : undefined;
@@ -19,7 +19,7 @@ export function CalendarClient() {
     }
   }, [status]);
 
-  const { calendarEvents } = useCalendar(userIdVerified);
+  const { calendarEvents } = useCalendar(userIdVerified, accessToken);
 
   if (status === "loading") {
     return <div className="p-6">Chargement...</div>;

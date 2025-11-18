@@ -21,7 +21,6 @@ export async function PUT(
       // Attend la résolution de la Promise pour accéder à params.id
       const { id } = await params;
       const body = await request.json();
-      console.log("Received body:", body);
 
       // Vérifie que l'ID est un nombre valide
       const subscriptionId = Number(id);

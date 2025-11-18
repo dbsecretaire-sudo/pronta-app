@@ -8,8 +8,8 @@ import { getSession } from "next-auth/react";
 
 export type UserNameRecord = Record<number, {id: number, name: string}>;
 
-export function useUser(userId?: string) {
-  const { data: session, status } = useAuthCheck();
+export function useUser( accessToken: string| null, userId?: string) {
+  const { data: session, status } = useAuthCheck(accessToken);
 
   const [isAuthChecked, setIsAuthChecked] = useState(false);
   const userIdVerified = isAuthChecked && status === 'authenticated' ? session?.user.id : undefined;
@@ -32,7 +32,7 @@ export function useUser(userId?: string) {
   if(userId){
     useEffect(()=> {
       const findUserById = async () => {
-        const getUser = await getUserById(Number(userId));
+        const getUser = await getUserById(Number(userId), accessToken);
         setUser(getUser);
       }
       findUserById();
@@ -48,7 +48,7 @@ export function useUser(userId?: string) {
         credentials: 'include',
         headers: {
           "Content-Type": "application/json",
-          'Authorization': `Bearer ${session?.accessToken ?? null}`, // <-- Utilise le token
+          'Authorization': `Bearer ${accessToken}`, // <-- Utilise le token
         },
       });
       if (!response.ok) throw new Error("Failed to fetch user data");
@@ -109,9 +109,9 @@ export function useUser(userId?: string) {
   useEffect(() => {
     const fetch = async () => {
       try {
-        const AllUsers = await fetchUsers(session?.accessToken ?? null);
-        const AllUsersName = await fetchUsersName(session?.accessToken ?? null);
-        const AllUsersRole = await fetchUsersRole(session?.accessToken ?? null);
+        const AllUsers = await fetchUsers(accessToken);
+        const AllUsersName = await fetchUsersName(accessToken);
+        const AllUsersRole = await fetchUsersRole(accessToken);
         setUsers(AllUsers);
         setUsersName(AllUsersName);
         setUsersRole(AllUsersRole);

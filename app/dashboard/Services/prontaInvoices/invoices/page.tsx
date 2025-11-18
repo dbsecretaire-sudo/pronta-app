@@ -3,9 +3,15 @@
 import Link from "next/link";
 import { useFetchInvoices } from "@/src/Hook/useInvoices";
 import { InvoiceRow } from "@/src/Modules/index";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { useContext } from "react";
+import { AuthContext } from "@/src/context/authContext";
 
-export default function InvoicesList() {
-  const { invoices, loading } = useFetchInvoices();
+export default async function InvoicesList() {
+  const accessToken = useContext(AuthContext);
+  
+  const { invoices, loading } = useFetchInvoices(accessToken);
 
   if (loading) return <div className="p-8">Chargement...</div>;
 

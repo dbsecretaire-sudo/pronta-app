@@ -202,11 +202,9 @@ export class SubscriptionModel {
    * Crée un abonnement pour un utilisateur spécifique
    */
   async createUserSubscription(userId: number, subscriptionData: CreateSubscription): Promise<Subscription> {
-  console.log("createUserSubscription called with:", { userId, subscriptionData });
 
   // Vérifie que l'utilisateur existe
   const { rows: userRows } = await pool.query('SELECT id FROM users WHERE id = $1', [userId]);
-  console.log("User check result:", userRows);
   if (userRows.length === 0) {
     throw new Error(`User with id ${userId} not found`);
   }
@@ -217,7 +215,6 @@ export class SubscriptionModel {
       ...subscriptionData,
       user_id: userId
     });
-    console.log("Validated data:", validatedData);
   } catch (error) {
     console.error("Validation error in createUserSubscription:", error);
     throw error;
@@ -231,15 +228,6 @@ export class SubscriptionModel {
     RETURNING *
   `;
 
-  console.log("Executing query with values:",
-    userId,
-    subscriptionData.service_id,
-    subscriptionData.status || 'active',
-    subscriptionData.start_date,
-    subscriptionData.end_date,
-    subscriptionData.next_payment_date
-  );
-
   try {
     const { rows } = await pool.query(query, [
       userId,
@@ -249,7 +237,6 @@ export class SubscriptionModel {
       formatDateForDB(subscriptionData.end_date),
       formatDateForDB(subscriptionData.next_payment_date)
     ]);
-    console.log("Query result:", rows);
     return this.mapDbSubscriptionToSubscription(rows[0]);
   } catch (error) {
     console.error("Database error in createUserSubscription:", error);

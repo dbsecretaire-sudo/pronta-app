@@ -1,33 +1,19 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { CallList, CallFilter } from "@/src/Components";
 import { CallFilter as CallFilterType } from "@/src/lib/schemas/calls";
 import { PhoneIcon } from "@heroicons/react/24/outline";
 import { CallModal } from "@/src/Components";
 import { useCalls } from "@/src/Hook/useCalls";
 import { useAuthCheck } from "@/src/Hook/useAuthCheck";
+import { AuthContext } from "@/src/context/authContext";
 
 export default function Calls() {
-  const { data: session, status } = useAuthCheck();
-
-  const [isAuthChecked, setIsAuthChecked] = useState(false);
-  const userIdVerified = isAuthChecked && status === 'authenticated' ? session?.id : undefined;
-
-    // Attendre que l'authentification soit vérifiée
-  useEffect(() => {
-    if (status !== 'loading') {
-      setIsAuthChecked(true);
-    }
-  }, [status]);
-
-  // const [loading, setLoading] = useState(true);
-  // const [filter, setFilter] = useState<CallFilterType>({
-  //   userId: 0,
-  //   byName: "",
-  //   byPhone: "",
-  // });
+  const accessToken = useContext(AuthContext);
+  const { data: session,  } = useAuthCheck(accessToken);
+  
   const [isCallModalOpen, setIsCallModalOpen] = useState(false);
-  const { calls, loading, filter, handleFilterChange } = useCalls(userIdVerified);
+  const { calls, loading, filter, handleFilterChange } = useCalls(accessToken);
 
   // const initiateZoiperCall = (phoneNumber: string) => {
   //   if (window.ZoiperAPI) {
@@ -55,7 +41,7 @@ export default function Calls() {
       <div className="bg-white rounded-lg shadow p-6 mb-6">
         <CallFilter
           onFilterChange={handleFilterChange}
-          userId={Number(userIdVerified)}
+          userId={Number(session?.user.id)}
         />
       </div>
 

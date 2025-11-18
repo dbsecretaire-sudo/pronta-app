@@ -12,7 +12,7 @@ interface UserData extends Session {
     [key: string]: any;
 }
 
-export const useAuthCheck = () => {
+export const useAuthCheck = (accessToken: string| null) => {
   const [status, setStatus] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -37,7 +37,7 @@ useEffect(() => {
 
         // Version corrigée pour récupérer les données utilisateur
         try {
-          const userData = await getUserById(data.user.id); // Attendre la résolution de la promesse
+          const userData = await getUserById(data.user.id, accessToken); // Attendre la résolution de la promesse
           setUser(userData);
         } catch (error) {
           setUser(data.user); // Utiliser les données de base en cas d'erreur

@@ -12,15 +12,18 @@ export default function Navbar({
   children,
   showLogo = true,
   logoText = "Pronta",
-  isInService = false,
+  // isInService = false,
   userServices = [], // Services par défaut vide
+  accessToken
 }: NavbarProps) {
+
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const { data: session, status } = useAuthCheck();
+  const { data: session, status } = useAuthCheck(accessToken);
   const pathname = usePathname();
   const [ isAdmin, setIsAdmin ] = useState(false);
   const router = useRouter();
+  const isInService = pathname.includes('/dashboard/Services/');
 
   // Menu principal (fixe)
   const mainMenuItems = [
@@ -46,7 +49,7 @@ export default function Navbar({
         return;
       }
       try {
-        const user = await getUserById(Number(session.user.id));
+        const user = await getUserById(Number(session.user.id), accessToken);
         setIsAdmin(user.role === 'ADMIN');
       } catch (error) {
         console.error("Erreur lors de la récupération du rôle :", error);

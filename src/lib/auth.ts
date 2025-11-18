@@ -1,5 +1,8 @@
 import { signIn } from "next-auth/react";
 import Cookies from 'js-cookie';
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { NextApiRequest } from "next";
 
 export async function login(email: string, password: string): Promise<boolean> {
   try {
@@ -23,4 +26,12 @@ export async function login(email: string, password: string): Promise<boolean> {
 export function logout() {
   Cookies.remove("next-auth.session-token");
   window.location.href = "/login";
+}
+
+
+export async function getSecureToken() {
+  const session = await getServerSession(authOptions);
+  // @ts-ignore (accès interne à NextAuth)
+  const token = await getToken({ req: undefined, secret: authOptions.secret });
+  return token?.accessToken;
 }

@@ -3,13 +3,16 @@ import { useRouter } from "next/navigation";
 import { ClientForm } from "@/src/Components";
 import { emptyClient } from "@/src/Types/Clients/index";
 import { createClient } from "@/src/lib/api";
+import { useContext } from "react";
+import { AuthContext } from "@/src/context/authContext";
 
 export default function NewClientPage() {
   const router = useRouter();
+  const accessToken = useContext(AuthContext);
 
   const handleSubmit = async (data: typeof emptyClient) => {
     try {
-      await createClient(data);
+      await createClient(data, accessToken);
       router.push('/dashboard/Services/prontaInvoices/clients');
     } catch (error) {
       console.error("Erreur:", error);

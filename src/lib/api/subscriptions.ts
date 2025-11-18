@@ -12,7 +12,8 @@ export const updateUserSubscription = async (
     end_date?: string | Date;
     next_payment_date?: string | Date | null;
     status?: string;
-  }
+  },
+  accessToken: string | null
 ): Promise<Subscription> => {
   const requestData = {
     ...data,
@@ -21,16 +22,11 @@ export const updateUserSubscription = async (
     ...(data.next_payment_date && { next_payment_date: data.next_payment_date instanceof Date ? data.next_payment_date.toISOString() : data.next_payment_date }),
   };
 
-  const currentSession = await getSession();
-  if (!currentSession) {
-    throw new Error("Session expirée. Veuillez vous reconnecter.");
-  }
-
   const res = await fetch(`/api/subscription/${subscription_id}`, {
     method: 'PUT',
     headers: { 
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${currentSession.accessToken}`,
+      'Authorization': `Bearer ${accessToken}`,
     },
     credentials: "include",
     body: JSON.stringify(requestData),
@@ -42,32 +38,25 @@ export const updateUserSubscription = async (
   return res.json();
 };
 
-export async function deleteSubscription(subscriptionId: number): Promise<void> {
-  const currentSession = await getSession();
-  if (!currentSession) {
-    throw new Error("Session expirée. Veuillez vous reconnecter.");
-  }
+export async function deleteSubscription(subscriptionId: number, accessToken: string | null): Promise<void> {
 
   const response = await fetch(`/api/subscription/${subscriptionId}`, { method: 'DELETE', 
     credentials: 'include',
     headers: {
       "Content-Type": "application/json",
-      'Authorization': `Bearer ${currentSession.accessToken}`, // <-- Utilise le token
+      'Authorization': `Bearer ${accessToken}`, // <-- Utilise le token
     },
   });
   if (!response.ok) throw new Error("Failed to delete subscription");
 }
 
-export async function getSubscriptionByService(userId: number, service_id: number): Promise<Subscription | null> {
-  const currentSession = await getSession();
-  if (!currentSession) {
-    throw new Error("Session expirée. Veuillez vous reconnecter.");
-  }
+export async function getSubscriptionByService(userId: number, service_id: number, accessToken: string | null): Promise<Subscription | null> {
+
   const response = await fetch(`/api/subscription/user/${userId}?service_id=${encodeURIComponent(service_id)}`, { 
     credentials: 'include',
     headers: {
       "Content-Type": "application/json",
-      'Authorization': `Bearer ${currentSession.accessToken}`, // <-- Utilise le token
+      'Authorization': `Bearer ${accessToken}`, // <-- Utilise le token
     },
   });
   if (!response.ok) throw new Error("Failed to fetch subscriptions");
@@ -81,17 +70,13 @@ export async function createSubscription(subscriptionData: {
   end_date: string | Date | null | undefined;
   next_payment_date: string | Date | null | undefined;
   status: string | Date | null | undefined;
-}): Promise<void> {
-  const currentSession = await getSession();
-  if (!currentSession) {
-    throw new Error("Session expirée. Veuillez vous reconnecter.");
-  }
+}, accessToken: string | null): Promise<void> {
 
   const response = await fetch(`/api/subscription`, {
     method: 'POST',
     headers: { 
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${currentSession.accessToken}`,
+      'Authorization': `Bearer ${accessToken}`,
     },
     credentials: "include",
     body: JSON.stringify({
@@ -104,17 +89,13 @@ export async function createSubscription(subscriptionData: {
   if (!response.ok) throw new Error("Failed to create subscription");
 }
 
-export async function fetchUserSubscriptions(userId: number) {
-  const currentSession = await getSession();
-  if (!currentSession) {
-    throw new Error("Session expirée. Veuillez vous reconnecter.");
-  }
+export async function fetchUserSubscriptions(userId: number, accessToken: string | null) {
 
   const res = await fetch(`/api/subscription/user/${userId}`, { 
     credentials: 'include',
     headers: {
       "Content-Type": "application/json",
-      'Authorization': `Bearer ${currentSession.accessToken}`, // <-- Utilise le token
+      'Authorization': `Bearer ${accessToken}`, // <-- Utilise le token
     },
   });
   if (!res.ok) throw new Error(`HTTP error: ${res.status}`);

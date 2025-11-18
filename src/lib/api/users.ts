@@ -4,16 +4,13 @@ import { getSession } from "next-auth/react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export const fetchUser = async (userId: number) => {
-  const currentSession = await getSession();
-  if (!currentSession) {
-    throw new Error("Session expirée. Veuillez vous reconnecter.");
-  }
+export const fetchUser = async (userId: number, accessToken: string | null) => {
+
   const res = await fetch(`${API_URL}/api/user/${userId}`, { 
     credentials: 'include',
     headers: { 
       "Content-Type": "application/json",
-      'Authorization': `Bearer ${currentSession.accessToken}`, // <-- Utilise le token
+      'Authorization': `Bearer ${accessToken}`, // <-- Utilise le token
     },
   });
   if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
@@ -25,16 +22,13 @@ export async function updateProfile(userId: number, data: {
   phone: string;
   name: string;
   role: Role;
-}) {
-  const currentSession = await getSession();
-  if (!currentSession) {
-    throw new Error("Session expirée. Veuillez vous reconnecter.");
-  }
+}, accessToken: string | null) {
+
   const response = await fetch(`/api/user/${userId}`, {
     method: "PUT",
     headers: { 
       "Content-Type": "application/json",
-      'Authorization': `Bearer ${currentSession.accessToken}`, // <-- Utilise le token
+      'Authorization': `Bearer ${accessToken}`, // <-- Utilise le token
     },
     credentials: "include",
     body: JSON.stringify(data),
@@ -57,16 +51,13 @@ export async function updateBilling(userId: number, data: {
     details: { card_number?: string; card_last_four?: string; card_brand?: string; paypal_email?: string };
     is_default: boolean;
   };
-}) {
-  const currentSession = await getSession();
-  if (!currentSession) {
-    throw new Error("Session expirée. Veuillez vous reconnecter.");
-  }
+}, accessToken: string | null) {
+
   const response = await fetch(`/api/users/${userId}`, {
     method: "PUT",
     headers: { 
       "Content-Type": "application/json",
-      'Authorization': `Bearer ${currentSession.accessToken}`, // <-- Utilise le token
+      'Authorization': `Bearer ${accessToken}`, // <-- Utilise le token
     },
     credentials: 'include',
     body: JSON.stringify(data),
@@ -75,16 +66,13 @@ export async function updateBilling(userId: number, data: {
   return response.json();
 }
 
-export async function getRoleByUserId(userId: number){
-  const currentSession = await getSession();
-  if (!currentSession) {
-    throw new Error("Session expirée. Veuillez vous reconnecter.");
-  }
+export async function getRoleByUserId(userId: number, accessToken: string | null){
+
   const res = await fetch(`${API_URL}/api/user/${userId}/role`, { 
     credentials: 'include',
     headers: {
       "Content-Type": "application/json",
-      'Authorization': `Bearer ${currentSession.accessToken}`, // <-- Utilise le token
+      'Authorization': `Bearer ${accessToken}`, // <-- Utilise le token
     },
   });
   if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
@@ -118,16 +106,13 @@ export const fetchUsersRole = async (accessToken: string | null) => {
 }
 
 
-export const fetchUsersForAdmin = async () => {
-    const currentSession = await getSession();
-    if (!currentSession) {
-      throw new Error("Session expirée. Veuillez vous reconnecter.");
-    }
+export const fetchUsersForAdmin = async (accessToken: string | null) => {
+     
     const res = await fetch(`${API_URL}/api/user/role`, {
       credentials: 'include',
       headers: {
         "Content-Type": "application/json",
-        'Authorization': `Bearer ${currentSession.accessToken}`, // <-- Utilise le token
+        'Authorization': `Bearer ${accessToken}`, // <-- Utilise le token
       },
     });
     const users = await res.json();
@@ -152,16 +137,13 @@ export const fetchUsersName = async (accessToken: string | null) : Promise<Recor
     return res.json();
 }
 
-export const getUserById = async (userId: number) : Promise<User> => {
-    const currentSession = await getSession();
-    if (!currentSession) {
-      throw new Error("Session expirée. Veuillez vous reconnecter.");
-    }
+export const getUserById = async (userId: number, accessToken: string | null) : Promise<User> => {
+     
     const res = await fetch(`${API_URL}/api/user/${userId}`, {
       credentials: 'include',
       headers: {
         "Content-Type": "application/json",
-        'Authorization': `Bearer ${currentSession.accessToken}`, // <-- Utilise le token
+        'Authorization': `Bearer ${accessToken}`, // <-- Utilise le token
       },
     });
     if (!res.ok) throw new Error(`HTTP error: ${res.status}`);

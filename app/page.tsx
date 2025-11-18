@@ -1,23 +1,19 @@
 "use client";
-import { useAuthCheck } from '@/src/Hook/useAuthCheck';
-import { getServerSession } from 'next-auth';
+import { AuthContext } from "@/src/context/authContext";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { authOptions } from './api/auth/[...nextauth]/route';
-import { useSession } from 'next-auth/react';
+import { useContext, useEffect } from "react";
 
 export default function Home() {
-  const { status } = useAuthCheck();
+  const accessToken = useContext(AuthContext);
   const router = useRouter();
 
-
-  useEffect(() => {
-    if (status === "authenticated") {
-      router.push(`/dashboard`);
-    } else if (status === "unauthenticated") {
-      router.push("/login");
-    }
-  }, [status, router]);
+useEffect(() => {
+  if(accessToken === null){
+    router.push(`/login`);
+  } else {
+    router.push(`/dashboard`);
+  }
+}, [accessToken]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">

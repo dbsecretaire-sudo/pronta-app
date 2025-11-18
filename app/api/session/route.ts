@@ -4,6 +4,6 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   const session = await getServerSession(authOptions);
-  console.log("Session côté serveur:", session); // <-- Debug
+
   return NextResponse.json({ session });
 }

@@ -9,9 +9,9 @@ import { useAuthCheck } from "@/src/Hook/useAuthCheck";
 import { useRouter } from "next/navigation";
 import { getSession } from 'next-auth/react';
 
-export function useAccount() {
+export function useAccount(accessToken: string |null) {
   const router = useRouter();
-  const { data: session, status } = useAuthCheck();
+  const { data: session, status } = useAuthCheck(accessToken);
   const [isAuthChecked, setIsAuthChecked] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
 
@@ -25,10 +25,10 @@ export function useAccount() {
   }, [status, router]);
 
   const userIdVerified = session?.user.id;
-  const { userData, loading, error, mutate } = useUser();
+  const { userData, loading, error, mutate } = useUser(accessToken);
   const { activeTab, setActiveTab } = useTab();
-  const { sO } = useServices(session?.user.id, status);
-  const { subscriptionServices } = useSubscription(session?.user.id, sO);
+  const { sO } = useServices(session?.user.id, status, accessToken);
+  const { subscriptionServices } = useSubscription(session?.user.id, sO, accessToken);
 
   // Fonction générique pour les mises à jour
   const updateUser = async <T extends object>(
@@ -48,7 +48,7 @@ export function useAccount() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          'Authorization': `Bearer ${session?.accessToken}`, // <-- Utilise le token
+          'Authorization': `Bearer ${accessToken}`, // <-- Utilise le token
         },
         body: JSON.stringify(updatedData),
       });

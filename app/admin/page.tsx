@@ -1,5 +1,4 @@
 // app/admin/page.tsx
-import { getServerSession } from 'next-auth';
 import Link from 'next/link';
 import {
   FaUsers,
@@ -11,13 +10,8 @@ import {
   FaUserCog,
   FaLayerGroup
 } from 'react-icons/fa';
-import { authOptions } from '../api/auth/[...nextauth]/route';
-import { getRoleByUserId } from '@/src/lib/api';
-import { CpuChipIcon } from '@heroicons/react/24/outline';
-import { getSession } from 'next-auth/react';
 
 export default async function AdminPage() {
-  const session = await getServerSession(authOptions);
 
   const resources = [
     {

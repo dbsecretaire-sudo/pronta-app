@@ -6,9 +6,9 @@ import { Subscription, SubscriptionWithService } from '@/src/lib/schemas/subscri
 import { fetchAllSubscriptions } from '@/src/lib/api';
 import { useAuthCheck } from './useAuthCheck';
 import { useRouter } from 'next/navigation'; 
-export const useSubscription = (userId: string | undefined, services: Service[]) => {
+export const useSubscription = (userId: string | undefined, services: Service[], accessToken: string | null) => {
     const router = useRouter();
-    const { data: session, status } = useAuthCheck();    
+    const { data: session, status } = useAuthCheck(accessToken);    
     const [subscriptionServices, setSubscriptionServices] = useState<SubscriptionWithService[]>([]);
     const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
     const [servicesIds, setServicesIds] = useState<number[]>([]);
@@ -35,7 +35,7 @@ export const useSubscription = (userId: string | undefined, services: Service[])
         const fetchData = async () => {
             try {
                 // 1. Récupérer tous les abonnements
-                const allSubscriptions = await fetchAllSubscriptions(session?.accessToken ?? null);
+                const allSubscriptions = await fetchAllSubscriptions(accessToken);
                 setSubscriptions(allSubscriptions);
 
                 // 2. Filtrer les abonnements pour l'utilisateur et les services donnés

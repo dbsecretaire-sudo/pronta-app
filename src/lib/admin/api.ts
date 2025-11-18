@@ -6,11 +6,11 @@ import { getSession } from 'next-auth/react';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export async function fetchResourceItem<T>(resource: string, id: number): Promise<T> {
-  return safeFetch<T>(`/api/admin/${resource}/${id}`);
+export async function fetchResourceItem<T>(resource: string, id: number, accessToken: string | null): Promise<T> {
+  return safeFetch<T>(accessToken, `/api/admin/${resource}/${id}`);
 }
 
-export async function updateResource(resource: string, id: number | undefined, data: any): Promise<FormState> {
+export async function updateResource(accessToken: string | null, resource: string, id: number | undefined, data: any): Promise<FormState> {
   let url: string;
   let method: 'POST' | 'PUT';
 
@@ -23,16 +23,13 @@ export async function updateResource(resource: string, id: number | undefined, d
   }
 
   try {
-    const currentSession = await getSession();
-    if (!currentSession) {
-      throw new Error("Session expirée. Veuillez vous reconnecter.");
-    }
+     
 
     const response = await fetch(url, { 
       method, 
       headers: { 
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${currentSession.accessToken}`, // <-- Utilise le token
+        'Authorization': `Bearer ${accessToken}`, // <-- Utilise le token
       }, 
       credentials: 'include', 
       body: JSON.stringify(id ? { id, ...data } : data) 
@@ -50,28 +47,25 @@ export async function updateResource(resource: string, id: number | undefined, d
   }
 }
 
-export async function getResourceById(resourceName: string, id: number) {
+export async function getResourceById(resourceName: string, id: number, accessToken : string | null) {
   // Appel à votre API ou base de données
   if(resourceName === 'invoices'){
     
-    const currentSession = await getSession();
-    if (!currentSession) {
-      throw new Error("Session expirée. Veuillez vous reconnecter.");
-    }
+     
 
     const [invoiceResponse, itemsResponse] = await Promise.all([
       fetch(`/api/admin/invoices/${id}`, { 
         credentials: 'include',
         headers: {
           "Content-Type": "application/json",
-          'Authorization': `Bearer ${currentSession.accessToken}`, // <-- Utilise le token
+          'Authorization': `Bearer ${accessToken}`, // <-- Utilise le token
         },
       }),
       fetch(`/api/invoices/${id}/items`, {
         credentials: 'include',
         headers: {
           "Content-Type": "application/json",
-          'Authorization': `Bearer ${currentSession.accessToken}`, // <-- Utilise le token
+          'Authorization': `Bearer ${accessToken}`, // <-- Utilise le token
         },
       }), // Endpoint dédié aux items
     ]);
@@ -89,16 +83,13 @@ export async function getResourceById(resourceName: string, id: number) {
       items: itemsData, // Ajoute les items à la facture
     };
   } else {
-    const currentSession = await getSession();
-    if (!currentSession) {
-      throw new Error("Session expirée. Veuillez vous reconnecter.");
-    }
+     
 
     const response = await fetch(`/api/admin/${resourceName}/${id}`, {
       credentials: "include",
       headers: {
         "Content-Type": "application/json",
-        'Authorization': `Bearer ${currentSession.accessToken}`, // <-- Utilise le token
+        'Authorization': `Bearer ${accessToken}`, // <-- Utilise le token
       },
     });
     if (!response.ok) {
@@ -108,32 +99,23 @@ export async function getResourceById(resourceName: string, id: number) {
   }
 }
 
-export async function fetchResource(resource: string) {
-    const currentSession = await getSession();
-
-    if (!currentSession) {
-      throw new Error("Session expirée. Veuillez vous reconnecter.");
-    }
+export async function fetchResource(accessToken: string | null, resource: string) {
+     
 
 //   const response = await fetch(`${API_URL}/api/admin/${resource}`);
 //   if (!response.ok) throw new Error('Failed to fetch');
 //   return response.json();
-    return resourcesConfig[resource]?.fetchData(currentSession?.accessToken ?? null);
+    return resourcesConfig[resource]?.fetchData(accessToken);
 }
 
-export async function createResource(resource: string, prevState: any, formData: FormData) {
+export async function createResource(resource: string, prevState: any, formData: FormData, accessToken: string | null) {
   const data = Object.fromEntries(formData.entries());
-
-  const currentSession = await getSession();
-  if (!currentSession) {
-    throw new Error("Session expirée. Veuillez vous reconnecter.");
-  }
 
   const response = await fetch(`/api/admin/${resource}`, {
     method: 'POST',
     headers: { 
       "Content-Type": "application/json",
-      'Authorization': `Bearer ${currentSession.accessToken}`, // <-- Utilise le token
+      'Authorization': `Bearer ${accessToken}`, // <-- Utilise le token
     },
     credentials: 'include',
     body: JSON.stringify(data),
@@ -145,21 +127,17 @@ export async function createResource(resource: string, prevState: any, formData:
 
 // src/lib/api.ts
 export async function safeFetch<T>(
+  accessToken: string | null,
   url: string,
-  config?: RequestInit
+  config?: RequestInit,
 ): Promise<T> {
   try {
-    const currentSession = await getSession();
-    if (!currentSession) {
-      throw new Error("Session expirée. Veuillez vous reconnecter.");
-    }
-
     const response = await fetch(url, {
       ...config,
       credentials: 'include', // <-- Toujours inclure les cookies
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${currentSession.accessToken}`, // <-- Utilise le token
+        'Authorization': `Bearer ${accessToken}`, // <-- Utilise le token
         ...config?.headers,
       },
     });

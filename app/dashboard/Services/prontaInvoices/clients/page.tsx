@@ -1,9 +1,13 @@
 // app/dashboard/Clients/page.tsx
 "use client";
 import { ClientList } from "@/src/Components";
+import { AuthContext } from "@/src/context/authContext";
 import { useClients } from "@/src/Hook/useClients";
+import { useContext } from "react";
 
 export default function ClientsPage() {
+  const accessToken = useContext(AuthContext);
+
   const {
     clients,
     loading,
@@ -14,7 +18,7 @@ export default function ClientsPage() {
     setCurrentPage,
     setSearchTerm,
     handleDelete,
-  } = useClients();
+  } = useClients(accessToken);
 
   return (
     <div className="p-8">
