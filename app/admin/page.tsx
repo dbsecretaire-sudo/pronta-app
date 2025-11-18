@@ -1,4 +1,5 @@
 // app/admin/page.tsx
+import { getServerSession } from 'next-auth';
 import Link from 'next/link';
 import {
   FaUsers,
@@ -10,8 +11,19 @@ import {
   FaUserCog,
   FaLayerGroup
 } from 'react-icons/fa';
+import { authOptions } from '../api/auth/[...nextauth]/route';
+import { verifyAndDecodeToken } from '@/src/lib/auth';
+import { redirect } from 'next/navigation';
 
 export default async function AdminPage() {
+
+  const session = await getServerSession(authOptions);
+  const accessToken = session?.accessToken ?? null;
+
+  const { valid, payload } = verifyAndDecodeToken(accessToken);
+  if (!valid) {
+    redirect('/login');
+  }
 
   const resources = [
     {

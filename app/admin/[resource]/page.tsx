@@ -1,5 +1,5 @@
 // app/admin/[resource]/page.tsx
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { DataTableUi } from '@/src/Components';
 import { resourcesConfig } from '@/src/lib/admin/resources';
 import { fetchUsersRole, fetchUsersName, fetchAllServices, fetchAllSubscriptions, fetchInvoices, fetchCalendar, fetchAllClients, fetchAllCalls, fetchUsers, fetchInvoiceItems, getRoleByUserId } from '@/src/lib/api';
@@ -7,6 +7,7 @@ import { getServerSession, Session } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { CpuChipIcon } from '@heroicons/react/24/outline';
 import { getSession } from 'next-auth/react';
+import { verifyAndDecodeToken } from '@/src/lib/auth';
 
 interface PageProps {
   params: { resource: string };
@@ -19,6 +20,11 @@ export default async function ResourcePage({
   const session = await getServerSession(authOptions);
   const accessToken = session?.accessToken ?? null;
   const { resource } = await params;
+
+  const { valid, payload } = verifyAndDecodeToken(accessToken);
+  if (!valid) {
+    redirect('/login');
+  }
 
   const config = resourcesConfig[resource];
   if (!config) {

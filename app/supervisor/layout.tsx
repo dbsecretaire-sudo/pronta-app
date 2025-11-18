@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import { getRoleByUserId } from "@/src/lib/api";
+import { verifyAndDecodeToken } from "@/src/lib/auth";
 
 export default async function AdminLayout({
   children,
@@ -12,11 +13,12 @@ export default async function AdminLayout({
   const session = await getServerSession(authOptions);
   const accessToken = session?.accessToken ?? null;
 
-  if (!session) {
-    redirect('/login');
-  }
+   const { valid, payload } = verifyAndDecodeToken(accessToken);
+   if (!valid) {
+     redirect('/login');
+   }
 
-  const role = await getRoleByUserId(Number(session.user.id), accessToken);
+  const role = await getRoleByUserId(Number(session?.user.id), accessToken);
   if (role.role !== 'SUPERVISOR') {
     redirect('/unauthorized');
   }
