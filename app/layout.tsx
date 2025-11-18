@@ -5,20 +5,18 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "./api/auth/[...nextauth]/route";
 import { AuthProvider } from "@/src/context/authContext";
 import { redirect } from "next/navigation";
-import { verifyAndDecodeToken } from "@/src/lib/auth";
+import { getServerToken, verifyAndDecodeToken } from "@/src/lib/auth";
 
 const geistSans = Geist({ subsets: ["latin"], variable: "--font-geist-sans" });
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" });
 
 export default async function RootLayout({ children }: {children: React.ReactNode}) {
  
-  const session = await getServerSession(authOptions);
-  const accessToken = session?.accessToken ?? null;
+  // const session = await getServerSession(authOptions);
+  // const accessToken = session?.accessToken ?? null;
 
-  // const { valid, payload } = verifyAndDecodeToken(accessToken);
-  // if (!valid) {
-  //   redirect('/login');
-  // }
+  const accessToken = await getServerToken();
+
 
   return (
     <html lang="fr" className={`${geistSans.variable} ${geistMono.variable}`}>

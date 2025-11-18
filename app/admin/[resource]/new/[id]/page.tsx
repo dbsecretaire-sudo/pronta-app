@@ -2,7 +2,7 @@
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { AdminForm } from '@/src/Components';
 import { fetchResourceItem, updateResource } from '@/src/lib/admin/api';
-import { verifyAndDecodeToken } from '@/src/lib/auth';
+import { getServerToken, verifyAndDecodeToken } from '@/src/lib/auth';
 import { getServerSession } from 'next-auth';
 import { notFound, redirect } from 'next/navigation';
 
@@ -11,8 +11,9 @@ interface ResourceItemPageProps {
 }
 
 export default async function ResourceItemPage({ params }: ResourceItemPageProps) {
-  const session = await getServerSession(authOptions);
-  const accessToken = session?.accessToken ?? null;
+  // const session = await getServerSession(authOptions);
+  // const accessToken = session?.accessToken ?? null;
+  const accessToken = await getServerToken();
 
   const { valid, payload } = verifyAndDecodeToken(accessToken);
   if (!valid) {

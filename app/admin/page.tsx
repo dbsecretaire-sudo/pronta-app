@@ -12,13 +12,14 @@ import {
   FaLayerGroup
 } from 'react-icons/fa';
 import { authOptions } from '../api/auth/[...nextauth]/route';
-import { verifyAndDecodeToken } from '@/src/lib/auth';
+import { getServerToken, verifyAndDecodeToken } from '@/src/lib/auth';
 import { redirect } from 'next/navigation';
 
 export default async function AdminPage() {
 
-  const session = await getServerSession(authOptions);
-  const accessToken = session?.accessToken ?? null;
+  // const session = await getServerSession(authOptions);
+  // const accessToken = session?.accessToken ?? null;
+   const accessToken = await getServerToken();
 
   const { valid, payload } = verifyAndDecodeToken(accessToken);
   if (!valid) {

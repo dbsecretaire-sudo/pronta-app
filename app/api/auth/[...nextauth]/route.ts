@@ -9,9 +9,7 @@ import bcrypt from "bcrypt";
 import { generateAccessToken } from "@/src/Types/Utils/Param";
 import { sign } from 'jsonwebtoken';
 
-async function verifyPassword(plainPassword: string, hashedPassword: string) {
-  return await bcrypt.compare(plainPassword, hashedPassword);
-}
+
 const DOMAIN = process.env.DOMAIN;
 
 export const authOptions: NextAuthOptions = {
@@ -75,7 +73,7 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id as string;
         session.user.email = token.email as string;
         session.user.name = token.name as string;
-        session.accessToken = token.accessToken as string;
+        // session.accessToken = token.accessToken as string;
       };
       return session;
     },
@@ -108,13 +106,3 @@ const handler = NextAuth(authOptions);
 
 // Export pour App Router
 export { handler as GET, handler as POST };
-
-export async function getServerAuthSession() {
-  const session = await getServerSession(authOptions);
-  // @ts-ignore (accès interne)
-  const token = session?.token as JWT | undefined;
-  return {
-    session,
-    token,
-  };
-}

@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import { getRoleByUserId } from "@/src/lib/api";
-import { verifyAndDecodeToken } from "@/src/lib/auth";
+import { getServerToken, verifyAndDecodeToken } from "@/src/lib/auth";
 
 export default async function SecretaryLayout({
   children,
@@ -11,7 +11,8 @@ export default async function SecretaryLayout({
   children: React.ReactNode;
 }) {
   const session = await getServerSession(authOptions);
-  const accessToken = session?.accessToken ?? null;
+  // const accessToken = session?.accessToken ?? null;
+  const accessToken = await getServerToken();
 
   const { valid, payload } = verifyAndDecodeToken(accessToken);
   if (!valid) {

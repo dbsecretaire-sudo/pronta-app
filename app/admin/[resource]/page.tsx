@@ -7,7 +7,7 @@ import { getServerSession, Session } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { CpuChipIcon } from '@heroicons/react/24/outline';
 import { getSession } from 'next-auth/react';
-import { verifyAndDecodeToken } from '@/src/lib/auth';
+import { getServerToken, verifyAndDecodeToken } from '@/src/lib/auth';
 import Link from 'next/link';
 
 interface PageProps {
@@ -18,8 +18,9 @@ interface PageProps {
 export default async function ResourcePage({
   params,
 }: PageProps) {
-  const session = await getServerSession(authOptions);
-  const accessToken = session?.accessToken ?? null;
+  // const session = await getServerSession(authOptions);
+  // const accessToken = session?.accessToken ?? null;
+   const accessToken = await getServerToken();
   const { resource } = await params;
 
   const { valid, payload } = verifyAndDecodeToken(accessToken);

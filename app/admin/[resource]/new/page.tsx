@@ -2,14 +2,15 @@ import { notFound, redirect } from 'next/navigation';
 import { ResourceForm } from '@/src/Components'; // Composant client
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { verifyAndDecodeToken } from '@/src/lib/auth';
+import { getServerToken, verifyAndDecodeToken } from '@/src/lib/auth';
 import Link from 'next/link';
 
 export default async function NewResourcePage({ params }: { params: Promise<{ resource: string }> }) {
   const { resource } =  await params;
 
-  const session = await getServerSession(authOptions);
-  const accessToken = session?.accessToken ?? null;
+  // const session = await getServerSession(authOptions);
+  // const accessToken = session?.accessToken ?? null;
+  const accessToken = await getServerToken();
 
   const { valid, payload } = verifyAndDecodeToken(accessToken);
   if (!valid) {

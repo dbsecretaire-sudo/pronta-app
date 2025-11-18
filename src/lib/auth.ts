@@ -30,11 +30,21 @@ export function logout() {
 }
 
 
-export async function getSecureToken() {
-  const session = await getServerSession(authOptions);
-  // @ts-ignore (accès interne à NextAuth)
-  const token = await getToken({ req: undefined, secret: authOptions.secret });
-  return token?.accessToken;
+import { getToken } from 'next-auth/jwt';
+import { NextRequest } from 'next/server';
+import { cookies } from "next/headers";
+
+export async function getServerToken() {
+  // Créez un objet req factice avec les cookies
+  const req = {
+    cookies: Object.fromEntries(
+      (await cookies()).getAll().map((cookie) => [cookie.name, cookie.value])
+    ),
+    headers: new Headers(),
+  } as any;
+
+  const token = await getToken({ req, secret: authOptions.secret });
+  return token?.accessToken as string | null;
 }
 
 export function verifyAndDecodeToken(token: string | null): { valid: boolean; payload?: any } {
