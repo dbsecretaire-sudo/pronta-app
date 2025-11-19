@@ -57,8 +57,6 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        // token.role = user.role;
-        // token.accessToken = user.accessToken;
         // Token standard pour tous les utilisateurs
         token.accessToken = sign(
           { id: user.id, email: user.email, role: user.role },
@@ -73,7 +71,6 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id as string;
         session.user.email = token.email as string;
         session.user.name = token.name as string;
-        // session.accessToken = token.accessToken as string;
       };
       return session;
     },
