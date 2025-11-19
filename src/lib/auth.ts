@@ -43,7 +43,7 @@ export async function getServerToken(): Promise<string | null> {
 console.log('req ', req)
     // Utilisez getToken pour déchiffrer le token NextAuth
     const token = await getToken({ req, secret: authOptions.secret });
-    console.log('token :', token)
+    console.log('token :', authOptions.secret)
     if (!token) {
       return null;
     }
