@@ -7,7 +7,7 @@ import {
 } from '@/src/lib/api';
 import { NavBar, ServiceForm } from "@/src/Components";
 import { TabProvider } from '@/src/context/TabContext';
-import { getServerToken, verifyAndDecodeToken } from "@/src/lib/auth";
+import { getServerToken, getServerTokenBis, verifyAndDecodeToken } from "@/src/lib/auth";
 import { redirect } from "next/navigation";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode}) {
@@ -16,6 +16,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   // const accessToken = session?.accessToken ?? null;
    const accessToken = await getServerToken();
    console.log(accessToken);
+   const accessTokenbid = await getServerTokenBis();
   const { valid, payload } = verifyAndDecodeToken(accessToken);
   console.log('valide', valid);
   if (!valid) {

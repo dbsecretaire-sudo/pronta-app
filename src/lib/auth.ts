@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { NextApiRequest } from "next";
 import jwt, { verify, JwtPayload } from 'jsonwebtoken';
-import { getToken } from 'next-auth/jwt';
+import { getToken, JWT } from 'next-auth/jwt';
 import { NextRequest } from 'next/server';
 import { cookies } from "next/headers";
 import { Role } from "../Types/Users";
@@ -30,6 +30,21 @@ export async function login(email: string, password: string): Promise<boolean> {
 export function logout() {
   Cookies.remove("next-auth.session-token");
   window.location.href = "/login";
+}
+
+export async function getServerTokenBis(): Promise<JWT | string | null> {
+  const cookieStore = cookies();
+  const req = {
+    cookies: Object.fromEntries(
+      (await cookieStore).getAll().map((cookie) => [cookie.name, cookie.value])
+    ),
+    headers: {
+      host: "fr.pronta.corsica",
+      "x-forwarded-proto": "https",
+    },
+  } as any;
+
+  return await getToken({ req, secret: authOptions.secret });
 }
 
 export async function getServerToken(): Promise<string | null> {
