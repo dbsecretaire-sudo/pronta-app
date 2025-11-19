@@ -3,7 +3,11 @@ import Cookies from 'js-cookie';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { NextApiRequest } from "next";
-import jwt from 'jsonwebtoken';
+import jwt, { verify, JwtPayload } from 'jsonwebtoken';
+import { getToken } from 'next-auth/jwt';
+import { NextRequest } from 'next/server';
+import { cookies } from "next/headers";
+import { Role } from "../Types/Users";
 
 export async function login(email: string, password: string): Promise<boolean> {
   try {
@@ -23,16 +27,10 @@ export async function login(email: string, password: string): Promise<boolean> {
   }
 }
 
-
 export function logout() {
   Cookies.remove("next-auth.session-token");
   window.location.href = "/login";
 }
-
-
-import { getToken } from 'next-auth/jwt';
-import { NextRequest } from 'next/server';
-import { cookies } from "next/headers";
 
 export async function getServerToken() {
   try {
@@ -54,22 +52,57 @@ export async function getServerToken() {
     // 3. Appel à getToken
     console.log("Appel à getToken avec secret:", authOptions.secret ? "OK" : "MISSING");
     const token = await getToken({ req, secret: authOptions.secret });
-
-    // 4. Log du résultat de getToken
-    console.log("Résultat de getToken:", token);
-
-    // 5. Vérification de token.accessToken
     if (!token) {
       console.error("getToken a retourné null/undefined");
       return null;
     }
 
     if (!token.accessToken) {
-      console.error("token.accessToken est manquant dans:", token);
+      console.error("token.accessToken est manquant");
       return null;
     }
 
-    return token.accessToken;
+    // Décoder le accessToken personnalisé
+    try {
+      let safeToken : string = "";
+      
+      if (typeof token.accessToken === "object" && token.accessToken !== null && 'token' in token.accessToken && typeof token.accessToken.token === "string") {
+        safeToken = token.accessToken.token; // Accède à la propriété "token" de l'objet
+      } else if (token.accessToken === "string") {
+        safeToken = token.accessToken
+      }
+
+      const decoded = verify(safeToken, process.env.NEXTAUTH_SECRET!) as JwtPayload;
+     if (typeof decoded.id !== 'string' || typeof decoded.email !== 'string' || typeof decoded.role !== 'string') {
+        console.error("Le accessToken ne contient pas les propriétés attendues");
+        return null;
+      }
+      console.log("Données décodées du accessToken:", decoded);
+      return {
+        id: decoded.id as string,
+        email: decoded.email as string,
+        role: decoded.role as Role,
+      }
+    } catch (error) {
+      console.error("Erreur de décodage du accessToken:", error);
+      return null;
+    }
+
+    // // 4. Log du résultat de getToken
+    // console.log("Résultat de getToken:", token);
+
+    // // 5. Vérification de token.accessToken
+    // if (!token) {
+    //   console.error("getToken a retourné null/undefined");
+    //   return null;
+    // }
+
+    // if (!token.accessToken) {
+    //   console.error("token.accessToken est manquant dans:", token);
+    //   return null;
+    // }
+
+    // return token.accessToken;
   } catch (error) {
     console.error("Erreur dans getServerToken:", error);
     return null;
