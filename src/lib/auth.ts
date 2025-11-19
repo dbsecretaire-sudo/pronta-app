@@ -68,7 +68,7 @@ export async function getServerToken() {
       
       if (typeof token.accessToken === "object" && token.accessToken !== null && 'token' in token.accessToken && typeof token.accessToken.token === "string") {
         safeToken = token.accessToken.token; // Accède à la propriété "token" de l'objet
-      } else if (token.accessToken === "string") {
+      } else if (typeof token.accessToken === "string") {
         safeToken = token.accessToken
       }
 
