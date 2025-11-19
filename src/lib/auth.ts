@@ -47,24 +47,19 @@ console.log('get Token',getToken({ req, secret: authOptions.secret }));
   return await getToken({ req, secret: authOptions.secret });
 }
 
-export async function getServerToken(): Promise<string | null> {
+export async function getServerToken() {
   try {
-    // 1. Récupérez les cookies avec `cookies()`
     const cookieStore = await cookies();
-    const allCookies = cookieStore.getAll();
-
-    // 2. Construisez l'objet `req` attendu par `getToken`
     const req = {
       cookies: Object.fromEntries(
-        allCookies.map((cookie) => [cookie.name, cookie.value])
+        cookieStore.getAll().map((cookie) => [cookie.name, cookie.value])
       ),
       headers: {
-        host: "fr.pronta.corsica",
+        host: process.env.NEXTAUTH_URL || "fr.pronta.corsica",
         "x-forwarded-proto": "https",
       },
     } as any;
 
-    // 3. Utilisez `getToken` pour déchiffrer le token NextAuth
     const token = await getToken({ req, secret: authOptions.secret });
 
     if (!token) {
@@ -72,19 +67,13 @@ export async function getServerToken(): Promise<string | null> {
       return null;
     }
 
-    // 4. Si vous avez un `accessToken` personnalisé, retournez-le
-    if (typeof token.accessToken === "string") {
-      return token.accessToken;
-    }
-
-    // 5. Sinon, retournez `null` (le token NextAuth n'est pas un JWT standard)
-    console.warn("Aucun accessToken personnalisé trouvé");
-    return null;
+    return token.accessToken as string | null;
   } catch (error) {
     console.error("Erreur dans getServerToken:", error);
     return null;
   }
 }
+
 
 
 export function verifyAndDecodeToken(token: string | null): { valid: boolean; payload?: any } {
