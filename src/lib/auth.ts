@@ -41,7 +41,7 @@ export async function getServerToken() {
         "next-auth.session-token": sessionToken, // Passez uniquement le cookie nécessaire
       },
       headers: {
-        host: process.env.NEXTAUTH_URL || "fr.pronta.corsica",
+        host: "fr.pronta.corsica",
         "x-forwarded-proto": "https",
       },
     } as any;
