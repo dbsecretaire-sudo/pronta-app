@@ -37,9 +37,14 @@ export async function getServerToken(): Promise<string | null> {
     const allCookies = (await cookies()).getAll();
 
     const req = {
-      cookies: Object.fromEntries(allCookies.map((cookie) => [cookie.name, cookie.value])),
-      headers: new Headers(),
-    } as any;
+  cookies: Object.fromEntries(
+    (await cookies()).getAll().map((cookie) => [cookie.name, cookie.value])
+  ),
+  headers: new Headers({
+    "host": "fr.pronta.corsica", // Obligatoire pour le déchiffrement
+    "x-forwarded-proto": "https", // Obligatoire en production
+  }),
+} as any;
     // Utilisez getToken pour déchiffrer le token NextAuth
     const token = await getToken({ req, secret: authOptions.secret });
     console.log('token : req : ',req, " secret : ",  authOptions.secret, " resultat: ", token)
