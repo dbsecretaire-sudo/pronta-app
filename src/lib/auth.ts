@@ -35,20 +35,44 @@ import { NextRequest } from 'next/server';
 import { cookies } from "next/headers";
 
 export async function getServerToken() {
-  // Créez un objet req factice avec les cookies
   try {
-  const req = {
-    cookies: Object.fromEntries(
-      (await cookies()).getAll().map((cookie) => [cookie.name, cookie.value])
-    ),
-    headers: new Headers(),
-  } as any;
+    console.log("Début de getServerToken...");
 
-  const token = await getToken({ req, secret: authOptions.secret });
-  return token?.accessToken as string | null;
+    // 1. Log des cookies disponibles
+    const allCookies = (await cookies()).getAll();
+    console.log("Cookies disponibles:", allCookies.map(c => `${c.name}=${c.value}`).join(", "));
+
+    // 2. Construction de l'objet req
+    const req = {
+      cookies: Object.fromEntries(
+        allCookies.map((cookie) => [cookie.name, cookie.value])
+      ),
+      headers: new Headers(),
+    } as any;
+    console.log("Obj req cookies:", req.cookies);
+
+    // 3. Appel à getToken
+    console.log("Appel à getToken avec secret:", authOptions.secret ? "OK" : "MISSING");
+    const token = await getToken({ req, secret: authOptions.secret });
+
+    // 4. Log du résultat de getToken
+    console.log("Résultat de getToken:", token);
+
+    // 5. Vérification de token.accessToken
+    if (!token) {
+      console.error("getToken a retourné null/undefined");
+      return null;
+    }
+
+    if (!token.accessToken) {
+      console.error("token.accessToken est manquant dans:", token);
+      return null;
+    }
+
+    return token.accessToken;
   } catch (error) {
-    console.error("Failed to fetch token:", error);
-    return null; // ou throw error;
+    console.error("Erreur dans getServerToken:", error);
+    return null;
   }
 }
 
