@@ -43,17 +43,19 @@ export async function getServerTokenBis(): Promise<JWT | string | null> {
       "x-forwarded-proto": "https",
     },
   } as any;
-console.log('get Token',getToken({ req, secret: authOptions.secret }));
+// console.log('get Token',getToken({ req, secret: authOptions.secret }));
   return await getToken({ req, secret: authOptions.secret });
 }
 
 export async function getServerToken() {
   try {
     const cookieStore = await cookies();
+    const sessionToken = cookieStore.get("next-auth.session-token")?.value;
+    console.log('sessionToken ', sessionToken)
     const req = {
-      cookies: Object.fromEntries(
-        cookieStore.getAll().map((cookie) => [cookie.name, cookie.value])
-      ),
+      cookies: {
+        "next-auth.session-token": sessionToken, // Passez uniquement le cookie nécessaire
+      },
       headers: {
         host: process.env.NEXTAUTH_URL || "fr.pronta.corsica",
         "x-forwarded-proto": "https",
