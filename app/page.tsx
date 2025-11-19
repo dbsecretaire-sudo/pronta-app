@@ -4,16 +4,16 @@ import { useRouter } from "next/navigation";
 import { useContext, useEffect } from "react";
 
 export default function Home() {
-  const session = useContext(AuthContext);
+  const accessToken = useContext(AuthContext);
   const router = useRouter();
 
 useEffect(() => {
-  if(session === null){
+  if(accessToken === null){
     router.push(`/login`);
   } else {
     router.push(`/dashboard`);
   }
-}, [session]);
+}, [accessToken]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">

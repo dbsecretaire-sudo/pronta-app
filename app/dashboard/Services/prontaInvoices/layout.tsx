@@ -29,7 +29,7 @@ export default async function ProntaInvoicesLayout({
       </nav>
 
       <div className="pt-4">
-        <AuthProvider accessToken={accessToken} session={null}>
+        <AuthProvider accessToken={accessToken}>
           {children}
         </AuthProvider>
       </div>

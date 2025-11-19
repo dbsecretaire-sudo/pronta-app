@@ -9,7 +9,7 @@ import { useAuthCheck } from "@/src/Hook/useAuthCheck";
 import { useRouter } from "next/navigation";
 import { getSession } from 'next-auth/react';
 
-export function useAccount(accessToken: {} | string |null) {
+export function useAccount(accessToken: string |null) {
   const router = useRouter();
   const { data: session, status } = useAuthCheck(accessToken);
   const [isAuthChecked, setIsAuthChecked] = useState(false);

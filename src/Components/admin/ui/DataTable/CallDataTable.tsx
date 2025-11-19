@@ -13,7 +13,7 @@ interface CallDataTableProps<T extends { id: number }> {
   createHref: string;
   onDelete?: (id: string | number) => void;
   dataMaps?: Record<string, UserMap>;
-  accessToken: {} | string | null;
+  accessToken: string | null;
 }
 
 export function CallDataTable({

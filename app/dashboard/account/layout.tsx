@@ -7,7 +7,7 @@ export default async function AccountLayout({ children }: { children: React.Reac
   const currentSession = await getServerSession(authOptions);
   const accessToken = currentSession?.accessToken ?? null;
   return (
-    <AuthProvider accessToken={accessToken} session={null}>
+    <AuthProvider accessToken={accessToken}>
 
       {children}
     </AuthProvider>

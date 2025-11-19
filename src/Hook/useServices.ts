@@ -19,7 +19,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
 
-export const useServices = (userIdVerified: string | undefined, status: string, accessToken: {} | string | null) => {
+export const useServices = (userIdVerified: string | undefined, status: string, accessToken: string | null) => {
   const router = useRouter();
   const { data: session } = useAuthCheck(accessToken);
   const [sO, setSO] = useState<Service[]>([]);

@@ -6,7 +6,7 @@ import { ClientFormData } from '@/src/Types/Clients';
 import { useAuthCheck } from './useAuthCheck';
 import { getSession } from 'next-auth/react';
 
-export const useEditClient = (accessToken : {} | string | null) => {
+export const useEditClient = (accessToken : string | null) => {
   const router = useRouter();
   const { data: session, status } = useAuthCheck(accessToken);
   const [client, setClient] = useState<ClientFormData | null>(null);

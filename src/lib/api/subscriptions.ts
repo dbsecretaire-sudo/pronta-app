@@ -13,7 +13,7 @@ export const updateUserSubscription = async (
     next_payment_date?: string | Date | null;
     status?: string;
   },
-  accessToken: {} | string | null
+  accessToken: string | null
 ): Promise<Subscription> => {
   const requestData = {
     ...data,
@@ -38,7 +38,7 @@ export const updateUserSubscription = async (
   return res.json();
 };
 
-export async function deleteSubscription(subscriptionId: number, accessToken: {} | string | null): Promise<void> {
+export async function deleteSubscription(subscriptionId: number, accessToken: string | null): Promise<void> {
 
   const response = await fetch(`/api/subscription/${subscriptionId}`, { method: 'DELETE', 
     credentials: 'include',
@@ -50,7 +50,7 @@ export async function deleteSubscription(subscriptionId: number, accessToken: {}
   if (!response.ok) throw new Error("Failed to delete subscription");
 }
 
-export async function getSubscriptionByService(userId: number, service_id: number, accessToken: {} | string | null): Promise<Subscription | null> {
+export async function getSubscriptionByService(userId: number, service_id: number, accessToken: string | null): Promise<Subscription | null> {
 
   const response = await fetch(`/api/subscription/user/${userId}?service_id=${encodeURIComponent(service_id)}`, { 
     credentials: 'include',
@@ -70,7 +70,7 @@ export async function createSubscription(subscriptionData: {
   end_date: string | Date | null | undefined;
   next_payment_date: string | Date | null | undefined;
   status: string | Date | null | undefined;
-}, accessToken: {} | string | null): Promise<void> {
+}, accessToken: string | null): Promise<void> {
 
   const response = await fetch(`/api/subscription`, {
     method: 'POST',
@@ -89,7 +89,7 @@ export async function createSubscription(subscriptionData: {
   if (!response.ok) throw new Error("Failed to create subscription");
 }
 
-export async function fetchUserSubscriptions(userId: number, accessToken: {} | string | null) {
+export async function fetchUserSubscriptions(userId: number, accessToken: string | null) {
 
   const res = await fetch(`/api/subscription/user/${userId}`, { 
     credentials: 'include',
@@ -102,7 +102,7 @@ export async function fetchUserSubscriptions(userId: number, accessToken: {} | s
   return res.json();
 }
 
-export async function fetchAllSubscriptions(accessToken: {} | string | null): Promise<Subscription[]> {
+export async function fetchAllSubscriptions(accessToken: string | null): Promise<Subscription[]> {
   const res = await fetch(`${API_URL}/api/subscription/`, { 
     credentials: 'include',
     headers: {

@@ -4,7 +4,7 @@ import { getSession } from "next-auth/react";
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 
-export async function fetchCalendar(accessToken: {} | string | null): Promise<CalendarEvent[]> {
+export async function fetchCalendar(accessToken: string | null): Promise<CalendarEvent[]> {
   const url = `${API_URL}/api/calendar`;
   const res = await fetch(url, {
      credentials: 'include',
@@ -16,7 +16,7 @@ export async function fetchCalendar(accessToken: {} | string | null): Promise<Ca
   return res.json();
 }
 
-export const fetchCalendarEvents = async (accessToken: {} | string | null, userId?: number) => {
+export const fetchCalendarEvents = async (accessToken: string | null, userId?: number) => {
   try {
      
 

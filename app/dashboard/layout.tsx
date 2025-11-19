@@ -15,7 +15,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const session = await getServerSession(authOptions);
   // const accessToken = session?.accessToken ?? null;
    const accessToken = await getServerToken();
-
   const { valid, payload } = verifyAndDecodeToken(accessToken);
   if (!valid) {
     redirect('/login');
@@ -43,7 +42,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
 
   return (
-  <AuthProvider accessToken={accessToken} session={null}> 
+  <AuthProvider accessToken={accessToken}> 
     <NavBar
       showLogo={true}
       logoText="Pronta"

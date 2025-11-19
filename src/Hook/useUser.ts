@@ -8,7 +8,7 @@ import { getSession } from "next-auth/react";
 
 export type UserNameRecord = Record<number, {id: number, name: string}>;
 
-export function useUser( accessToken: {} | string| null, userId?: string) {
+export function useUser( accessToken: string| null, userId?: string) {
   const { data: session, status } = useAuthCheck(accessToken);
 
   const [isAuthChecked, setIsAuthChecked] = useState(false);

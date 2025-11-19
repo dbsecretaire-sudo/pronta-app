@@ -6,7 +6,7 @@ import { useAuthCheck } from './useAuthCheck';
 import { useRouter } from 'next/navigation';
 import { getSession } from 'next-auth/react';
 
-export const useClients = (accessToken: {} | string | null) => {
+export const useClients = (accessToken: string | null) => {
   const router = useRouter();
   const { data: session, status } = useAuthCheck(accessToken);
   const [clients, setClients] = useState<Client[]>([]);

@@ -7,7 +7,7 @@ export default async function ConciergerLayout({ children }: { children: React.R
   const currentSession = await getServerSession(authOptions);
   const accessToken = currentSession?.accessToken ?? null;
   return (
-    <AuthProvider accessToken={accessToken} session={null}>
+    <AuthProvider accessToken={accessToken}>
 
       {children}
     </AuthProvider>

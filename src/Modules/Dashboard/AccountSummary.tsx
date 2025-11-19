@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { Service } from '@/src/lib/schemas/services';
 import { PaymentMethod } from '@/src/lib/schemas/users';
 
-export const AccountSummary = ({sN, sO, accessToken}: {sN: Service[], sO: Service[], accessToken: {} | string | null}) => {
+export const AccountSummary = ({sN, sO, accessToken}: {sN: Service[], sO: Service[], accessToken: string | null}) => {
   const { userData, subscriptionServices, loading, error } = useAccount(accessToken);
   const { setActiveTab } = useTab();
   const router = useRouter();

@@ -6,7 +6,7 @@ import { Subscription, SubscriptionWithService } from '@/src/lib/schemas/subscri
 import { fetchAllSubscriptions } from '@/src/lib/api';
 import { useAuthCheck } from './useAuthCheck';
 import { useRouter } from 'next/navigation'; 
-export const useSubscription = (userId: string | undefined, services: Service[], accessToken: {} | string | null) => {
+export const useSubscription = (userId: string | undefined, services: Service[], accessToken: string | null) => {
     const router = useRouter();
     const { data: session, status } = useAuthCheck(accessToken);    
     const [subscriptionServices, setSubscriptionServices] = useState<SubscriptionWithService[]>([]);

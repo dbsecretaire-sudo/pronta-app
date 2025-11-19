@@ -15,7 +15,7 @@ export default async function ProntaCallsLayout({ children }: { children: React.
   }
 
   return (
-    <AuthProvider accessToken={accessToken} session={null}>
+    <AuthProvider accessToken={accessToken}>
       {children}
     </AuthProvider>
   );
