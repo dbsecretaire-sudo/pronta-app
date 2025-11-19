@@ -43,7 +43,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
 
   return (
-  <AuthProvider accessToken={accessToken}> 
+  <AuthProvider accessToken={accessToken} session={null}> 
     <NavBar
       showLogo={true}
       logoText="Pronta"

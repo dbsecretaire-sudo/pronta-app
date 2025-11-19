@@ -4,23 +4,16 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import { getRoleByUserId } from "@/src/lib/api";
 import { getServerToken, verifyAndDecodeToken } from "@/src/lib/auth";
+import { getSession } from "next-auth/react";
 
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getServerSession(authOptions);
-  // const accessToken = session?.accessToken ?? null;
-  const accessToken = await getServerToken();
-
-   const { valid, payload } = verifyAndDecodeToken(accessToken);
-   if (!valid) {
-     redirect('/login');
-   }
-
-  const role = await getRoleByUserId(Number(session?.user.id), accessToken);
-  if (role.role !== 'SUPERVISOR') {
+  const session = await getSession();
+  
+  if (session?.user.role !== 'SUPERVISOR') {
     redirect('/unauthorized');
   }
 

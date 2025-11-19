@@ -5,6 +5,8 @@ import { AuthContext } from "@/src/context/authContext";
 import { useEditClient } from "@/src/Hook/useEditClient";
 import { useContext } from "react";
 
+export const dynamicParams = true;
+
 export default function EditClientPage() {
   const accessToken = useContext(AuthContext);
   const { client, loading, error, handleSubmit, router } = useEditClient(accessToken);

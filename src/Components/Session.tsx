@@ -1,13 +1,14 @@
 import { User } from "@/src/Types/Users/index";
 import { DefaultSession, DefaultUser } from "next-auth";
 import { JWT } from "next-auth/jwt";
+import { Role } from "../lib/schemas/users";
 
 declare module "next-auth" {
   interface User {
     id: string;
     email: string;
     name?: string;
-    role?: string;
+    role?: Role;
     accessToken: {} | string | null;
   }
 
@@ -17,13 +18,13 @@ declare module "next-auth" {
       id: string;
       email: string;
       name?: string;
-      role?: string,
+      role?: Role,
     } & DefaultSession["user"];
     auth?: {
       userId: string;
       email: string;
       name?: string;
-      role?: string;
+      role?: Role;
     };
   }
 }
@@ -36,7 +37,7 @@ declare module "next-auth/jwt" {
   }
 }
 
-export interface CustomUser extends Omit<User, 'id' | "password_hash" | "role" | "payment_method" | "created_at" | "subscription" | "can_write" | "can_delete" | "service_ids"> {
+export interface CustomUser extends Omit<User, 'id' | "password_hash" | "payment_method" | "created_at" | "subscription" | "can_write" | "can_delete" | "service_ids"> {
   id: string; // Redéfini en string
   email: string;
   name: string;

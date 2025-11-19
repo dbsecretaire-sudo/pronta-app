@@ -15,6 +15,8 @@ import { authOptions } from '../api/auth/[...nextauth]/route';
 import { getServerToken, verifyAndDecodeToken } from '@/src/lib/auth';
 import { redirect } from 'next/navigation';
 
+export const dynamicParams = true;
+
 export default async function AdminPage() {
 
   // const session = await getServerSession(authOptions);

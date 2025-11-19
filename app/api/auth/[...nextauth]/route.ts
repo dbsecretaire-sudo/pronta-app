@@ -8,8 +8,9 @@ import { CustomUser } from "@/src/Components";
 import bcrypt from "bcrypt";
 import { generateAccessToken } from "@/src/Types/Utils/Param";
 import { sign } from 'jsonwebtoken';
+import { Role } from "@/src/Types/Users";
 
-
+export const dynamicParams = true;
 const DOMAIN = process.env.DOMAIN;
 
 export const authOptions: NextAuthOptions = {
@@ -27,7 +28,7 @@ export const authOptions: NextAuthOptions = {
           }
 
           const { rows } = await pool.query(
-            "SELECT id, email, password_hash, name FROM users WHERE email = $1",
+            "SELECT id, email, password_hash, name, role FROM users WHERE email = $1",
             [credentials.email.toLowerCase()]
           );
 
@@ -45,6 +46,7 @@ export const authOptions: NextAuthOptions = {
             id: user.id.toString(),
             email: user.email,
             name: user.name,
+            role: user.role,
             accessToken: user.accessToken,
           };
         } catch (error) {
@@ -57,7 +59,7 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        // Token standard pour tous les utilisateurs
+        token.role = user.role;
         token.accessToken = sign(
           { id: user.id, email: user.email, role: user.role },
           process.env.NEXTAUTH_SECRET!,
@@ -71,6 +73,7 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id as string;
         session.user.email = token.email as string;
         session.user.name = token.name as string;
+        session.user.role = token.role as Role;
       };
       return session;
     },

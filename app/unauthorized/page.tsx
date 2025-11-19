@@ -3,9 +3,10 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { SignOutButton } from "@/src/Components"; // À créer
 import Link from "next/link";
+import { getSession } from "next-auth/react";
 
 export default async function UnauthorizedPage() {
-  const session = await getServerSession(authOptions);
+  const session = await getSession();
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">

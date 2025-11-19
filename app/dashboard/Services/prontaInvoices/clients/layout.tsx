@@ -13,7 +13,7 @@ export default async function ClientsLayout({
   const accessToken = currentSession?.accessToken ?? null;
 
   return (
-    <AuthProvider accessToken={accessToken}>
+    <AuthProvider accessToken={accessToken} session={null}>
         {children}
     </AuthProvider>
   );
