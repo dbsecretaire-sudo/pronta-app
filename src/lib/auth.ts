@@ -69,7 +69,7 @@ export async function getServerToken() {
       return null;
     }
 
-    return token.accessToken as string;
+    return token.accessToken;
   } catch (error) {
     console.error("Erreur dans getServerToken:", error);
     return null;

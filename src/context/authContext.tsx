@@ -3,7 +3,7 @@
 import { createContext, ReactNode } from 'react';
 
 // ✅ Contexte exporté
-export const AuthContext = createContext<string | null>(null);
+export const AuthContext = createContext<{} | string | null>(null);
 
 // ✅ Composant client pour le Provider
 export function AuthProvider({
@@ -11,7 +11,7 @@ export function AuthProvider({
   accessToken,
 }: {
   children: ReactNode;
-  accessToken: string | null;
+  accessToken: {} | string | null;
 }) {
   return (
     <AuthContext.Provider value={accessToken}>
