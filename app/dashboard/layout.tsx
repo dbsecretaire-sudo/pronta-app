@@ -9,9 +9,24 @@ import { NavBar, ServiceForm } from "@/src/Components";
 import { TabProvider } from '@/src/context/TabContext';
 import { getServerToken, getServerTokenBis, verifyAndDecodeToken } from "@/src/lib/auth";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
+import { getToken } from "next-auth/jwt";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode}) {
+ const cookieStore = await cookies();
+ const req = {
+    cookies: Object.fromEntries(
+      cookieStore.getAll().map((cookie) => [cookie.name, cookie.value])
+    ),
+    headers: {
+      host: process.env.NEXTAUTH_URL || "fr.pronta.corsica",
+      "x-forwarded-proto": "https",
+    },
+  } as any;
 
+    const token = await getToken({ req, secret: authOptions.secret });
+
+console.log('cookie token', token)
   const session = await getServerSession(authOptions);
   // const accessToken = session?.accessToken ?? null;
    const accessToken = await getServerToken();
