@@ -10,11 +10,11 @@ import { TabProvider } from '@/src/context/TabContext';
 import { getServerToken, verifyAndDecodeToken } from "@/src/lib/auth";
 import { redirect } from "next/navigation";
 
-export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default async function DashboardLayout({ children }: { children: React.ReactNode }, req: Request) {
 
   const session = await getServerSession(authOptions);
   // const accessToken = session?.accessToken ?? null;
-   const accessToken = await getServerToken();
+   const accessToken = await getServerToken(req);
    console.log(accessToken);
   const { valid, payload } = verifyAndDecodeToken(accessToken);
   console.log('valide', valid);

@@ -32,19 +32,21 @@ export function logout() {
   window.location.href = "/login";
 }
 
-export async function getServerToken(): Promise<string | null> {
+export async function getServerToken(request?: Request): Promise<string | null> {
   try {
-    const allCookies = (await cookies()).getAll();
-
-    const req = {
-  cookies: Object.fromEntries(
-    (await cookies()).getAll().map((cookie) => [cookie.name, cookie.value])
-  ),
-  headers: new Headers({
-    "host": "fr.pronta.corsica", // Obligatoire pour le déchiffrement
-    "x-forwarded-proto": "https", // Obligatoire en production
-  }),
-} as any;
+    const cookieHeader = request?.headers.get('cookie');
+  const req = {
+    cookies: Object.fromEntries(
+      cookieHeader?.split(';').map(cookie => {
+        const [name, value] = cookie.trim().split('=');
+        return [name, decodeURIComponent(value)];
+      }) || []
+    ),
+    headers: {
+      host: request?.headers.get('host') || 'fr.pronta.corsica',
+      'x-forwarded-proto': request?.headers.get('x-forwarded-proto') || 'https',
+    },
+  } as any;
     // Utilisez getToken pour déchiffrer le token NextAuth
     const token = await getToken({ req, secret: authOptions.secret });
     console.log('token : req : ',req, " secret : ",  authOptions.secret, " resultat: ", token)
