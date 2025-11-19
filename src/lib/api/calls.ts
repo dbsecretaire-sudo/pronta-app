@@ -3,7 +3,7 @@ import { getSession } from "next-auth/react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export async function fetchCalls(filter: CallFilter, accessToken: string | null) {
+export async function fetchCalls(filter: CallFilter, accessToken: {} | string | null) {
   const queryParams = new URLSearchParams();
   if (filter.userId) queryParams.append('userId', filter.userId.toString());
   if (filter.byName) queryParams.append('byName', filter.byName);
@@ -21,7 +21,7 @@ export async function fetchCalls(filter: CallFilter, accessToken: string | null)
   return res.json();
 }
 
-export const fetchAllCalls = async (accessToken: string | null): Promise<Call[]> => {
+export const fetchAllCalls = async (accessToken: {} | string | null): Promise<Call[]> => {
   const res = await fetch(`${API_URL}/api/calls/All`, { 
     credentials: 'include',
     headers: {

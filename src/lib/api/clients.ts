@@ -4,7 +4,7 @@ import { emptyClient } from "@/src/Types/Clients/index";
 import { getSession } from "next-auth/react";
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export const createClient = async (clientData: typeof emptyClient, accessToken: string | null) => {
+export const createClient = async (clientData: typeof emptyClient, accessToken: {} | string | null) => {
   try {
      
 
@@ -28,7 +28,7 @@ export const createClient = async (clientData: typeof emptyClient, accessToken: 
   }
 };
 
-export const fetchAllClients = async (accessToken: string | null): Promise<Client[]> => {
+export const fetchAllClients = async (accessToken: {} | string | null): Promise<Client[]> => {
   const res = await fetch(`${API_URL}/api/clients`, { 
     credentials: 'include',
     headers: {

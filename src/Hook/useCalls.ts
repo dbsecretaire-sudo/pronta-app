@@ -47,7 +47,7 @@ const calculateCallStats = (calls: Call[]) => {
   };
 };
 
-export const useCalls = (accessToken: string | null, initialFilter: Omit<CallFilterType, 'userId'> = {}) => {
+export const useCalls = (accessToken: {} | string | null, initialFilter: Omit<CallFilterType, 'userId'> = {}) => {
   const router = useRouter();
   const { data: session, status } = useAuthCheck(accessToken);  
   const [filter, setFilter] = useState<Omit<CallFilterType, 'userId'>>(initialFilter);

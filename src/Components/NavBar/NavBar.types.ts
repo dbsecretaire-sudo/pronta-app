@@ -11,5 +11,5 @@ export interface NavbarProps {
   logoText?: string;
   // isInService?: boolean;
   userServices?: ServiceItem[];
-  accessToken: string | null;
+  accessToken: {} | string | null;
 }

@@ -6,11 +6,11 @@ import { getSession } from 'next-auth/react';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export async function fetchResourceItem<T>(resource: string, id: number, accessToken: string | null): Promise<T> {
+export async function fetchResourceItem<T>(resource: string, id: number, accessToken: {} | string | null): Promise<T> {
   return safeFetch<T>(accessToken, `/api/admin/${resource}/${id}`);
 }
 
-export async function updateResource(accessToken: string | null, resource: string, id: number | undefined, data: any): Promise<FormState> {
+export async function updateResource(accessToken: {} | string | null, resource: string, id: number | undefined, data: any): Promise<FormState> {
   let url: string;
   let method: 'POST' | 'PUT';
 
@@ -45,7 +45,7 @@ export async function updateResource(accessToken: string | null, resource: strin
   }
 }
 
-export async function getResourceById(resourceName: string, id: number, accessToken : string | null) {
+export async function getResourceById(resourceName: string, id: number, accessToken : {} | string | null) {
   // Appel à votre API ou base de données
   if(resourceName === 'invoices'){
     
@@ -97,7 +97,7 @@ export async function getResourceById(resourceName: string, id: number, accessTo
   }
 }
 
-export async function fetchResource(accessToken: string | null, resource: string) {
+export async function fetchResource(accessToken: {} | string | null, resource: string) {
      
 
 //   const response = await fetch(`${API_URL}/api/admin/${resource}`);
@@ -106,7 +106,7 @@ export async function fetchResource(accessToken: string | null, resource: string
     return resourcesConfig[resource]?.fetchData(accessToken);
 }
 
-export async function createResource(resource: string, prevState: any, formData: FormData, accessToken: string | null) {
+export async function createResource(resource: string, prevState: any, formData: FormData, accessToken: {} | string | null) {
   const data = Object.fromEntries(formData.entries());
 
   const response = await fetch(`/api/admin/${resource}`, {
@@ -125,7 +125,7 @@ export async function createResource(resource: string, prevState: any, formData:
 
 // src/lib/api.ts
 export async function safeFetch<T>(
-  accessToken: string | null,
+  accessToken: {} | string | null,
   url: string,
   config?: RequestInit,
 ): Promise<T> {

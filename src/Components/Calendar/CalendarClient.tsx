@@ -6,7 +6,7 @@ import { useCalendar } from "@/src/Hook/useCalendar";
 import { useAuthCheck } from "@/src/Hook/useAuthCheck";
 import { useEffect, useState } from "react";
 
-export function CalendarClient({accessToken}: {accessToken: string | null}) {
+export function CalendarClient({accessToken}: {accessToken: {} | string | null}) {
   const { data:session, status } = useAuthCheck(accessToken);
 
   const [isAuthChecked, setIsAuthChecked] = useState(false);

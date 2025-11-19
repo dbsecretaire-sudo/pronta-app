@@ -10,7 +10,7 @@ import { useRouter } from 'next/navigation';
 import { getSession } from 'next-auth/react';
 const API_URL = process.env.NEXTAUTH_URL
 
-export const useInvoices = (accessToken: string | null, userId: number | undefined) => {
+export const useInvoices = (accessToken: {} | string | null, userId: number | undefined) => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [stats, setStats] = useState({
     totalInvoices: 0,
@@ -127,7 +127,7 @@ export const useInvoices = (accessToken: string | null, userId: number | undefin
   return { invoices, invoiceItems, invoicesWithItems, stats, loading, error, handleFilterChange };
 };
 
-export const useFetchInvoices = (accessToken: string|null) => {
+export const useFetchInvoices = (accessToken: {} |string|null) => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
 

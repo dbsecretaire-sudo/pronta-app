@@ -5,7 +5,7 @@ import { CalendarEvent } from '../lib/schemas/calendar';
 import { useAuthCheck } from './useAuthCheck';
 import { useRouter } from 'next/navigation';
 
-export const useCalendar = (userId: string | undefined, accessToken: string | null) => {
+export const useCalendar = (userId: string | undefined, accessToken: {} | string | null) => {
     const router = useRouter();
     const { data: session, status } = useAuthCheck(accessToken);
     const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]); // Initialisez comme un tableau vide

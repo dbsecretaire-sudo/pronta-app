@@ -12,7 +12,7 @@ interface UserData extends Session {
     [key: string]: any;
 }
 
-export const useAuthCheck = (accessToken: string| null) => {
+export const useAuthCheck = (accessToken: {} | string| null) => {
   const [status, setStatus] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

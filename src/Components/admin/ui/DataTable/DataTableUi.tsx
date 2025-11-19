@@ -32,7 +32,7 @@ interface DataTableProps<TData extends DataWithId> {
   createHref: string;
   onDelete?: (id: string | number) => void;
   dataMaps?: Record<string, Record<any, any>>;
-  accessToken: string | null;
+  accessToken: {} | string | null;
 }
 
 // Composants de cellule

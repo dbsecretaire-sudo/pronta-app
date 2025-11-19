@@ -3,7 +3,7 @@ import { getSession } from "next-auth/react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export const fetchAllServices = async (accessToken: string | null):Promise<Service[]> => {
+export const fetchAllServices = async (accessToken: {} | string | null):Promise<Service[]> => {
   const res = await fetch(`${API_URL}/api/services`, { 
     credentials: 'include',
     headers: {
@@ -15,7 +15,7 @@ export const fetchAllServices = async (accessToken: string | null):Promise<Servi
   return res.json();
 };
 
-export const fetchUserServices = async (userId: number, accessToken: string | null) => {
+export const fetchUserServices = async (userId: number, accessToken: {} | string | null) => {
 
   const res = await fetch(`${API_URL}/api/user/${userId}/service`, { 
     credentials: 'include',
@@ -30,7 +30,7 @@ export const fetchUserServices = async (userId: number, accessToken: string | nu
 
 
 
-export const subscribeToService = async (userId: number, serviceId: number, accessToken: string | null): Promise<void> => {
+export const subscribeToService = async (userId: number, serviceId: number, accessToken: {} | string | null): Promise<void> => {
 
   const res = await fetch(`${API_URL}/api/user/${userId}/${serviceId}/reactivate`, {
     method: 'POST', 
@@ -44,7 +44,7 @@ export const subscribeToService = async (userId: number, serviceId: number, acce
   return res.json();
 };
 
-export const deactivateUserService = async (userId: number, serviceId: number, accessToken: string | null): Promise<void> => {
+export const deactivateUserService = async (userId: number, serviceId: number, accessToken: {} | string | null): Promise<void> => {
 
   const response = await fetch(`${API_URL}/api/user/${userId}/${serviceId}/deactivate`, {
     method: 'PUT',
@@ -60,7 +60,7 @@ export const deactivateUserService = async (userId: number, serviceId: number, a
   }
 };
 
-export const reactivateUserService = async (userId: number, serviceId: number, accessToken: string | null): Promise<void> => {
+export const reactivateUserService = async (userId: number, serviceId: number, accessToken: {} | string | null): Promise<void> => {
 
   const response = await fetch(`${API_URL}/api/user/${userId}/${serviceId}/reactivate`, {
     method: 'PUT',
@@ -76,7 +76,7 @@ export const reactivateUserService = async (userId: number, serviceId: number, a
   }
 };
 
-export const createService = async (serviceData: Omit<Service, 'id'>, accessToken: string| null): Promise<Service> => {
+export const createService = async (serviceData: Omit<Service, 'id'>, accessToken: {} | string| null): Promise<Service> => {
 
   const response = await fetch(`${API_URL}/api/services`, {
     method: 'POST',

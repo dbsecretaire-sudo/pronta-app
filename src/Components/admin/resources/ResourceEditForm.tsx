@@ -21,7 +21,7 @@ import { CreateSubscription, CreateSubscriptionSchema } from '@/src/lib/schemas/
 interface ResourceEditFormProps {
   resourceName: string;
   id?: number;
-  accessToken: string | null;
+  accessToken: {} | string | null;
 }
 
 type CreateResourceData =

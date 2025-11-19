@@ -4,7 +4,7 @@ import { getSession } from "next-auth/react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export const fetchUser = async (userId: number, accessToken: string | null) => {
+export const fetchUser = async (userId: number, accessToken: {} | string | null) => {
 
   const res = await fetch(`${API_URL}/api/user/${userId}`, { 
     credentials: 'include',
@@ -22,7 +22,7 @@ export async function updateProfile(userId: number, data: {
   phone: string;
   name: string;
   role: Role;
-}, accessToken: string | null) {
+}, accessToken: {} | string | null) {
 
   const response = await fetch(`/api/user/${userId}`, {
     method: "PUT",
@@ -51,7 +51,7 @@ export async function updateBilling(userId: number, data: {
     details: { card_number?: string; card_last_four?: string; card_brand?: string; paypal_email?: string };
     is_default: boolean;
   };
-}, accessToken: string | null) {
+}, accessToken: {} | string | null) {
 
   const response = await fetch(`/api/users/${userId}`, {
     method: "PUT",
@@ -66,7 +66,7 @@ export async function updateBilling(userId: number, data: {
   return response.json();
 }
 
-export async function getRoleByUserId(userId: number, accessToken: string | null){
+export async function getRoleByUserId(userId: number, accessToken: {} | string | null){
 
   const res = await fetch(`${API_URL}/api/user/${userId}/role`, { 
     credentials: 'include',
@@ -79,7 +79,7 @@ export async function getRoleByUserId(userId: number, accessToken: string | null
   return res.json();
 }
 
-export const fetchUsers = async (accessToken: string | null):Promise<User[]> => {
+export const fetchUsers = async (accessToken: {} | string | null):Promise<User[]> => {
   const res = await fetch(`${API_URL}/api/user`, {
       credentials: 'include',
       headers: {
@@ -92,7 +92,7 @@ export const fetchUsers = async (accessToken: string | null):Promise<User[]> => 
 }
 
 
-export const fetchUsersRole = async (accessToken: string | null) => {
+export const fetchUsersRole = async (accessToken: {} | string | null) => {
 
     const res = await fetch(`${API_URL}/api/user/role`, {
       credentials: 'include',
@@ -106,7 +106,7 @@ export const fetchUsersRole = async (accessToken: string | null) => {
 }
 
 
-export const fetchUsersForAdmin = async (accessToken: string | null) => {
+export const fetchUsersForAdmin = async (accessToken: {} | string | null) => {
      
     const res = await fetch(`${API_URL}/api/user/role`, {
       credentials: 'include',
@@ -124,7 +124,7 @@ export const fetchUsersForAdmin = async (accessToken: string | null) => {
 
 }
 
-export const fetchUsersName = async (accessToken: string | null) : Promise<Record<number, User>> => {
+export const fetchUsersName = async (accessToken: {} | string | null) : Promise<Record<number, User>> => {
 
     const res = await fetch(`${API_URL}/api/user/name`, {
       credentials: 'include',
@@ -137,7 +137,7 @@ export const fetchUsersName = async (accessToken: string | null) : Promise<Recor
     return res.json();
 }
 
-export const getUserById = async (userId: number, accessToken: string | null) : Promise<User> => {
+export const getUserById = async (userId: number, accessToken: {} | string | null) : Promise<User> => {
      
     const res = await fetch(`${API_URL}/api/user/${userId}`, {
       credentials: 'include',
