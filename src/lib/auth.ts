@@ -36,6 +36,7 @@ import { cookies } from "next/headers";
 
 export async function getServerToken() {
   // Créez un objet req factice avec les cookies
+  try {
   const req = {
     cookies: Object.fromEntries(
       (await cookies()).getAll().map((cookie) => [cookie.name, cookie.value])
@@ -45,6 +46,10 @@ export async function getServerToken() {
 
   const token = await getToken({ req, secret: authOptions.secret });
   return token?.accessToken as string | null;
+  } catch (error) {
+    console.error("Failed to fetch token:", error);
+    return null; // ou throw error;
+  }
 }
 
 export function verifyAndDecodeToken(token: string | null): { valid: boolean; payload?: any } {

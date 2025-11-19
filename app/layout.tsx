@@ -1,11 +1,8 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "@/app/globals.css";
 import React from "react";
-import { getServerSession } from "next-auth";
-import { authOptions } from "./api/auth/[...nextauth]/route";
 import { AuthProvider } from "@/src/context/authContext";
-import { redirect } from "next/navigation";
-import { getServerToken, verifyAndDecodeToken } from "@/src/lib/auth";
+import { getServerToken } from "@/src/lib/auth";
 
 const geistSans = Geist({ subsets: ["latin"], variable: "--font-geist-sans" });
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" });
