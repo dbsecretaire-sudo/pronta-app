@@ -15,7 +15,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const session = await getServerSession(authOptions);
   // const accessToken = session?.accessToken ?? null;
    const accessToken = await getServerToken();
+   console.log(accessToken);
   const { valid, payload } = verifyAndDecodeToken(accessToken);
+  console.log('valide', valid);
   if (!valid) {
     redirect('/login');
   }
