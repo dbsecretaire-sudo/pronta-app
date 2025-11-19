@@ -32,48 +32,45 @@ export function logout() {
   window.location.href = "/login";
 }
 
-export async function getServerToken(request?: Request): Promise<string | null> {
+export async function getServerToken(): Promise<string | null> {
   try {
-    const cookieHeader = request?.headers.get('cookie');
-  const req = {
-    cookies: Object.fromEntries(
-      cookieHeader?.split(';').map(cookie => {
-        const [name, value] = cookie.trim().split('=');
-        return [name, decodeURIComponent(value)];
-      }) || []
-    ),
-    headers: {
-      host: request?.headers.get('host') || 'fr.pronta.corsica',
-      'x-forwarded-proto': request?.headers.get('x-forwarded-proto') || 'https',
-    },
-  } as any;
-    // Utilisez getToken pour déchiffrer le token NextAuth
+    // 1. Récupérez les cookies avec `cookies()`
+    const cookieStore = await cookies();
+    const allCookies = cookieStore.getAll();
+
+    // 2. Construisez l'objet `req` attendu par `getToken`
+    const req = {
+      cookies: Object.fromEntries(
+        allCookies.map((cookie) => [cookie.name, cookie.value])
+      ),
+      headers: {
+        host: "fr.pronta.corsica",
+        "x-forwarded-proto": "https",
+      },
+    } as any;
+
+    // 3. Utilisez `getToken` pour déchiffrer le token NextAuth
     const token = await getToken({ req, secret: authOptions.secret });
-    console.log('token : req : ',req, " secret : ",  authOptions.secret, " resultat: ", token)
+
     if (!token) {
+      console.error("Aucun token trouvé");
       return null;
     }
 
-    // Si vous avez un accessToken personnalisé dans le token NextAuth
-    if (token.accessToken) {
-      // Vérifiez si accessToken est une chaîne ou un objet
-      let safeToken: string;
-      if (typeof token.accessToken === "string") {
-        safeToken = token.accessToken;
-      } else {
-        return null;
-      }
-
-      return safeToken;
+    // 4. Si vous avez un `accessToken` personnalisé, retournez-le
+    if (typeof token.accessToken === "string") {
+      return token.accessToken;
     }
 
-    // Si vous n'avez pas d'accessToken personnalisé, retournez le token NextAuth lui-même
-    // (mais attention, il n'est pas au format JWT standard)
-    return token.toString();
+    // 5. Sinon, retournez `null` (le token NextAuth n'est pas un JWT standard)
+    console.warn("Aucun accessToken personnalisé trouvé");
+    return null;
   } catch (error) {
+    console.error("Erreur dans getServerToken:", error);
     return null;
   }
 }
+
 
 export function verifyAndDecodeToken(token: string | null): { valid: boolean; payload?: any } {
   if(token !== null) {
