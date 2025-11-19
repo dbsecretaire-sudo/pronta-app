@@ -32,26 +32,10 @@ export function logout() {
   window.location.href = "/login";
 }
 
-export async function getServerTokenBis(): Promise<JWT | string | null> {
-  const cookieStore = cookies();
-  const req = {
-    cookies: Object.fromEntries(
-      (await cookieStore).getAll().map((cookie) => [cookie.name, cookie.value])
-    ),
-    headers: {
-      host: "fr.pronta.corsica",
-      "x-forwarded-proto": "https",
-    },
-  } as any;
-// console.log('get Token',getToken({ req, secret: authOptions.secret }));
-  return await getToken({ req, secret: authOptions.secret });
-}
-
 export async function getServerToken() {
   try {
     const cookieStore = await cookies();
     const sessionToken = cookieStore.get("next-auth.session-token")?.value;
-    console.log('sessionToken ', sessionToken)
     const req = {
       cookies: {
         "next-auth.session-token": sessionToken, // Passez uniquement le cookie nécessaire
@@ -65,13 +49,11 @@ export async function getServerToken() {
     const token = await getToken({ req, secret: authOptions.secret });
 
     if (!token) {
-      console.error("Aucun token trouvé");
       return null;
     }
 
     return token.accessToken as string | null;
   } catch (error) {
-    console.error("Erreur dans getServerToken:", error);
     return null;
   }
 }
