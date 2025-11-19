@@ -3,7 +3,7 @@ import { AuthProvider } from "@/src/context/authContext";
 import { getServerToken, verifyAndDecodeToken } from "@/src/lib/auth";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-
+export const dynamic = 'force-dynamic';
 export default async function ProntaCallsLayout({ children }: { children: React.ReactNode }) {
   // const session = await getServerSession(authOptions);
   // const accessToken = session?.accessToken ?? null;

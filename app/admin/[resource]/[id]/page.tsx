@@ -6,7 +6,7 @@ import { getServerSession } from 'next-auth';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 
-export const dynamicParams = true;
+export const dynamic = 'force-dynamic';
 
 interface ResourceEditPageProps {
   params: Promise<{ resource: string, id: string }>;

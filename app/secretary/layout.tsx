@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { getRoleByUserId } from "@/src/lib/api";
 import { getServerToken, verifyAndDecodeToken } from "@/src/lib/auth";
 import { getSession } from "next-auth/react";
-
+export const dynamic = 'force-dynamic';
 export default async function SecretaryLayout({
   children,
 }: {

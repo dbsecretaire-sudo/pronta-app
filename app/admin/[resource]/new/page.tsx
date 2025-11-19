@@ -4,7 +4,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { getServerToken, verifyAndDecodeToken } from '@/src/lib/auth';
 import Link from 'next/link';
-
+export const dynamic = 'force-dynamic';
 export default async function NewResourcePage({ params }: { params: Promise<{ resource: string }> }) {
   const { resource } =  await params;
 

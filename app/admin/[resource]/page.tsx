@@ -9,7 +9,7 @@ import { CpuChipIcon } from '@heroicons/react/24/outline';
 import { getSession } from 'next-auth/react';
 import { getServerToken, verifyAndDecodeToken } from '@/src/lib/auth';
 import Link from 'next/link';
-
+export const dynamic = 'force-dynamic';
 interface PageProps {
   params: { resource: string };
   searchParams: { [key: string]: string | string[] };
