@@ -43,7 +43,7 @@ export async function getServerTokenBis(): Promise<JWT | string | null> {
       "x-forwarded-proto": "https",
     },
   } as any;
-
+console.log('get Token',getToken({ req, secret: authOptions.secret }));
   return await getToken({ req, secret: authOptions.secret });
 }
 
