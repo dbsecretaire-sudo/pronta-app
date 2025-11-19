@@ -35,22 +35,17 @@ export function logout() {
 export async function getServerToken() {
   try {
     console.log("Début de getServerToken...");
-
-    // 1. Log des cookies disponibles
     const allCookies = (await cookies()).getAll();
     console.log("Cookies disponibles:", allCookies.map(c => `${c.name}=${c.value}`).join(", "));
 
-    // 2. Construction de l'objet req
     const req = {
-      cookies: Object.fromEntries(
-        allCookies.map((cookie) => [cookie.name, cookie.value])
-      ),
+      cookies: Object.fromEntries(allCookies.map((cookie) => [cookie.name, cookie.value])),
       headers: new Headers(),
     } as any;
-    console.log("Obj req cookies:", req.cookies);
 
-    // 3. Appel à getToken
+    console.log("Obj req cookies:", req.cookies);
     console.log("Appel à getToken avec secret:", authOptions.secret ? "OK" : "MISSING");
+
     const token = await getToken({ req, secret: authOptions.secret });
     if (!token) {
       console.error("getToken a retourné null/undefined");
@@ -62,47 +57,31 @@ export async function getServerToken() {
       return null;
     }
 
-    // Décoder le accessToken personnalisé
-    try {
-      let safeToken : string = "";
-      
-      if (typeof token.accessToken === "object" && token.accessToken !== null && 'token' in token.accessToken && typeof token.accessToken.token === "string") {
-        safeToken = token.accessToken.token; // Accède à la propriété "token" de l'objet
-      } else if (typeof token.accessToken === "string") {
-        safeToken = token.accessToken
-      }
+    // Décodage du accessToken
+    let safeToken: string; // Pas de valeur par défaut
 
-      const decoded = verify(safeToken, process.env.NEXTAUTH_SECRET!) as JwtPayload;
-     if (typeof decoded.id !== 'string' || typeof decoded.email !== 'string' || typeof decoded.role !== 'string') {
-        console.error("Le accessToken ne contient pas les propriétés attendues");
-        return null;
-      }
-      console.log("Données décodées du accessToken:", decoded);
-      return {
-        id: decoded.id as string,
-        email: decoded.email as string,
-        role: decoded.role as Role,
-      }
-    } catch (error) {
-      console.error("Erreur de décodage du accessToken:", error);
+    if (typeof token.accessToken === "object" && token.accessToken !== null && 'token' in token.accessToken && typeof token.accessToken.token === "string") {
+      safeToken = token.accessToken.token;
+    } else if (typeof token.accessToken === "string") { // Correction : `typeof` au lieu de `===`
+      safeToken = token.accessToken;
+    } else {
+      console.error("Format de token.accessToken non reconnu:", token.accessToken);
       return null;
     }
 
-    // // 4. Log du résultat de getToken
-    // console.log("Résultat de getToken:", token);
+    const decoded = verify(safeToken, process.env.NEXTAUTH_SECRET!) as JwtPayload;
 
-    // // 5. Vérification de token.accessToken
-    // if (!token) {
-    //   console.error("getToken a retourné null/undefined");
-    //   return null;
-    // }
+    if (typeof decoded.id !== 'string' || typeof decoded.email !== 'string' || typeof decoded.role !== 'string') {
+      console.error("Le accessToken ne contient pas les propriétés attendues");
+      return null;
+    }
 
-    // if (!token.accessToken) {
-    //   console.error("token.accessToken est manquant dans:", token);
-    //   return null;
-    // }
-
-    // return token.accessToken;
+    console.log("Données décodées du accessToken:", decoded);
+    return {
+      id: decoded.id as string,
+      email: decoded.email as string,
+      role: decoded.role as Role,
+    };
   } catch (error) {
     console.error("Erreur dans getServerToken:", error);
     return null;
