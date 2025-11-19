@@ -40,9 +40,10 @@ export async function getServerToken(): Promise<string | null> {
       cookies: Object.fromEntries(allCookies.map((cookie) => [cookie.name, cookie.value])),
       headers: new Headers(),
     } as any;
-
+console.log('req ', req)
     // Utilisez getToken pour déchiffrer le token NextAuth
     const token = await getToken({ req, secret: authOptions.secret });
+    console.log('token :', token)
     if (!token) {
       return null;
     }
