@@ -19,8 +19,7 @@ export default async function AdminPage() {
 
   // const session = await getServerSession(authOptions);
   // const accessToken = session?.accessToken ?? null;
-   const accessToken = await getServerToken();
-
+  const accessToken = await getServerToken();
   const { valid, payload } = verifyAndDecodeToken(accessToken);
   if (!valid) {
     redirect('/login');

@@ -76,10 +76,22 @@ export async function getServerToken() {
   }
 }
 
-export function verifyAndDecodeToken(token: string | null): { valid: boolean; payload?: any } {
+export function verifyAndDecodeToken(token: {} | string | null): { valid: boolean; payload?: any } {
   if(token !== null) {
     try {
-      const payload = jwt.verify(token, process.env.NEXTAUTH_SECRET!);
+      // Si token est un objet vide, on retourne false
+      if (typeof token === "object" && !("token" in token)) {
+        return { valid: false };
+      }
+
+      // Si token est un objet avec une propriété "token", on extrait la chaîne
+      const tokenString = typeof token === "string" ? token : (token as { token?: string }).token;
+
+      if (!tokenString) {
+        return { valid: false };
+      }
+
+      const payload = jwt.verify(tokenString, process.env.NEXTAUTH_SECRET!);
       return { valid: true, payload };
     } catch (error) {
       return { valid: false };
