@@ -8,9 +8,8 @@ export const dynamic = 'force-dynamic';
 export default async function NewResourcePage({ params }: { params: Promise<{ resource: string }> }) {
   const { resource } =  await params;
 
-  // const session = await getServerSession(authOptions);
-  // const accessToken = session?.accessToken ?? null;
-  const accessToken = await getServerToken();
+  const session = await getServerSession(authOptions);
+  const accessToken = session?.accessToken ?? null;
 
   const { valid, payload } = verifyAndDecodeToken(accessToken);
   if (!valid) {

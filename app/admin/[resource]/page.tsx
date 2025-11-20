@@ -18,9 +18,9 @@ interface PageProps {
 export default async function ResourcePage({
   params,
 }: PageProps) {
-  // const session = await getServerSession(authOptions);
-  // const accessToken = session?.accessToken ?? null;
-   const accessToken = await getServerToken();
+  const session = await getServerSession(authOptions);
+  const accessToken = session?.accessToken ?? null;
+
   const { resource } = await params;
 
   const { valid, payload } = verifyAndDecodeToken(accessToken);

@@ -11,9 +11,8 @@ interface ResourceItemPageProps {
 }
 
 export default async function ResourceItemPage({ params }: ResourceItemPageProps) {
-  // const session = await getServerSession(authOptions);
-  // const accessToken = session?.accessToken ?? null;
-  const accessToken = await getServerToken();
+  const session = await getServerSession(authOptions);
+  const accessToken = session?.accessToken ?? null;
 
   const { valid, payload } = verifyAndDecodeToken(accessToken);
   if (!valid) {

@@ -5,9 +5,8 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 export const dynamic = 'force-dynamic';
 export default async function ProntaCallsLayout({ children }: { children: React.ReactNode }) {
-  // const session = await getServerSession(authOptions);
-  // const accessToken = session?.accessToken ?? null;
-   const accessToken = await getServerToken();
+  const session = await getServerSession(authOptions);
+  const accessToken = session?.accessToken ?? null;
   
   const { valid, payload } = verifyAndDecodeToken(accessToken);
   if (!valid) {

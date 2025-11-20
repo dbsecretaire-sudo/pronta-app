@@ -13,9 +13,9 @@ interface ResourceEditPageProps {
 }
 
 export default async function ResourceEditPage({ params }: ResourceEditPageProps) {
-  // const session = await getServerSession(authOptions);
-  // const accessToken = session?.accessToken ?? null;
-  const accessToken = await getServerToken();
+  const session = await getServerSession(authOptions);
+  const accessToken = session?.accessToken ?? null;
+
   const { resource, id } = await params;
 
   const { valid, payload } = verifyAndDecodeToken(accessToken);
