@@ -13,8 +13,7 @@ export const dynamic = 'force-dynamic';
 export default async function DashboardLayout({ children }: { children: React.ReactNode}) {
 
   const session = await getServerSession(authOptions);
-  // const accessToken = session?.accessToken ?? null;
-   const accessToken = await getServerToken();
+  const accessToken = session?.accessToken ?? null;
 
   const { valid, payload } = verifyAndDecodeToken(accessToken);
   console.log('valide', valid);
