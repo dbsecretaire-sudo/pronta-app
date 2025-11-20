@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { NextApiRequest } from "next";
 import jwt, { verify, JwtPayload } from 'jsonwebtoken';
-import { getToken, JWT } from 'next-auth/jwt';
+import { getToken } from 'next-auth/jwt';
 import { NextRequest } from 'next/server';
 import { cookies } from "next/headers";
 import { Role } from "../Types/Users";
@@ -32,51 +32,56 @@ export function logout() {
   window.location.href = "/login";
 }
 
-export async function getServerToken() {
+export async function getServerToken(): Promise<string | null> {
   try {
-    const cookieStore = await cookies();
-    const sessionToken = cookieStore.get("next-auth.session-token")?.value;
+    const allCookies = (await cookies()).getAll();
+
     const req = {
-      cookies: {
-        "next-auth.session-token": sessionToken, // Passez uniquement le cookie nécessaire
-      },
-      headers: {
-        host: "fr.pronta.corsica",
-        "x-forwarded-proto": "https",
-      },
+      cookies: Object.fromEntries(allCookies.map((cookie) => [cookie.name, cookie.value])),
+      headers: new Headers(),
     } as any;
 
+    // Utilisez getToken pour déchiffrer le token NextAuth
     const token = await getToken({ req, secret: authOptions.secret });
-
+    console.log('token : req : ',req, " secret : ",  authOptions.secret, "")
     if (!token) {
       return null;
     }
 
-    return token.accessToken as string | null;
+    // Si vous avez un accessToken personnalisé dans le token NextAuth
+    if (token.accessToken) {
+      // Vérifiez si accessToken est une chaîne ou un objet
+      let safeToken: string;
+      if (typeof token.accessToken === "string") {
+        safeToken = token.accessToken;
+      } else {
+        return null;
+      }
+
+      return safeToken;
+    }
+
+    // Si vous n'avez pas d'accessToken personnalisé, retournez le token NextAuth lui-même
+    // (mais attention, il n'est pas au format JWT standard)
+    return token.toString();
   } catch (error) {
     return null;
   }
 }
 
-
-
 export function verifyAndDecodeToken(token: string | null): { valid: boolean; payload?: any } {
-  if(token !== null) {
-    try {
-      if (!token) {
-        return { valid: false };
-      }
+   if (!token) {
+    console.log('Token manquant');
+    return { valid: false, payload: null };
+  }
 
-      try{
-        verify(token, process.env.NEXTAUTH_SECRET!)
-      } catch(error) {console.error(error)}
-      const payload = verify(token, process.env.NEXTAUTH_SECRET!) as JwtPayload;
-     
-      return { valid: true, payload };
-    } catch (error) {
-      return { valid: false };
-    }
-  } else {
-    return { valid: false };
+  try {
+    // Vérifier le token avec jsonwebtoken (comme il a été signé avec sign())
+    const payload = jwt.verify(token, process.env.NEXTAUTH_SECRET!);
+    console.log('Token valide. Payload :', payload);
+    return { valid: true, payload };
+  } catch (error) {
+    console.error('Erreur de vérification du token :', error);
+    return { valid: false, payload: null };
   }
 }
