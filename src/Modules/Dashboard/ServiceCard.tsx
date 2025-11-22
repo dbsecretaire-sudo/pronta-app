@@ -59,14 +59,14 @@ export const ServiceCard = ({
         </>
       )}
 
-      {!isSubscribed && (
+      {/* {!isSubscribed && (
         <button
           onClick={() => onSubscribe?.(service)} // ✅ Bouton "Souscrire" pour les services non abonnés
           className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
         >
           Souscrire
         </button>
-      )}
+      )} */}
       
     </div>
   )

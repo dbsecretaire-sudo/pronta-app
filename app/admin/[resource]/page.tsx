@@ -3,11 +3,9 @@ import { notFound, redirect } from 'next/navigation';
 import { DataTableUi } from '@/src/Components';
 import { resourcesConfig } from '@/src/lib/admin/resources';
 import { fetchUsersRole, fetchUsersName, fetchAllServices, fetchAllSubscriptions, fetchInvoices, fetchCalendar, fetchAllClients, fetchAllCalls, fetchUsers, fetchInvoiceItems, getRoleByUserId } from '@/src/lib/api';
-import { getServerSession, Session } from 'next-auth';
+import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { CpuChipIcon } from '@heroicons/react/24/outline';
-import { getSession } from 'next-auth/react';
-import { getServerToken, verifyAndDecodeToken } from '@/src/lib/auth';
+import { verifyAndDecodeToken } from '@/src/lib/auth';
 import Link from 'next/link';
 export const dynamic = 'force-dynamic';
 interface PageProps {

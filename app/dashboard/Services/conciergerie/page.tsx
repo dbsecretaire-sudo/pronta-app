@@ -9,8 +9,8 @@ import Link from "next/link";
 import { AuthContext } from "@/src/context/authContext";
 
 export default function ConciergerieDashboard() {
-  const accessToken = useContext(AuthContext);
-  const { data: session } = useAuthCheck(accessToken);
+  const context = useContext(AuthContext)
+  const { accessToken, session } = context;
 
   const [filter, setFilter] = useState<CallFilterType>({
       userId: 0,

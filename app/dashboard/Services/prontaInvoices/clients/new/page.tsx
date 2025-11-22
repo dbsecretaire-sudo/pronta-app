@@ -8,7 +8,8 @@ import { AuthContext } from "@/src/context/authContext";
 
 export default function NewClientPage() {
   const router = useRouter();
-  const accessToken = useContext(AuthContext);
+    const context = useContext(AuthContext)
+  const { accessToken, session } = context;
 
   const handleSubmit = async (data: typeof emptyClient) => {
     try {

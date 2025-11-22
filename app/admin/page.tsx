@@ -12,7 +12,7 @@ import {
   FaLayerGroup
 } from 'react-icons/fa';
 import { authOptions } from '../api/auth/[...nextauth]/route';
-import { getServerToken, verifyAndDecodeToken } from '@/src/lib/auth';
+import { verifyAndDecodeToken } from '@/src/lib/auth';
 import { redirect } from 'next/navigation';
 export const dynamic = 'force-dynamic';
 

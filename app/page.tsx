@@ -4,7 +4,8 @@ import { useRouter } from "next/navigation";
 import { useContext, useEffect } from "react";
 
 export default function Home() {
-  const accessToken = useContext(AuthContext);
+    const context = useContext(AuthContext)
+  const { accessToken, session } = context;
   const router = useRouter();
 
 useEffect(() => {

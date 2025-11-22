@@ -12,7 +12,6 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-
   return withAuth(request, async (session) => {
 
     try {

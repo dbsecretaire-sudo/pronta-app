@@ -1,7 +1,9 @@
+import { Service } from "@/src/lib/schemas";
+
 // src/Components/NavBar.types.ts
 export interface ServiceItem {
   name: string;
-  path: string;
+  route: string;
   icon: string | React.ReactNode;
 }
 
@@ -10,6 +12,6 @@ export interface NavbarProps {
   showLogo?: boolean;
   logoText?: string;
   // isInService?: boolean;
-  userServices?: ServiceItem[];
+  userServices?: Service[];
   accessToken: string | null;
 }

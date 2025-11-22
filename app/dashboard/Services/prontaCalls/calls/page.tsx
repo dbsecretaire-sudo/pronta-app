@@ -9,8 +9,8 @@ import { useAuthCheck } from "@/src/Hook/useAuthCheck";
 import { AuthContext } from "@/src/context/authContext";
 
 export default function Calls() {
-  const accessToken = useContext(AuthContext);
-  const { data: session,  } = useAuthCheck(accessToken);
+    const context = useContext(AuthContext)
+  const { accessToken, session } = context;
   
   const [isCallModalOpen, setIsCallModalOpen] = useState(false);
   const { calls, loading, filter, handleFilterChange } = useCalls(accessToken);

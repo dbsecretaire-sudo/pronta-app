@@ -129,8 +129,8 @@ export default function Navbar({
                 <h3 className="text-sm font-semibold text-gray-500 mb-2">Mes services</h3>
                 {userServices.map((service) => (
                   <Link
-                    key={service.path}
-                    href={service.path}
+                    key={service.route}
+                    href={service.route}
                     className="block py-2 text-gray-600 hover:text-gray-900 border-b border-gray-200"
                     onClick={() => setIsOpen(false)}
                   >
@@ -202,10 +202,10 @@ export default function Navbar({
             </h3>
             {userServices.map((service) => (
               <Link
-                key={service.path}
-                href={service.path}
+                key={service.route}
+                href={service.route}
                 className={`block py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded px-2 mb-1 ${
-                  pathname.startsWith(service.path) ? 'bg-gray-100' : ''
+                  pathname.startsWith(service.route) ? 'bg-gray-100' : ''
                 }`}
               >
                 {typeof service.icon === 'string' ? (

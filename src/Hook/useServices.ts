@@ -51,6 +51,7 @@ export const useServices = (userIdVerified: string | undefined, status: string, 
         fetchUser(userIdNumber, accessToken),
         fetchAllServices(accessToken),
       ]);
+      
       setUser(fetchedUser);
       setS(allServices);
 
@@ -60,7 +61,6 @@ export const useServices = (userIdVerified: string | undefined, status: string, 
           isSubscribed: fetchedUser.service_ids !== null && fetchedUser.service_ids.includes(service.id),
         };
       });
-
       const subscribedServices = servicesWithStatus.filter(service =>
         service.isSubscribed === true && service.is_active === true
       );
@@ -78,7 +78,6 @@ export const useServices = (userIdVerified: string | undefined, status: string, 
   }, [session?.user.id]);
 
   useEffect(() => {
-
     if (status === "authenticated" && session?.user.id && !isNaN(Number(session?.user.id))) {
       fetchData();
     } else {

@@ -4,10 +4,10 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { AuthProvider } from "@/src/context/authContext";
 
 export default async function ConciergerLayout({ children }: { children: React.ReactNode }) {
-  const currentSession = await getServerSession(authOptions);
-  const accessToken = currentSession?.accessToken ?? null;
+  const session = await getServerSession(authOptions);
+  const accessToken = session?.accessToken ?? null;
   return (
-    <AuthProvider accessToken={accessToken}>
+    <AuthProvider accessToken={accessToken} session={session}>
 
       {children}
     </AuthProvider>

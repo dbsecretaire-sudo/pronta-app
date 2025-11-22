@@ -8,8 +8,9 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { useContext } from "react";
 import { AuthContext } from "@/src/context/authContext";
 
-export default async function InvoicesList() {
-  const accessToken = useContext(AuthContext);
+export default function InvoicesList() {
+    const context = useContext(AuthContext)
+  const { accessToken, session } = context;
   
   const { invoices, loading } = useFetchInvoices(accessToken);
 

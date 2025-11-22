@@ -9,11 +9,11 @@ export default async function callsLayout({
   children: React.ReactNode;
 }) {
 
-  const currentSession = await getServerSession(authOptions);
-  const accessToken = currentSession?.accessToken ?? null;
+  const session = await getServerSession(authOptions);
+  const accessToken = session?.accessToken ?? null;
 
   return (
-    <AuthProvider accessToken={accessToken}>
+    <AuthProvider accessToken={accessToken} session={session}>
         {children}
     </AuthProvider>
   );

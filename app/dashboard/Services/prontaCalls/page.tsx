@@ -9,8 +9,8 @@ import Link from "next/link";
 import { AuthContext } from "@/src/context/authContext";
 
 export default function ProntaCallsDashboard() {
-  const accessToken = useContext(AuthContext);
-  const { data: session } = useAuthCheck(accessToken);
+    const context = useContext(AuthContext)
+  const { accessToken, session } = context;
   const { calls, stats, calendarEvents, loading, handleFilterChange } = useCalls(accessToken);
 
   const tabs = [

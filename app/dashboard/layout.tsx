@@ -7,7 +7,7 @@ import {
 } from '@/src/lib/api';
 import { NavBar, ServiceForm } from "@/src/Components";
 import { TabProvider } from '@/src/context/TabContext';
-import { getServerToken, verifyAndDecodeToken } from "@/src/lib/auth";
+import { verifyAndDecodeToken } from "@/src/lib/auth";
 import { redirect } from "next/navigation";
 export const dynamic = 'force-dynamic';
 export default async function DashboardLayout({ children }: { children: React.ReactNode}) {
@@ -21,41 +21,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
     redirect('/login');
   }
 
-  const allServices = await fetchAllServices(accessToken);
-  const fetchedUser = await fetchUser(Number(session?.user.id), accessToken);
-  const servicesWithStatus = allServices.map((service: any) => {
-    return {
-      ...service,
-      isSubscribed: fetchedUser.service_ids !== null && fetchedUser.service_ids.includes(service.id),
-    };
-  });
-
-  const subscribedServices = servicesWithStatus.filter((service : any) =>
-    service.isSubscribed === true && service.is_active === true
-  );
-
-  // Calcul des données après les hooks
-  const userServices = subscribedServices.map((service: any) => ({
-    name: service.name,
-    path: service.route || `/dashboard/services/${service.id}`,
-    icon: service.icon || "🔧"
-  }));
-
-
   return (
-  <AuthProvider accessToken={accessToken}> 
-    <NavBar
-      showLogo={true}
-      logoText="Pronta"
-      userServices={userServices}
-      accessToken={accessToken}
-    >
+    <AuthProvider accessToken={accessToken} session={session}> 
       <TabProvider>
-
-    {children}
+        {children}
       </TabProvider>
-      </NavBar>
-  </AuthProvider>
-   
+    </AuthProvider>
   );
 }

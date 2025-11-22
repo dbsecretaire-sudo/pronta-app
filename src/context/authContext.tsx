@@ -3,19 +3,30 @@
 import { Session } from 'next-auth';
 import { createContext, ReactNode } from 'react';
 
-// ✅ Contexte exporté
-export const AuthContext = createContext< string | null>(null);
+interface AuthContextValue {
+  accessToken: string | null;
+  session: Session | null;
+}
 
-// ✅ Composant client pour le Provider
+const defaultAuthContextValue: AuthContextValue = {
+  accessToken: null,
+  session: null,
+};
+
+export const AuthContext = createContext<AuthContextValue>(defaultAuthContextValue);
+
+// ✅ Provider avec valeurs par défaut
 export function AuthProvider({
   children,
-  accessToken = "",
+  accessToken = null,
+  session = null,
 }: {
   children: ReactNode;
   accessToken: string | null;
+  session: Session | null;
 }) {
   return (
-    <AuthContext.Provider value={accessToken}>
+    <AuthContext.Provider value={{ accessToken, session }}>
       {children}
     </AuthContext.Provider>
   );

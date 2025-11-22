@@ -1,6 +1,6 @@
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { AuthProvider } from "@/src/context/authContext";
-import { getServerToken, verifyAndDecodeToken } from "@/src/lib/auth";
+import { verifyAndDecodeToken } from "@/src/lib/auth";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 export const dynamic = 'force-dynamic';
@@ -14,7 +14,7 @@ export default async function ProntaCallsLayout({ children }: { children: React.
   }
 
   return (
-    <AuthProvider accessToken={accessToken}>
+    <AuthProvider accessToken={accessToken} session={session}>
       {children}
     </AuthProvider>
   );

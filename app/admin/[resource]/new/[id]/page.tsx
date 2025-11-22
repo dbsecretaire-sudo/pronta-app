@@ -2,7 +2,7 @@
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { AdminForm } from '@/src/Components';
 import { fetchResourceItem, updateResource } from '@/src/lib/admin/api';
-import { getServerToken, verifyAndDecodeToken } from '@/src/lib/auth';
+import { verifyAndDecodeToken } from '@/src/lib/auth';
 import { getServerSession } from 'next-auth';
 import { notFound, redirect } from 'next/navigation';
 export const dynamic = 'force-dynamic';

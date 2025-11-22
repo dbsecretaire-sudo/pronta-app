@@ -32,42 +32,42 @@ export function logout() {
   window.location.href = "/login";
 }
 
-export async function getServerToken(): Promise<string | null> {
-  try {
-    const allCookies = (await cookies()).getAll();
+// export async function getServerToken(): Promise<string | null> {
+//   try {
+//     const allCookies = (await cookies()).getAll();
 
-    const req = {
-      cookies: Object.fromEntries(allCookies.map((cookie) => [cookie.name, cookie.value])),
-      headers: new Headers(),
-    } as any;
+//     const req = {
+//       cookies: Object.fromEntries(allCookies.map((cookie) => [cookie.name, cookie.value])),
+//       headers: new Headers(),
+//     } as any;
 
-    // Utilisez getToken pour déchiffrer le token NextAuth
-    const token = await getToken({ req, secret: authOptions.secret });
-    console.log('token : req : ',req, " secret : ",  authOptions.secret, "")
-    if (!token) {
-      return null;
-    }
+//     // Utilisez getToken pour déchiffrer le token NextAuth
+//     const token = await getToken({ req, secret: authOptions.secret });
+//     console.log('token : req : ',req, " secret : ",  authOptions.secret, "")
+//     if (!token) {
+//       return null;
+//     }
 
-    // Si vous avez un accessToken personnalisé dans le token NextAuth
-    if (token.accessToken) {
-      // Vérifiez si accessToken est une chaîne ou un objet
-      let safeToken: string;
-      if (typeof token.accessToken === "string") {
-        safeToken = token.accessToken;
-      } else {
-        return null;
-      }
+//     // Si vous avez un accessToken personnalisé dans le token NextAuth
+//     if (token.accessToken) {
+//       // Vérifiez si accessToken est une chaîne ou un objet
+//       let safeToken: string;
+//       if (typeof token.accessToken === "string") {
+//         safeToken = token.accessToken;
+//       } else {
+//         return null;
+//       }
 
-      return safeToken;
-    }
+//       return safeToken;
+//     }
 
-    // Si vous n'avez pas d'accessToken personnalisé, retournez le token NextAuth lui-même
-    // (mais attention, il n'est pas au format JWT standard)
-    return token.toString();
-  } catch (error) {
-    return null;
-  }
-}
+//     // Si vous n'avez pas d'accessToken personnalisé, retournez le token NextAuth lui-même
+//     // (mais attention, il n'est pas au format JWT standard)
+//     return token.toString();
+//   } catch (error) {
+//     return null;
+//   }
+// }
 
 export function verifyAndDecodeToken(token: string | null): { valid: boolean; payload?: any } {
    if (!token) {
@@ -78,7 +78,6 @@ export function verifyAndDecodeToken(token: string | null): { valid: boolean; pa
   try {
     // Vérifier le token avec jsonwebtoken (comme il a été signé avec sign())
     const payload = jwt.verify(token, process.env.NEXTAUTH_SECRET!);
-    console.log('Token valide. Payload :', payload);
     return { valid: true, payload };
   } catch (error) {
     console.error('Erreur de vérification du token :', error);

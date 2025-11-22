@@ -8,7 +8,8 @@ import { useSubscription } from "@/src/Hook/useSubscriptions";
 import { useContext, useEffect, useState } from "react";
 
 export default function AccountPage() {
-  const accessToken = useContext(AuthContext);
+    const context = useContext(AuthContext)
+  const { accessToken, session } = context;
   
   const {
     userData,
@@ -21,7 +22,7 @@ export default function AccountPage() {
     handleBillingUpdate
   } = useAccount(accessToken);
 
-  const { data: session, status} = useAuthCheck(accessToken);
+  const { status} = useAuthCheck(accessToken);
 
   const [isAuthChecked, setIsAuthChecked] = useState(false);
   const userIdVerified = isAuthChecked && status === 'authenticated' ? session?.user.id : undefined;

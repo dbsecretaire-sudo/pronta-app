@@ -8,7 +8,8 @@ import { useContext } from "react";
 export const dynamicParams = true;
 
 export default function EditClientPage() {
-  const accessToken = useContext(AuthContext);
+    const context = useContext(AuthContext)
+  const { accessToken, session } = context;
   const { client, loading, error, handleSubmit, router } = useEditClient(accessToken);
 
   if (loading) return <div className="p-8">Chargement...</div>;

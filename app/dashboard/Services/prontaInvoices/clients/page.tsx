@@ -6,7 +6,8 @@ import { useClients } from "@/src/Hook/useClients";
 import { useContext } from "react";
 
 export default function ClientsPage() {
-  const accessToken = useContext(AuthContext);
+    const context = useContext(AuthContext)
+  const { accessToken, session } = context;
 
   const {
     clients,

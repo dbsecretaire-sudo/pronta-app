@@ -1,7 +1,7 @@
 // src/app/admin/[resource]/[id]/page.tsx
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { ResourceEditForm } from '@/src/Components';
-import { getServerToken, verifyAndDecodeToken } from '@/src/lib/auth';
+import { verifyAndDecodeToken } from '@/src/lib/auth';
 import { getServerSession } from 'next-auth';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
