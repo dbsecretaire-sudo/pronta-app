@@ -1,10 +1,8 @@
 "use client";
-import { useAuthCheck } from "@/src/Hook/useAuthCheck";
 import { CallStats, CallList, CallFilter, Calendar } from "@/src/Components";
-import { CallFilter as CallFilterType } from "@/src/lib/schemas/calls";
 import { useCalls } from "@/src/Hook/useCalls";
 import { Tabs } from "@/src/Components"; // À créer ou utiliser une lib comme @radix-ui/react-tabs
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import Link from "next/link";
 import { AuthContext } from "@/src/context/authContext";
 

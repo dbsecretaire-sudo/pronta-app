@@ -79,18 +79,30 @@ export const useCalls = (accessToken: string | null, initialFilter: Omit<CallFil
       const params = new URLSearchParams();
       if (filter.byName) params.append('byName', filter.byName);
       if (filter.byPhone) params.append('byPhone', filter.byPhone);
-
-      const response = await fetch(`/api/calls?userId=${session?.user.id}&${params.toString()}`, {
-        credentials: 'include',
-        headers: {
-          "Content-Type": "application/json",
-          'Authorization': `Bearer ${accessToken}`,
-        }
-      });
-      if (!response.ok) throw new Error("Erreur lors de la récupération des appels");
-      const callsData: Call[] = await response.json();
-      setCalls(callsData);
-      setStats(calculateCallStats(callsData));
+      if(!session?.user.id){
+        setCalls([]);
+        setStats({
+          totalToday: 0,
+          missedToday: 0, 
+          answerRate: 0, 
+          answeredToday: 0, 
+          missedRate: 0, 
+        })
+        return;
+      } else {
+        const response = await fetch(`/api/calls?userId=${session?.user.id}&${params.toString()}`, {
+          credentials: 'include',
+          headers: {
+            "Content-Type": "application/json",
+            'Authorization': `Bearer ${accessToken}`,
+          }
+        });
+    
+        if (!response.ok) throw new Error("Erreur lors de la récupération des appels");
+        const callsData: Call[] = await response.json(); 
+        setCalls(callsData);
+        setStats(calculateCallStats(callsData));
+      }
     } catch (error) {
     } finally {
       setLoading(false);

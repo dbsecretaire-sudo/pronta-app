@@ -71,7 +71,6 @@ export function logout() {
 
 export function verifyAndDecodeToken(token: string | null): { valid: boolean; payload?: any } {
    if (!token) {
-    console.log('Token manquant');
     return { valid: false, payload: null };
   }
 

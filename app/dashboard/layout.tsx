@@ -1,11 +1,6 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/route";
 import { AuthProvider } from "@/src/context/authContext";
-import {
-  fetchUser,
-  fetchAllServices,
-} from '@/src/lib/api';
-import { NavBar, ServiceForm } from "@/src/Components";
 import { TabProvider } from '@/src/context/TabContext';
 import { verifyAndDecodeToken } from "@/src/lib/auth";
 import { redirect } from "next/navigation";
@@ -16,7 +11,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const accessToken = session?.accessToken ?? null;
 
   const { valid, payload } = verifyAndDecodeToken(accessToken);
-  console.log('valide', valid);
   if (!valid) {
     redirect('/login');
   }
